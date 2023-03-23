@@ -7,7 +7,7 @@
             :class="getCss"
             v-bind:src="
               getBase64Avatar(
-                user.thumbnailPhotoUrl ? user.thumbnailPhotoUrl : null
+                user.avatar ? user.avatar : null
               )
             "
             alt=""

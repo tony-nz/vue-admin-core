@@ -224,11 +224,11 @@ export default defineComponent({
       return null;
     });
     const getUser = computed(() => {
-      return store.currentUser;
+      return store.getUser;
     });
     const getUserAvatar = computed(() => {
-      return getUser.value["thumbnailPhotoUrl"]
-        ? getUser.value["thumbnailPhotoUrl"]
+      return getUser.value["avatar"]
+        ? getUser.value["avatar"]
         : "/media/icons/duotone/user.svg";
     });
 

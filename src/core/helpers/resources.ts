@@ -9,7 +9,7 @@ const can = (permissions) => {
     return permissions;
   }
   return true;
-  // return authStore.userPermissions;
+  // return authStore.getPermissions;
 };
 
 /**

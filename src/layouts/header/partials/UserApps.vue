@@ -220,7 +220,7 @@ export default defineComponent({
 
     onMounted(async () => {
       try {
-        currentUser.value = await store.currentUser;
+        currentUser.value = await store.getUser;
       } catch (e) {
         console.log(e);
       }

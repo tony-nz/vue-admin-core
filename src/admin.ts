@@ -11,7 +11,6 @@ export default class VueAdmin {
     const configStore = useConfigStore();
     const localesStore = useLocalesStore();
 
-
     /**
      * Initialize Config
      */

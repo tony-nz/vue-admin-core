@@ -9,6 +9,12 @@ import useConfigStore from "../store/config";
 
 export async function initRouter(router) {
   /**
+   * Initialize Auth Verification
+   * @description This will verify the user auth status
+   */
+  useAuthStore().verifyAuth();
+
+  /**
    * NProgress Configuration
    * @type {{showSpinner: boolean, easing: string, speed: number}}
    */
@@ -41,7 +47,7 @@ export async function initRouter(router) {
           query: { redirect: to.fullPath },
         });
       } else {
-        authStore.verifyAuth();
+        // authStore.verifyAuth();
         configStore.resetLayoutConfig();
 
         const getPage = to.matched.find((record) => record.meta.page);
@@ -55,7 +61,7 @@ export async function initRouter(router) {
 
         // params for middleware
         const params = {
-          userRoles: authStore.userRoles,
+          userRoles: authStore.getRoles,
         };
 
         // role middleware

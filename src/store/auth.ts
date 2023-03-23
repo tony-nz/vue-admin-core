@@ -7,35 +7,41 @@ import JwtService from "../core/services/JwtService";
 import objectPath from "object-path";
 
 interface IState {
-  counter: number;
   errors: string[];
-  user: any;
-  locale: string;
-  // user = {} as User;
-  isAuthenticated: boolean;
   config: AuthConfig;
+  locale: string;
+  isAuthenticated: boolean;
+  permissions: any;
+  user: any;
+  roles: any;
 }
 
 const useAuthStore = defineStore({
   id: "AuthStore",
   state: (): IState => ({
-    counter: 0,
     errors: [],
-    user: JSON.parse(JwtService.getUser()),
-    // user = {} as User;
-    locale: window.localStorage.getItem("locale") || "en",
-    isAuthenticated: !!JwtService.getToken(),
     config: authConfig,
+    locale: window.localStorage.getItem("locale") || "en",
+    isAuthenticated: false,
+    permissions: [],
+    user: [],
+    roles: [],
   }),
   actions: {
     login(credentials) {
+      ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.csrfCookie"))
           .then(({ data }) => {
             ApiService.post(this.AuthConfig("api.login"), credentials)
               .then(({ data }) => {
-                this.setAuth(data);
-                resolve();
+                this.verifyAuth()
+                  .then(() => {
+                    resolve();
+                  })
+                  .catch(() => {
+                    reject();
+                  });
               })
               .catch(({ response }) => {
                 this.setError(response.data.error);
@@ -68,7 +74,7 @@ const useAuthStore = defineStore({
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("oauth.callback"), payload)
           .then(({ data }) => {
-            this.setAuth(data);
+            this.verifyAuth();
             resolve();
           })
           .catch(({ response }) => {
@@ -80,7 +86,7 @@ const useAuthStore = defineStore({
     logout() {
       return new Promise<void>((resolve, reject) => {
         this.purgeAuth();
-        ApiService.get(this.AuthConfig("api.logout"))
+        ApiService.post(this.AuthConfig("api.logout"), {})
           .then(() => {
             resolve();
           })
@@ -104,7 +110,7 @@ const useAuthStore = defineStore({
     },
     forgotPassword(payload) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.post("forgot_password", payload)
+        ApiService.post(this.AuthConfig("api.forgotPassword"), payload)
           .then(({ data }) => {
             this.setAuth(data);
             resolve();
@@ -116,25 +122,20 @@ const useAuthStore = defineStore({
       });
     },
     verifyAuth() {
+      ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
-        if (JwtService.getToken()) {
-          ApiService.setHeader();
-          ApiService.get(this.AuthConfig("api.verify"))
-            .then(({ data }) => {
-              // commit(SET_AUTH, data);
-              resolve();
-            })
-            .catch(({ response }) => {
-              if (response) {
-                this.purgeAuth();
-                this.setError(response.message);
-              }
-              reject();
-            });
-        } else {
-          this.purgeAuth();
-          reject();
-        }
+        ApiService.get(this.AuthConfig("api.verify"))
+          .then(({ data }) => {
+            this.setAuth(data.data);
+            resolve();
+          })
+          .catch(({ response }) => {
+            if (response) {
+              this.purgeAuth();
+              this.setError(response.message);
+            }
+            reject();
+          });
       });
     },
     updateUser(payload) {
@@ -152,9 +153,6 @@ const useAuthStore = defineStore({
       });
     },
     setLocale(locale) {
-      // TODO::update api server with locale
-      // change locale for i18n
-      // this.user.locale = locale;
       this.locale = locale;
       i18n.global.locale = locale;
       JwtService.saveLocale(locale);
@@ -163,35 +161,22 @@ const useAuthStore = defineStore({
       this.errors = error;
     },
     setAuth(data) {
-      const locale = data.user.locale ? data.user.locale : "en";
+      // const locale = data.user.locale ? data.user.locale : "en";
       this.isAuthenticated = true;
       this.user = data.user;
+      this.roles = data.roles;
+      this.permissions = data.permissions;
       this.errors = [];
-
-      JwtService.saveUser(data.user);
-      JwtService.saveToken(data.token);
-      JwtService.savePermissions(data.permissions);
-      JwtService.saveRoles(data.roles);
-      JwtService.saveLocale(locale);
     },
     setUser(user) {
       this.user = user;
-    },
-    setPassword(password) {
-      // this.user.password = password;
     },
     purgeAuth() {
       this.isAuthenticated = false;
       this.user = [];
       this.errors = [];
-      JwtService.destroyUser();
-      JwtService.destroyToken();
-      JwtService.destroyPermissions();
-      JwtService.destroyRoles();
-      JwtService.destroyLocales();
-      // this.context.commit(Mutations.SET_LOCALE, "en");
-      // TODO:: allow server to return/store locale setting
-      // this.context.commit(Mutations.SET_LOCALE, data.locale);
+      this.roles = [];
+      this.permissions = [];
     },
     setAuthConfig(config) {
       this.config = config;
@@ -218,22 +203,22 @@ const useAuthStore = defineStore({
      * Return the user's locale
      * @returns boolean
      */
-    getUserLocale(): string {
+    getLocale(): string {
       return this.locale;
     },
     /**
      * User's roles
      * @returns array
      */
-    userRoles(): Array<string> {
-      return JwtService.getRoles();
+    getRoles(): Array<string> {
+      return this.roles;
     },
     /**
      * User's roles
      * @returns array
      */
-    userPermissions(): Array<string> {
-      return JwtService.getPermissions();
+    getPermissions(): Array<string> {
+      return this.permissions;
     },
     /**
      * User's token
@@ -253,9 +238,7 @@ const useAuthStore = defineStore({
      * Return current user object
      * @returns User
      */
-    currentUser(): Array<string> {
-      // const user = JwtService.getUser();
-      // return typeof user !== "undefined" ? JSON.parse(user) : null;
+    getUser(): Array<string> {
       return this.user;
     },
   },

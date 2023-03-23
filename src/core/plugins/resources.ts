@@ -11,9 +11,9 @@ import useResourceStore from "../../store/resource";
  */
 function init(router) {
   const resources = useConfigStore().config.resources;
-  // /**
-  //  * Install resources
-  //  */
+  /**
+   * Install resources
+   */
   Object.values(resources).forEach((item: any) => {
     const resource = buildResourceConfig(item.resource);
     useResourceStore(resource)();
@@ -29,7 +29,7 @@ export const initResources = async function (app, router) {
     mounted: (el, binding) => {
       const store = useAuthStore();
       const permission = binding.value;
-      const userPermissions = store.userPermissions;
+      const userPermissions = store.getPermissions;
       if (permission && userPermissions) {
         const hasPermission = userPermissions.includes(permission);
         if (!hasPermission) {

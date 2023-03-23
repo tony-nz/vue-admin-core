@@ -6,7 +6,7 @@ import useAuthStore from "../../store/auth";
  */
 function checkUserRole(roles) {
   const store = useAuthStore();
-  const userRoles = JSON.parse(JSON.stringify(store.userRoles));
+  const userRoles = JSON.parse(JSON.stringify(store.getRoles));
 
   return new Promise<void>((resolve, reject) => {
     if (typeof userRoles === "string") {

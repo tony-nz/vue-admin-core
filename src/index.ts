@@ -32,7 +32,7 @@ import { useTabsStore } from "./store/tabs";
  */
 import { AuthConfig } from "./core/types/AuthTypes";
 import { Item, ChildField, Field } from "./core/types/FieldTypes";
-import { 
+import {
   Main,
   Loader,
   ScrollTop,
@@ -47,9 +47,18 @@ import {
   LayoutConfig,
 } from "./core/types/LayoutConfigTypes";
 import { MainMenu } from "./core/types/MainMenuTypes";
-import { List, ModalPage, Permissions, ResourceConfig } from "./core/types/ResourceConfigTypes";
+import {
+  List,
+  ModalPage,
+  Permissions,
+  ResourceConfig,
+} from "./core/types/ResourceConfigTypes";
 import { IState, ITabsItem } from "./core/types/TabTypes";
-import { UserAppMenu, MenuItem, MenuItemIcon } from "./core/types/UserAppsMenuTypes";
+import {
+  UserAppMenu,
+  MenuItem,
+  MenuItemIcon,
+} from "./core/types/UserAppsMenuTypes";
 
 /**
  * Helpers
@@ -88,6 +97,7 @@ const VueAdminPlugin = {
      * Register VueAdmin
      */
     app.component("VueAdmin", new VueAdmin({ app, options }));
+
     /**
      * Register VueAdmin components
      */
@@ -96,6 +106,7 @@ const VueAdminPlugin = {
         app.component(`Va${name}`, component[name]);
       });
     });
+
     /**
      * Inject global admin conf
      */
@@ -133,7 +144,7 @@ export type {
   UserAppMenu,
   MenuItem,
   MenuItemIcon,
-}
+};
 
 export {
   /**
