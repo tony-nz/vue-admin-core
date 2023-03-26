@@ -5,6 +5,7 @@ import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";
 import JwtService from "../core/services/JwtService";
 import objectPath from "object-path";
+import { useRouter } from "vue-router";
 
 interface IState {
   errors: string[];
@@ -121,7 +122,7 @@ const useAuthStore = defineStore({
           });
       });
     },
-    verifyAuth() {
+    async verifyAuth() {
       ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.verify"))
@@ -130,8 +131,8 @@ const useAuthStore = defineStore({
             resolve();
           })
           .catch(({ response }) => {
+            this.purgeAuth();
             if (response) {
-              this.purgeAuth();
               this.setError(response.message);
             }
             reject();

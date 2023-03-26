@@ -9,12 +9,6 @@ import useConfigStore from "../store/config";
 
 export async function initRouter(router) {
   /**
-   * Initialize Auth Verification
-   * @description This will verify the user auth status
-   */
-  useAuthStore().verifyAuth();
-
-  /**
    * NProgress Configuration
    * @type {{showSpinner: boolean, easing: string, speed: number}}
    */
@@ -35,19 +29,28 @@ export async function initRouter(router) {
    * @param from
    * @param next
    */
-  router.beforeEach((to, from, next) => {
+  router.beforeEach(async (to, from, next) => {
     // NProgress.start();
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       const authStore = useAuthStore();
-      const configStore = useConfigStore();
-      const breadcrumbStore = useBreadcrumbStore();
+      const user = await authStore
+        .verifyAuth()
+        .then((res) => {
+          console.log("verified");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      console.log(user);
       if (!authStore.isUserAuthenticated) {
         next({
           path: "/login",
           query: { redirect: to.fullPath },
         });
       } else {
-        // authStore.verifyAuth();
+        const configStore = useConfigStore();
+        const breadcrumbStore = useBreadcrumbStore();
         configStore.resetLayoutConfig();
 
         const getPage = to.matched.find((record) => record.meta.page);

@@ -8,7 +8,6 @@ const LOCALE_KEY = "locale" as string;
  * @description get token form localStorage
  */
 export const getToken = (): string | null => {
-  console.log("getToken", ID_TOKEN_KEY);
   return window.localStorage.getItem(ID_TOKEN_KEY);
 };
 
