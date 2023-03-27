@@ -3,9 +3,7 @@ import { AuthConfig } from "../core/types/AuthTypes";
 import ApiService from "../core/services/ApiService";
 import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";
-import JwtService from "../core/services/JwtService";
 import objectPath from "object-path";
-import { useRouter } from "vue-router";
 
 interface IState {
   errors: string[];
@@ -139,28 +137,6 @@ const useAuthStore = defineStore({
           });
       });
     },
-    updateUser(payload) {
-      ApiService.setHeader();
-      return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.update"), payload)
-          .then(({ data }) => {
-            this.setUser(data);
-            resolve();
-          })
-          .catch(({ response }) => {
-            this.setError(response.data.errors);
-            reject();
-          });
-      });
-    },
-    setLocale(locale) {
-      this.locale = locale;
-      i18n.global.locale = locale;
-      JwtService.saveLocale(locale);
-    },
-    setError(error) {
-      this.errors = error;
-    },
     setAuth(data) {
       // const locale = data.user.locale ? data.user.locale : "en";
       this.isAuthenticated = true;
@@ -169,10 +145,19 @@ const useAuthStore = defineStore({
       this.permissions = data.permissions;
       this.errors = [];
     },
+    setError(error) {
+      this.errors = error;
+    },
     setUser(user) {
       this.user = user;
     },
+    setLocale(locale) {
+      this.locale = locale;
+      i18n.global.locale = locale;
+      // JwtService.saveLocale(locale);
+    },
     purgeAuth() {
+      // delete axios.defaults.auth;
       this.isAuthenticated = false;
       this.user = [];
       this.errors = [];
@@ -194,11 +179,11 @@ const useAuthStore = defineStore({
       };
     },
     /**
-     * Verify user authentication
-     * @returns boolean
+     * Get authentification errors
+     * @returns array
      */
-    isUserAuthenticated(): boolean {
-      return this.isAuthenticated;
+    getErrors(): Array<string> {
+      return this.errors;
     },
     /**
      * Return the user's locale
@@ -211,29 +196,15 @@ const useAuthStore = defineStore({
      * User's roles
      * @returns array
      */
-    getRoles(): Array<string> {
-      return this.roles;
+    getPermissions(): Array<string> {
+      return this.permissions;
     },
     /**
      * User's roles
      * @returns array
      */
-    getPermissions(): Array<string> {
-      return this.permissions;
-    },
-    /**
-     * User's token
-     * @returns array
-     */
-    userToken(): string | null {
-      return JwtService.getToken();
-    },
-    /**
-     * Get authentification errors
-     * @returns array
-     */
-    getErrors(): Array<string> {
-      return this.errors;
+    getRoles(): Array<string> {
+      return this.roles;
     },
     /**
      * Return current user object
@@ -241,6 +212,13 @@ const useAuthStore = defineStore({
      */
     getUser(): Array<string> {
       return this.user;
+    },
+    /**
+     * Verify user authentication
+     * @returns boolean
+     */
+    isUserAuthenticated(): boolean {
+      return this.isAuthenticated;
     },
   },
 });

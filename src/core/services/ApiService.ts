@@ -1,7 +1,6 @@
 import { App } from "vue";
 import axios from "axios";
 import VueAxios from "vue-axios";
-import JwtService from "../../core/services/JwtService";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 
 /**
@@ -31,9 +30,9 @@ class ApiService {
     ApiService.vueInstance.axios.defaults.headers.common[
       "Access-Control-Allow-Origin"
     ] = "*";
-    ApiService.vueInstance.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Token ${JwtService.getToken()}`;
+    // ApiService.vueInstance.axios.defaults.headers.common[
+    //   "Authorization"
+    // ] = `Token ${JwtService.getToken()}`;
   }
 
   /**

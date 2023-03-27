@@ -1,53 +1,52 @@
-import * as methods from "./enums/ResourceEnums";
 import { defineStore } from "pinia";
 import { translate, upperCaseFirst } from "../core/helpers/functions";
 import { ResourceConfig } from "../core/types/ResourceConfigTypes";
+
+import * as methods from "./enums/ResourceEnums";
+
 import ApiService from "../core/services/ApiService";
+import useApiStore from "./api";
+import useLogStore from "./log";
 
-interface IState {
-  isLoading: boolean;
-  name: string;
-  resource: ResourceConfig;
-  data: {
-    // [key: string]: any;
-    item: any;
-    list: any;
-    user: any;
-    lastSync: Date | string;
-  };
-}
+const stores = {};
+let storeActions = {};
 
-const storeActions = {};
+/**
+ * TODO
+ * Rewrite state.whatever* to getters and setters...
+ */
 
 const {
-  GET,
-  GET_LIST,
-  GET_TREE,
-  GET_NODES,
-  GET_ONE,
   CREATE,
-  UPDATE,
-  UPDATE_MANY,
   DELETE,
   DELETE_MANY,
+  GET,
+  GET_LIST,
+  GET_NODES,
+  GET_ONE,
+  GET_TREE,
   MOVE_NODE,
+  UPDATE,
+  UPDATE_MANY,
 } = methods;
 
-// /**
-//  * Format the sub resource apiUrl to replace the
-//  * primary :id with the route Id
-//  */
-function replaceUrlId(url, id) {
-  let newApiUrl = url;
-  if (url.includes(":id")) {
-    newApiUrl = newApiUrl.replace(":id", id);
-  }
-  return newApiUrl;
+interface IState {
+  data: {
+    item: any;
+    list: any[];
+    lastSync: number;
+    userList: any[];
+  };
+  resource: ResourceConfig;
 }
-// /**
-//  * Function to figure out the correct apiUrl
-//  */
+
+/**
+ * Function to figure out the correct apiUrl
+ */
 function getApiUrl(state, apiUrl, action, payload) {
+  const replaceUrlId = (url, id) => {
+    return url.replace(":id", id);
+  };
   const params = payload?.params ? payload?.params : {};
   const stateList = payload?.stateList ? payload?.stateList : null;
   const routeId = payload?.routeId ? payload?.routeId : null;
@@ -79,514 +78,344 @@ function getApiUrl(state, apiUrl, action, payload) {
   return apiUrl;
 }
 
-// /**
-//  * Return the correct action params
-//  */
-function getParams(action, params) {
-  if (action === "update") {
-    return params.id;
-  } else if (action === "create") {
-    return params;
-  } else if (action === "delete") {
-    return params.id;
-  } else if (action === "getOne") {
-    return params.id;
-  }
-  return params;
-}
+/**
+ *
+ * @param state
+ * @param action
+ * @param params
+ * @param data
+ */
+function processStoreData(state, action, payload, data) {
+  const currentDate = new Date();
+  const params = payload?.params ? payload.params : {};
+  const stateList = params?.stateList ? params.stateList : "";
+  const stateUser = params?.stateUser ? params.stateUser : false;
 
-// /**
-//  * If the resource has custom lists,
-//  * generate them
-//  */
-function generateStateLists(lists) {
-  const newLists = {};
-  if (lists) {
-    lists.forEach((list) => {
-      // newLists.push(list.name);
-      newLists[list.name] = [];
-    });
-  }
-  return newLists;
-}
-
-// /**
-//  * Validate the action against ApiService
-//  */
-function validateAction(resource, action) {
-  const errors: string[] = [];
-  if (
-    !ApiService[["get", "getOne", "getList"].includes(action) ? "get" : action]
-  ) {
-    errors.push("Data provider action " + action + " not implemented");
-  }
-  if (errors.length > 0) {
-    // throw new Error(errors.toString());
-    console.log(
-      "The following errors have been found within the " +
-        upperCaseFirst(resource.name) +
-        " resource: \n" +
-        errors
-    );
-  }
-}
-// const resource: any = {};
-// const { name, apiUrl, userApiUrl, getName } = resource;
-
-async function sendAction(state, action, payload?, userApiUrl?) {
-  try {
-    validateAction(state.resource, action);
-    const params = payload?.params ? payload.params : {};
-    const stateList = payload?.stateList ? payload.stateList : "";
-    const stateUser = payload?.stateUser ? payload.stateUser : false;
-    const currentDate = new Date();
-    const futureDate = new Date();
-
-    /**
-     * Only set global loading when read actions
-     */
-    if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-      state.setIsLoading(true);
-      // store.commit("ApiModule/setLoading", true);
-    }
-
-    /**
-     * Check to see if we have cached results within 5 or 1 minutes old?
-     * TODO::Enum the following
-     */
-    futureDate.setMinutes(futureDate.getMinutes() - 1);
-
-    /**
-     * Check for cached store
-     */
-    if (
-      (!params?.force &&
-        !stateUser &&
-        state.lastSync >= futureDate &&
-        action === "getList") ||
-      (!params?.force && !state.lastSync === null && action === "getList")
-    ) {
-      /**
-       * Apply success message on writes operations
-       */
-      // dispatch("showSuccess", { action, params });
-      // store.commit("ApiModule/setLoading", false);
-      state.setIsLoading(false);
-      // store.commit(
-      //   `${upperCaseFirst(resource.name)}Resource/setIsLoading`,
-      //   false
-      // );
+  console.log("action", action);
+  switch (action) {
+    case CREATE:
+      if (stateUser) {
+        state.data.user.push(data);
+      }
       if (stateList) {
-        return {
-          data: state.list[stateList],
-        };
+        state.data.list[stateList].push(data);
+      } else {
+        state.data.list.push(data);
       }
-      return {
-        data: state.getDataList,
-      };
-    }
-
-    /* Calling the setIsLoading mutation on the resource's module.
-     * We want this after the cache to prevent false loading states
-     */
-    state.setIsLoading(true);
-    // store.commit(
-    //   `${upperCaseFirst(resource.name)}Resource/setIsLoading`,
-    //   true
-    // );
-
-    try {
-      try {
-        if (!params?.id && action === "update") {
-          params.id = state.item.id;
-        }
-      } catch (e) {
-        // r
-      }
-      const newApiUrl = stateUser ? userApiUrl : state.resource.apiUrl;
-      const response = await ApiService[
-        ["get", "getOne", "getList"].includes(action) ? "get" : action
-      ](
-        getApiUrl(state, newApiUrl, action, payload), // generate apiUrl
-        getParams(action, params),
-        // params?.id ? params.id : "", // check resource for id, if so, add slug
-        {
-          locale: state.locale,
-          ...params,
-        }
-      );
-      const data = response.data?.data ? response.data.data : response.data;
-      switch (action) {
-        case "getList":
-        case "getTree":
-          // update lastSync time
-          state.lastSync = currentDate.setMinutes(currentDate.getMinutes());
-          // write response to list
-          state.setList({
-            stateList: stateList,
-            stateUser: payload?.stateUser ? payload.stateUser : false,
-            data: data,
-          });
-          // store.commit(`${upperCaseFirst(name)}Resource/setList`, {
-          //   stateList: stateList,
-          //   stateUser: payload?.stateUser ? payload.stateUser : false,
-          //   data: data,
-          // });
-          break;
-        case "getOne":
-          // this is performed in resources helper
-          // store.commit(
-          //   `${upperCaseFirst(resource.name)}Resource/setItem`,
-          //   data
-          // );
-          break;
-        case "create":
-          if (stateUser) {
-            state.user.push(data);
-          }
+      break;
+    case DELETE:
+      if (params.id) {
+        if (stateUser && state.data.user) {
+          state.data.user.splice(
+            state.data.user.map((item) => item.id).indexOf(params.id),
+            1
+          );
+        } else {
           if (stateList) {
-            state.list[stateList].push(data);
+            state.data.list[stateList].splice(
+              state.data.list[stateList]
+                .map((item) => item.id)
+                .indexOf(params.id),
+              1
+            );
           } else {
-            state.list.push(data);
+            state.data.list.splice(
+              state.data.list.map((item) => item.id).indexOf(params.id),
+              1
+            );
           }
-          break;
-        case "update":
-          try {
-            /**
-             * Check for param Id
-             */
-            let stateListResource: string[] = [];
-            if (stateUser) {
-              stateListResource =
-                params?.id && state.user
-                  ? state.user.find((val) => val["id"] === params.id)
-                  : null;
-            } else {
-              stateListResource =
-                params?.id && state.list[stateList]
-                  ? state.list[stateList].find((val) => val["id"] === params.id)
-                  : null;
-            }
-
-            if (stateListResource) {
-              // .every includes keys with false values
-              Object.keys(data).forEach((key) => {
-                if (stateListResource) {
-                  if (
-                    /* Creating a new instance of the stateListResource class. */
-                    stateListResource[key] ||
-                    stateListResource[key] === "" ||
-                    stateListResource[key] === null ||
-                    stateListResource[key] === false
-                  ) {
-                    stateListResource[key] = data[key];
-                  }
-                }
-              });
-            }
-            // don't overwrite the exisiting resource we're working with
-            if (!stateUser) {
-              state.setItem(data);
-              // store.commit(
-              //   `${upperCaseFirst(resource.name)}Resource/setItem`,
-              //   data
-              // );
-            }
-          } catch (e) {
-            // TODO ERROR LOG
-            console.log(e);
-          }
-          break;
-        case "delete":
-          if (params.id) {
-            if (stateUser && state.user) {
-              state.user.splice(
-                state.user.map((item) => item.id).indexOf(params.id),
+        }
+      }
+      break;
+    case DELETE_MANY:
+      if (params.values) {
+        if (stateUser && state.data.user) {
+          params.values.forEach((id) => {
+            state.data.user.splice(
+              state.data.user.map((item) => id).indexOf(id),
+              1
+            );
+          });
+        } else {
+          if (stateList) {
+            params.values.forEach((id) => {
+              state.data.list[stateList].splice(
+                state.data.list[stateList].map((item) => id).indexOf(id),
                 1
               );
-            } else {
-              if (stateList) {
-                state.list[stateList].splice(
-                  state.list[stateList]
-                    .map((item) => item.id)
-                    .indexOf(params.id),
-                  1
-                );
-              } else {
-                state.list.splice(
-                  state.list.map((item) => item.id).indexOf(params.id),
-                  1
-                );
-              }
-            }
+            });
+          } else {
+            params.values.forEach((id) => {
+              state.data.list.splice(
+                state.data.list.map((item) => id).indexOf(id),
+                1
+              );
+            });
           }
-          break;
-        case "deleteMany":
-          if (params.values) {
-            if (stateUser && state.user) {
-              params.values.forEach((id) => {
-                state.user.splice(state.user.map((item) => id).indexOf(id), 1);
-              });
-            } else {
-              if (stateList) {
-                params.values.forEach((id) => {
-                  state.list[stateList].splice(
-                    state.list[stateList].map((item) => id).indexOf(id),
-                    1
-                  );
-                });
-              } else {
-                params.values.forEach((id) => {
-                  state.list.splice(
-                    state.list.map((item) => id).indexOf(id),
-                    1
-                  );
-                });
-              }
-            }
-          }
-          break;
-        default:
-          break;
+        }
       }
+      break;
+    case GET_LIST:
+    case GET_TREE:
+      // update lastSync time
+      // state.lastSync = currentDate.setMinutes(currentDate.getMinutes());
+      state.setLastSync(Date.now());
 
-      // GET,
-      // GET_NODES,
-      // GET_ONE,
-      // UPDATE_MANY,
-      // DELETE_MANY,
-      // MOVE_NODE,
-      state.isLoading = false;
-      // store.commit(
-      //   `${upperCaseFirst(resource.name)}Resource/setIsLoading`,
-      //   false
-      // );
+      console.log("Setting list data", data);
+      // set list data
+      state.setList({
+        stateList,
+        stateUser,
+        data,
+      });
+      break;
+    case GET_ONE:
+      break;
+    case MOVE_NODE:
+      break;
+    case UPDATE:
       /**
-       * Apply success message on writes operations
+       * Check for param Id
        */
-      // dispatch("showSuccess", { action, params });
-      // store.commit("ApiModule/setLoading", false);
-      // TODO FIX THIS
-      if (response.data?.data) {
-        return Promise.resolve(response.data);
+      let stateListResource: string[] = [];
+      if (stateUser) {
+        stateListResource =
+          params?.id && state.user
+            ? state.user.find((val) => val["id"] === params.id)
+            : null;
+      } else {
+        stateListResource =
+          params?.id && state.list[stateList]
+            ? state.list[stateList].find((val) => val["id"] === params.id)
+            : null;
       }
 
-      return Promise.resolve(response);
-    } catch ({ status, message }) {
-      console.log(message);
-      // store.commit("LogModule/addLog", {
-      //   log: "error",
-      //   message: {
-      //     message,
-      //     url: window.location.href,
-      //   },
-      // });
-      // store.dispatch("ToastModule/showToast", {
-      //   severity: "danger",
-      //   summary: "Error",
-      //   message,
-      // });
-
-      return Promise.resolve(message);
-    }
-  } catch (e: any) {
-    // store.commit("ApiModule/setLoading", false);
-    // dispatch("showError", e.message);
-    // dispatch("auth/checkError", e, {
-    //   root: true,
-    // });
-    return Promise.reject(e);
+      if (stateListResource) {
+        Object.keys(data).forEach((key) => {
+          if (stateListResource) {
+            if (
+              stateListResource[key] ||
+              stateListResource[key] === "" ||
+              stateListResource[key] === null ||
+              stateListResource[key] === false
+            ) {
+              stateListResource[key] = data[key];
+            }
+          }
+        });
+      }
+      // don't overwrite the exisiting resource we're working with
+      if (!stateUser) {
+        state.setItem(data);
+      }
+      break;
+    case UPDATE_MANY:
+      break;
+    default:
+      break;
   }
 }
 
-const stores = {};
-
 const useResourceStore = function (resource) {
-  const { name, apiUrl, userApiUrl, getName } = resource;
-  const storeId = "Resource" + upperCaseFirst(resource.name);
-
-  if (!stores[storeId]) {
-    stores[storeId] = defineStore({
-      id: "Resource" + upperCaseFirst(resource.name),
-      state: (): IState => ({
-        isLoading: false,
-        name,
-        resource,
-        data: {
-          item: "",
-          list: [],
-          user: [],
-          lastSync: "",
-        },
-      }),
-      actions: {
-        getList(payload) {
-          return sendAction(this, "getList", payload);
-        },
-        setItem(item) {
-          if (item) {
-            this.data.item = item;
-          } else {
-            this.showError("No item found");
-          }
-        },
-        removeItem() {
-          this.data.item = null;
-        },
-        setList(params) {
-          if (params) {
-            const data = params.data || null;
-            const stateList = params.stateList || null;
-            const stateUser = params.stateUser || null;
-            if (stateUser && data) {
-              this.data.user = data;
-              this.data.lastSync = new Date();
-            } else {
-              if (stateList) {
-                this.data.list[stateList] = data;
-              } else {
-                this.data.list = data;
-              }
-              this.data.lastSync = new Date();
-            }
-          } else {
-            this.showError("No params found");
-          }
-        },
-        removeList(params) {
-          if (params) {
-            const stateList = params.stateList || null;
-            const stateUser = params.stateUser || null;
-            if (stateUser) {
-              this.data.user = null;
-              this.data.lastSync = "";
-            } else {
-              if (stateList) {
-                this.data.list[stateList] = null;
-              } else {
-                this.data.list = null;
-              }
-              this.data.lastSync = "";
-            }
-          } else {
-            this.showError("No params found");
-          }
-        },
-        setIsLoading(value) {
-          if (value) {
-            this.isLoading = value;
-          } else {
-            this.showError("No value found");
-          }
-        },
-        showSuccess({ action, params }) {
-          // const messages = {
-          //   [CREATE]: () => translate("va.messages.created"),
-          //   // translate("va.messages.created", {
-          //   //   resource: getName(1),
-          //   // }),
-          //   [UPDATE]: () => translate("va.messages.updated"),
-          //   // translate("va.messages.updated", {
-          //   //   resource: getName(1),
-          //   //   id: params.id,
-          //   // }),
-          //   [UPDATE_MANY]: () => translate("va.messages.updated_many"),
-          //   // translate("va.messages.updated_many", {
-          //   //   resource: getName(params.ids.length).toLowerCase(),
-          //   //   count: params.ids.length,
-          //   // })
-          //   [DELETE]: () => translate("va.messages.deleted"),
-          //   // translate("va.messages.deleted", {
-          //   //   resource: getName(1),
-          //   //   id: params.id,
-          //   // }),
-          //   [DELETE_MANY]: () => translate("va.messages.deleted_many"),
-          //   // translate("va.messages.deleted_many", {
-          //   //   resource: getName(params.ids.length).toLowerCase(),
-          //   //   count: params.ids.length,
-          //   // }),
-          //   [MOVE_NODE]: () => translate("va.messages.moved"),
-          //   // translate("va.messages.moved", {
-          //   //   resource: getName(1),
-          //   //   id: params.id,
-          //   // }),
-          // };
-          // if (messages[action]) {
-          //   store.commit("LogModule/addLog", {
-          //     log: "success",
-          //     message: {
-          //       message: messages[action](),
-          //       url: window.location.href,
-          //     },
-          //   });
-          //   store.dispatch("ToastModule/showToast", {
-          //     severity: "success",
-          //     summary: "Success",
-          //     message: messages[action](),
-          //   });
-          // }
-        },
-        showError(message) {
-          // store.commit("LogModule/addLog", {
-          //   log: "error",
-          //   message: {
-          //     message,
-          //     url: window.location.href,
-          //   },
-          // });
-          // store.dispatch("ToastModule/showToast", {
-          //   severity: "danger",
-          //   summary: "Error",
-          //   message,
-          // });
-        },
-        create(params) {
-          // if (params) {
-          //   const { name, api } = resource;
-          //   const { data, stateList, stateUser } = params;
-          //   this.setIsLoading(true);
-          //   return api
-          //     .create(data)
-          //     .then((response) => {
-          //       this.setIsLoading(false);
-          //       this.setList(
-          //         { getters },
-          //         { data: response.data, stateList, stateUser }
-          //       );
-          //       this.showSuccess({ action: CREATE, params });
-          //       return Promise.resolve(response.data);
-          //     })
-          //     .catch((error) => {
-          //       this.setIsLoading(false);
-          //       this.showError(error.message);
-          //       return Promise.reject(error);
-          //     });
-          // } else {
-          //   this.showError("No value found");
-          // }
-        },
-      },
-      getters: {
-        getResource(): ResourceConfig {
-          return this.resource;
-        },
-        getIsLoading(): boolean {
-          return this.isLoading;
-        },
-        getDataItem(): any {
-          return this.data.item;
-        },
-        getDataList(): any {
-          return this.data.list;
-        },
-        getUserList(): any {
-          return this.data.user;
-        },
-      },
-    });
+  if (!resource.name) {
+    throw new Error(translate("errors.missingResourceName"));
   }
+  const storeName = "Resource" + upperCaseFirst(resource.name);
 
-  return stores[storeId];
+  Object.values(methods).forEach(
+    (action) =>
+      (storeActions[action] = async (state, payload, userApiUrl) => {
+        const apiStore = useApiStore();
+        const resourceStore = useResourceStore(resource)();
+
+        try {
+          let params = payload?.params ? payload.params : {};
+          const stateList = params?.stateList ? params.stateList : "";
+          const stateUser = params?.stateUser ? params.stateUser : false;
+          const currentDate = new Date();
+
+          /**
+           * Set loading for certain methods
+           */
+          if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
+            apiStore.setLoading(state, true);
+          }
+
+          /**
+           * Set future date 1 minute(s) ago
+           */
+          currentDate.setMinutes(currentDate.getMinutes() - 1);
+
+          // tmp
+          console.log("action", action);
+
+          /**
+           * Check for cache
+           * Conditions:
+           *  1. If force is not true and action is GET_LIST/getList
+           *  2. If stateUser is not set and lastSync is less than 1 minute(s) ago
+           *  3. OR if lastSync is not set
+           */
+          // if (!params.force && action === GET_LIST) {
+          //   if (
+          //     (!stateUser && resourceStore.lastSync >= currentDate) ||
+          //     !resourceStore.lastSync
+          if (
+            (!params?.force &&
+              !stateUser &&
+              resourceStore.getLastSync >= currentDate &&
+              action === "getList") ||
+            (!params?.force &&
+              !resourceStore.getLastSync === null &&
+              action === "getList")
+          ) {
+            apiStore.setLoading(state, false);
+
+            if (stateList) {
+              return Promise.resolve({
+                data: resourceStore.data.list[stateList],
+              });
+            }
+            return Promise.resolve({
+              data: resourceStore.data.list,
+            });
+          }
+          // }
+
+          /**
+           * Set params.id to state.item.id if action
+           * is UPDATE and params.id is not set
+           */
+          if (action === UPDATE && !params.id) {
+            params.id = resourceStore.item.id;
+          }
+
+          /**
+           * Check action and return correct params
+           */
+          params = [DELETE, GET_ONE, UPDATE].includes(action)
+            ? params.id
+            : params;
+
+          const newApiUrl = stateUser
+            ? userApiUrl
+            : resourceStore.resource.apiUrl;
+          let response = await ApiService[
+            [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
+              ? "get"
+              : action
+          ](getApiUrl(resourceStore, newApiUrl, action, payload), params);
+
+          // if the response contains a data object, use that,
+          // otherwise use the response itself
+          const data = response.data?.data ? response.data.data : response.data;
+
+          /**
+           * Process data into store for caching
+           * and referencing
+           */
+          processStoreData(resourceStore, action, payload, data);
+
+          apiStore.setLoading(resourceStore, false);
+          // resourceStore.showSuccess({ action, params });
+
+          /**
+           * Return response data if it exists
+           */
+          if (response.data?.data) {
+            return Promise.resolve(response.data);
+          }
+
+          return Promise.resolve(response);
+        } catch (e: any) {
+          apiStore.setLoading(resourceStore, false);
+          resourceStore.showError(e.message);
+          // stores[storeName].showError(e.message);
+          // state.showError(e.message);
+
+          return Promise.reject(e);
+        }
+      })
+  );
+  stores[storeName] = defineStore({
+    id: storeName,
+    state: (): IState => ({
+      data: {
+        item: {},
+        lastSync: 0,
+        list: [],
+        userList: [],
+      },
+      resource,
+    }),
+    actions: {
+      ...storeActions,
+      setItem(state, item) {
+        state.data.item = item;
+      },
+      setList(state, { stateList, stateUser, data }) {
+        if (stateUser && data) {
+          state.data.userList = data;
+          state.data.lastSync = Date.now();
+        } else {
+          if (stateList) {
+            state.data.list[stateList] = data;
+          } else {
+            state.data.list = data;
+          }
+          state.data.lastSync = Date.now();
+        }
+      },
+      setLastSync(state, lastSync) {
+        state.data.lastSync = lastSync;
+      },
+      showSuccess(state, { action, params }): any {
+        const logStore = useLogStore();
+        const messages = {
+          [CREATE]: translate("va.messages.created"),
+          [DELETE]: translate("va.messages.deleted"),
+          [DELETE_MANY]: translate("va.messages.deletedMany"),
+          [GET]: translate("va.messages.fetched"),
+          [GET_LIST]: translate("va.messages.fetched"),
+          [GET_NODES]: translate("va.messages.fetched"),
+          [GET_ONE]: translate("va.messages.fetched"),
+          [GET_TREE]: translate("va.messages.fetched"),
+          [UPDATE]: translate("va.messages.updated"),
+          [UPDATE_MANY]: translate("va.messages.updatedMany"),
+        };
+        // logStore.showToast({
+        //   severity: "success",
+        //   summary: messages[action],
+        // });
+      },
+      showError(state, message): any {
+        const logStore = useLogStore();
+        logStore.showToast({
+          severity: "error",
+          summary: message,
+        });
+      },
+    },
+    getters: {
+      getDataItem(): any {
+        return this.data.item;
+      },
+      getDataList(): any {
+        return this.data.list;
+      },
+      getDataUserList(): any {
+        return this.data.userList;
+      },
+      getDataResource(): ResourceConfig {
+        return this.resource;
+      },
+      getLastSync(): any {
+        return this.data.lastSync;
+      },
+    },
+  });
+
+  return stores[storeName];
 };
 
 export default useResourceStore;
