@@ -44,7 +44,6 @@ interface IState {
  * Function to figure out the correct apiUrl
  */
 function getApiUrl(state, apiUrl, action, payload) {
-  console.log("getApiUrl", payload);
   const replaceUrlId = (url, id) => {
     return url.replace(":id", id);
   };
