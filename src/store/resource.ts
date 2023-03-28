@@ -79,7 +79,8 @@ function getApiUrl(state, apiUrl, action, payload) {
 }
 
 /**
- *
+ * processStoreData
+ * Modify store lists with updated data
  * @param state
  * @param action
  * @param params
@@ -220,13 +221,12 @@ const useResourceStore = function (resource) {
       (storeActions[action] = async (state, payload, userApiUrl) => {
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
-        console.log("storeActions[action]", state, payload, userApiUrl);
+      
         try {
           let params = payload?.params ? payload.params : {};
           const stateList = params?.stateList ? params.stateList : "";
           const stateUser = params?.stateUser ? params.stateUser : false;
           const currentDate = new Date();
-          console.log("params 1", params);
 
           /**
            * Set loading for certain methods
@@ -242,15 +242,7 @@ const useResourceStore = function (resource) {
 
           /**
            * Check for cache
-           * Conditions:
-           *  1. If force is not true and action is GET_LIST/getList
-           *  2. If stateUser is not set and lastSync is less than 1 minute(s) ago
-           *  3. OR if lastSync is not set
            */
-          // if (!params.force && action === GET_LIST) {
-          //   if (
-          //     (!stateUser && resourceStore.lastSync >= currentDate) ||
-          //     !resourceStore.lastSync
           if (
             (!params?.force &&
               !stateUser &&
@@ -271,8 +263,6 @@ const useResourceStore = function (resource) {
               data: resourceStore.data.list,
             });
           }
-          // }
-          console.log("params 2", params);
 
           /**
            * Set params.id to state.item.id if action
@@ -282,7 +272,6 @@ const useResourceStore = function (resource) {
             params.id = resourceStore.item.id;
           }
 
-          console.log("params 3", params);
           /**
            * Check action and return correct params
            */
