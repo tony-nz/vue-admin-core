@@ -12,13 +12,14 @@
     >
       <div class="m-0">
         <VueFormGenerator
+          @onChange="updateData"
           @updateData="updateData"
           @validated="validated"
           :allowedFields="allowedFields"
           :data="modalData"
           :fetchData="fetchData"
           :form="fields"
-          :type="'tabs'"
+          :type="'form'"
         />
       </div>
       <template #footer>
@@ -36,22 +37,22 @@
           @click="onCreate"
           autofocus
         />
-        <!-- <Button
+        <Button
           v-else
           label="Update"
           icon="pi pi-check"
           class="btn bg-primary-500"
           @click="onUpdate"
           autofocus
-        /> -->
-        <Button
+        />
+        <!-- <Button
           v-else
           label="Update"
           icon="pi pi-check"
           class="btn bg-primary-500"
           @click="isValid = true"
           autofocus
-        />
+        /> -->
       </template>
     </Dialog>
   </div>
@@ -59,14 +60,12 @@
 
 <script>
 import { defineComponent, onMounted, ref } from "vue";
-import useResourceStore from "../../../store/resource";
-import ApiService from "../../../core/services/ApiService";
-// import * as resources from "@/resources/routes";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
   methods: {
     updateData(data) {
+      console.log("updateData", data);
       this.modalData = data;
     },
     onCreate() {

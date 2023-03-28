@@ -44,6 +44,7 @@ interface IState {
  * Function to figure out the correct apiUrl
  */
 function getApiUrl(state, apiUrl, action, payload) {
+  console.log("getApiUrl", payload);
   const replaceUrlId = (url, id) => {
     return url.replace(":id", id);
   };
@@ -86,12 +87,10 @@ function getApiUrl(state, apiUrl, action, payload) {
  * @param data
  */
 function processStoreData(state, action, payload, data) {
-  const currentDate = new Date();
   const params = payload?.params ? payload.params : {};
   const stateList = params?.stateList ? params.stateList : "";
   const stateUser = params?.stateUser ? params.stateUser : false;
 
-  console.log("action", action);
   switch (action) {
     case CREATE:
       if (stateUser) {
@@ -159,15 +158,10 @@ function processStoreData(state, action, payload, data) {
     case GET_TREE:
       // update lastSync time
       // state.lastSync = currentDate.setMinutes(currentDate.getMinutes());
-      state.setLastSync(Date.now());
+      state.setLastSync(state, Date.now());
 
-      console.log("Setting list data", data);
       // set list data
-      state.setList({
-        stateList,
-        stateUser,
-        data,
-      });
+      state.setList(state, { data, stateList, stateUser });
       break;
     case GET_ONE:
       break;
@@ -227,12 +221,13 @@ const useResourceStore = function (resource) {
       (storeActions[action] = async (state, payload, userApiUrl) => {
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
-
+        console.log("storeActions[action]", state, payload, userApiUrl);
         try {
           let params = payload?.params ? payload.params : {};
           const stateList = params?.stateList ? params.stateList : "";
           const stateUser = params?.stateUser ? params.stateUser : false;
           const currentDate = new Date();
+          console.log("params 1", params);
 
           /**
            * Set loading for certain methods
@@ -245,9 +240,6 @@ const useResourceStore = function (resource) {
            * Set future date 1 minute(s) ago
            */
           currentDate.setMinutes(currentDate.getMinutes() - 1);
-
-          // tmp
-          console.log("action", action);
 
           /**
            * Check for cache
@@ -281,6 +273,7 @@ const useResourceStore = function (resource) {
             });
           }
           // }
+          console.log("params 2", params);
 
           /**
            * Set params.id to state.item.id if action
@@ -290,6 +283,7 @@ const useResourceStore = function (resource) {
             params.id = resourceStore.item.id;
           }
 
+          console.log("params 3", params);
           /**
            * Check action and return correct params
            */
@@ -304,7 +298,11 @@ const useResourceStore = function (resource) {
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
               ? "get"
               : action
-          ](getApiUrl(resourceStore, newApiUrl, action, payload), params);
+          ](
+            getApiUrl(resourceStore, newApiUrl, action, payload),
+            params,
+            action === UPDATE ? payload.params : null
+          );
 
           // if the response contains a data object, use that,
           // otherwise use the response itself
@@ -358,7 +356,7 @@ const useResourceStore = function (resource) {
           state.data.userList = data;
           state.data.lastSync = Date.now();
         } else {
-          if (stateList) {
+          if (stateList !== "") {
             state.data.list[stateList] = data;
           } else {
             state.data.list = data;

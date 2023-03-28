@@ -53,7 +53,7 @@ export default function useResource(
 
   function create(params: unknown, subId?: number) {
     if (params && resourceName) {
-      resourceStore.create({
+      resourceStore.create(resourceStore, {
         params,
         routeId: routeId.value,
         stateList: stateList.value,
@@ -66,7 +66,7 @@ export default function useResource(
   function update(params, id, subId?: number) {
     if (params && id && resourceName) {
       params.id = id;
-      resourceStore.update({
+      resourceStore.update(resourceStore, {
         params,
         routeId: routeId.value,
         stateList: stateList.value,
@@ -78,7 +78,7 @@ export default function useResource(
 
   function remove(id, subId?: number) {
     if (id && resourceName) {
-      resourceStore.delete({
+      resourceStore.delete(resourceStore, {
         params: { id },
         routeId: routeId.value,
         stateList: stateList.value,
@@ -90,7 +90,7 @@ export default function useResource(
 
   function bulkRemove(data, subId?: number) {
     if (data && resourceName) {
-      resourceStore.deleteMany({
+      resourceStore.deleteMany(resourceStore, {
         params: { data },
         routeId: routeId.value,
         stateList: stateList.value,
