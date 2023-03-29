@@ -87,7 +87,6 @@ function getApiUrl(state, apiUrl, action, payload) {
  * @param data
  */
 function processStoreData(state, action, payload, data) {
-  console.log("processStoreData", action, payload, data);
   const params = payload?.params ? payload.params : {};
   const stateList = params?.stateList ? params.stateList : "";
   const stateUser = params?.stateUser ? params.stateUser : false;
@@ -169,7 +168,6 @@ function processStoreData(state, action, payload, data) {
     case MOVE_NODE:
       break;
     case UPDATE:
-      console.log("UPDATE");
       /**
        * Check for param Id
        */
@@ -191,6 +189,7 @@ function processStoreData(state, action, payload, data) {
             : null;
       }
 
+      // go through resource and update any values that are not null
       if (stateListResource) {
         Object.keys(data).forEach((key) => {
           if (stateListResource) {
@@ -311,7 +310,7 @@ const useResourceStore = function (resource) {
           processStoreData(resourceStore, action, payload, data);
 
           apiStore.setLoading(resourceStore, false);
-          // resourceStore.showSuccess({ action, params });
+          resourceStore.showSuccess(resourceStore, { action, params });
 
           /**
            * Return response data if it exists
@@ -323,9 +322,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           apiStore.setLoading(resourceStore, false);
-          resourceStore.showError(e.message);
-          // stores[storeName].showError(e.message);
-          // state.showError(e.message);
+          resourceStore.showError(resourceStore, e.message);
 
           return Promise.reject(e);
         }
