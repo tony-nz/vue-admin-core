@@ -87,6 +87,7 @@ function getApiUrl(state, apiUrl, action, payload) {
  * @param data
  */
 function processStoreData(state, action, payload, data) {
+  console.log("processStoreData", action, payload, data);
   const params = payload?.params ? payload.params : {};
   const stateList = params?.stateList ? params.stateList : "";
   const stateUser = params?.stateUser ? params.stateUser : false;
@@ -168,19 +169,25 @@ function processStoreData(state, action, payload, data) {
     case MOVE_NODE:
       break;
     case UPDATE:
+      console.log("UPDATE");
       /**
        * Check for param Id
        */
       let stateListResource: string[] = [];
       if (stateUser) {
         stateListResource =
-          params?.id && state.user
-            ? state.user.find((val) => val["id"] === params.id)
+          params?.id && state.data.user
+            ? state.data.user.find((val) => val["id"] === params.id)
+            : null;
+      } else if (stateList) {
+        stateListResource =
+          params?.id && state.data.list[stateList]
+            ? state.data.list[stateList].find((val) => val["id"] === params.id)
             : null;
       } else {
         stateListResource =
-          params?.id && state.list[stateList]
-            ? state.list[stateList].find((val) => val["id"] === params.id)
+          params?.id && state.data.list
+            ? state.data.list.find((val) => val["id"] === params.id)
             : null;
       }
 
@@ -198,9 +205,10 @@ function processStoreData(state, action, payload, data) {
           }
         });
       }
+
       // don't overwrite the exisiting resource we're working with
       if (!stateUser) {
-        state.setItem(data);
+        state.setItem(state, data);
       }
       break;
     case UPDATE_MANY:
@@ -221,7 +229,7 @@ const useResourceStore = function (resource) {
       (storeActions[action] = async (state, payload, userApiUrl) => {
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
-      
+
         try {
           let params = payload?.params ? payload.params : {};
           const stateList = params?.stateList ? params.stateList : "";

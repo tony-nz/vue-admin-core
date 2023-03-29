@@ -65,7 +65,6 @@ export default defineComponent({
   name: "CreateUpdateDialog",
   methods: {
     updateData(data) {
-      console.log("updateData", data);
       this.modalData = data;
     },
     onCreate() {
