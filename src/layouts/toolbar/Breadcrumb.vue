@@ -5,7 +5,7 @@
         <router-link to="/main/dashboard"> {{ title }} </router-link>
       </h4>
       <p
-        class="flex items-center text-gray-300 text-xs bg-gray-100 bg-opacity-30 rounded-xl p-2 px-4"
+        class="flex items-center text-gray-300 text-xs bg-emerald-700 bg-opacity-30 rounded-xl p-2 px-4"
       >
         <template v-for="(item, index) in breadcrumbs" :key="index">
           <router-link :to="generatePath(breadcrumbs, index)">

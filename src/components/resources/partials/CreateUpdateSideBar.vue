@@ -12,6 +12,8 @@
           :type="'form'"
           :submit="submit"
         />
+        {{ modalData }}
+        {{ data }}
       </div>
     </Sidebar>
   </div>
@@ -23,36 +25,36 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 export default defineComponent({
   name: "CreateUpdateSideBar",
   methods: {
-    updateData(data) {
-      this.sideBarData = data;
-    },
-    onCreate() {
-      this.$emit("create", this.sideBarData);
-      this.$emit("close");
-    },
-    onUpdate() {
-      // TODO reference direct mixin
-      this.$emit("update", this.sideBarData, this.dataId);
-      this.$emit("close");
-    },
     close() {
       this.$emit("close");
     },
-    validated(valid) {
+    onSubmit() {
+      this.submit = true;
+    },
+    updateData(data) {
+      this.modalData = data;
+    },
+    validated(valid, data = null) {
+      this.modalData = data;
       if (valid) {
+        if (this.dataValues) {
+          // add dataValues to modalData
+          this.modalData = { ...this.modalData, ...this.dataValues };
+        }
         if (this.modalType == "create") {
-          this.$emit("create", this.sideBarData, this.dataId);
+          this.$emit("create", this.modalData, this.dataId, this.subId);
         } else if (this.modalType == "update") {
-          this.$emit("update", this.sideBarData, this.dataId);
+          this.$emit("update", this.modalData, this.dataId, this.subId);
         }
         this.$emit("close");
       }
-      this.isValid = false;
+      this.submit = false;
     },
   },
   props: {
-    value: {
-      required: true,
+    allowedFields: {
+      type: Array,
+      required: false,
     },
     data: {
       type: Object,
@@ -62,6 +64,14 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    fieldFilters: {
+      type: Object,
+      required: false,
+    },
+    fieldValues: {
+      type: Object,
+      required: false,
+    },
     type: {
       type: String,
     },
@@ -69,13 +79,56 @@ export default defineComponent({
       type: String,
       default: "id",
     },
+    resource: {
+      type: Object,
+      required: true,
+    },
+    subId: {
+      type: Number,
+      default: null,
+    },
+    value: {
+      required: true,
+    },
   },
   setup(props, { emit }) {
-    const showSideBar = ref(false);
-    const isValid = ref(false);
-    const sideBarData = ref();
-    const modalType = ref(props.type);
     const dataId = ref();
+    const dataValues = ref();
+    const modalData = ref(props.data);
+    const modalType = ref(props.type);
+    const showModal = ref(false);
+    const submit = ref(false);
+    const resource = ref();
+
+    function fetchData(params) {
+      // if (params.resourceName) {
+      //   try {
+      //     for (const [key, value] of Object.entries(resources)) {
+      //       if (value.resource.name == params.resourceName) {
+      //         resource.value = value.resource;
+      //       }
+      //     }
+      //     const resourceStore = useResourceStore(resource.value)();
+      //     return resourceStore.getList().then(({ data }) => {
+      //       if (typeof data == "undefined") {
+      //         return null;
+      //       }
+      //       return data;
+      //     });
+      //   } catch (e) {
+      //     // TODO ERROR LOG
+      //     console.log(e);
+      //   }
+      // }
+      // return ApiService.get(params.url).then((res) => {
+      //   // state.value.options[fieldId] = res.data.data;
+      //   return res.data.data;
+      // });
+    }
+    /**
+     * Local value for sidebar
+     * @type {Ref<boolean>}
+     */
     const localValue = computed({
       get() {
         return props.value;
@@ -84,18 +137,23 @@ export default defineComponent({
         emit("close");
       },
     });
+
     onMounted(() => {
-      sideBarData.value = props.data;
       dataId.value = props.data[props.primaryKey];
-      showSideBar.value = true;
+      dataValues.value = props.fieldValues;
+      modalData.value = props.data;
+      showModal.value = true;
     });
+
     return {
-      showSideBar,
-      sideBarData,
-      modalType,
       dataId,
-      isValid,
+      dataValues,
+      fetchData,
       localValue,
+      modalData,
+      modalType,
+      showModal,
+      submit,
     };
   },
 });
