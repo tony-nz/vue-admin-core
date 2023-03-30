@@ -6,10 +6,11 @@
           @updateData="updateData"
           @validated="validated"
           :allowedFields="allowedFields"
-          :data="sideBarData"
+          :data="modalData"
           :fetchData="fetchData"
           :form="fields"
-          :type="'tabs'"
+          :type="'form'"
+          :submit="submit"
         />
       </div>
     </Sidebar>

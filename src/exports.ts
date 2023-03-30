@@ -5,7 +5,7 @@ import useApiStore from "./store/api";
 import useAuthStore from "./store/auth";
 import useBreadcrumbStore from "./store/breadcrumb";
 import useConfigStore from "./store/config";
-import useLogStore from "./store/log";
+import useNotificationStore from "./store/notification";
 import useResourceStore from "./store/resource";
 import { useTabsStore, ITabsItem } from "./store/tabs";
 /**
@@ -51,7 +51,7 @@ export {
   useAuthStore,
   useBreadcrumbStore,
   useConfigStore,
-  useLogStore,
+  useNotificationStore,
   useResourceStore,
   useTabsStore,
 };

@@ -6,7 +6,7 @@ import * as methods from "./enums/ResourceEnums";
 
 import ApiService from "../core/services/ApiService";
 import useApiStore from "./api";
-import useLogStore from "./log";
+import useNotificationStore from "./notification";
 
 const stores = {};
 let storeActions = {};
@@ -366,7 +366,7 @@ const useResourceStore = function (resource) {
         state.data.lastSync = lastSync;
       },
       showSuccess(state, { action, params, data }): any {
-        const logStore = useLogStore();
+        const logStore = useNotificationStore();
         const messages = {
           [CREATE]: translate("va.messages.created", {
             resource: resource.getName(1),
@@ -408,7 +408,7 @@ const useResourceStore = function (resource) {
         });
       },
       showError(state, summary, message): any {
-        const logStore = useLogStore();
+        const logStore = useNotificationStore();
         logStore.showToast({
           severity: "error",
           summary,

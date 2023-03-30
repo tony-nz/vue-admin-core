@@ -1,5 +1,5 @@
 import { App } from "vue";
-import useLogStore from "../../store/log";
+import useNotificationStore from "../../store/notification";
 import settings from "../config/AppConfig";
 
 const { errorLog: needErrorLog } = settings;
@@ -17,7 +17,7 @@ const checkNeed = () => {
  * @param app vue instance
  */
 export function initErrorLog(app: App<Element>) {
-  const store = useLogStore();
+  const store = useNotificationStore();
   if (checkNeed()) {
     app.config.errorHandler = function (err, vm, info) {
       store.addLog({

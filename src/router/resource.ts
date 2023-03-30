@@ -2,7 +2,7 @@ import { h, resolveComponent, getCurrentInstance, handleError } from "vue";
 import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
 import i18n from "../core/plugins/i18n";
 import useAuthStore from "../store/auth";
-import useLogStore from "../store/log";
+import useNotificationStore from "../store/notification";
 import useResourceStore from "../store/resource";
 import roles from "./middleware/roles";
 
@@ -120,7 +120,7 @@ export const useResourceRoutes = function (resource) {
                   return next();
                 }
               } catch ({ status, message }) {
-                const logStore = useLogStore();
+                const logStore = useNotificationStore();
                 logStore.showToast({
                   severity: "error",
                   summary: message,

@@ -1,6 +1,4 @@
 import { defineStore } from "pinia";
-import { upperCaseFirst } from "../core/helpers/functions";
-import { inject } from "vue";
 import { toast, type ToastOptions } from "vue3-toastify";
 
 interface IState {
@@ -12,7 +10,7 @@ interface IState {
 
 const LIFE = 3000;
 
-const useLogStore = defineStore({
+const useNotificationStore = defineStore({
   id: "LogStore",
   state: (): IState => ({
     api: [],
@@ -80,4 +78,4 @@ const useLogStore = defineStore({
   },
 });
 
-export default useLogStore;
+export default useNotificationStore;

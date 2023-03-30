@@ -12,7 +12,7 @@ import "vue3-toastify/dist/index.css";
  * Initialize plugins
  * @param app vue instance
  */
-export const initPlugins = async function (app: App<Element>, router) {
+export const initPlugins = async function (app: App<Element>, router, options) {
   // Load CRUD Resources
   await initResources(app, router);
   // Load Api Service
@@ -30,4 +30,14 @@ export const initPlugins = async function (app: App<Element>, router) {
     autoClose: 3000,
     // ...
   } as ToastContainerOptions);
+
+  /**
+   * Initialize Locales
+   */
+  if (options.config?.locales) {
+    // loop through payload and set each locale
+    for (const [key, value] of Object.entries(options.config.locales)) {
+      i18n.global.setLocaleMessage(key, Object.assign({}, value));
+    }
+  }
 };
