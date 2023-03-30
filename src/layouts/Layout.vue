@@ -1,4 +1,5 @@
 <template>
+  <Toast />
   <div
     id="vueadmin-app"
     class="min-h-full"

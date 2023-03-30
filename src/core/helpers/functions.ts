@@ -48,10 +48,10 @@ const cleanDate = (isoDate) => {
  * Translate defined text into current locale
  * @param {string} text
  */
-function translate(text) {
-  const { t, te } = i18n.global;
+function translate(text, vars = {}) {
+  const { t, te, tc } = i18n.global;
   if (te(text) && text) {
-    return t(text);
+    return tc(text, vars);
   } else {
     return text;
   }

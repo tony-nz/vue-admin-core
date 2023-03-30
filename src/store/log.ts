@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { upperCaseFirst } from "../core/helpers/functions";
-// import app from "../main";
+import { inject } from "vue";
+import { toast, type ToastOptions } from "vue3-toastify";
 
 interface IState {
   api: any;
@@ -10,20 +11,6 @@ interface IState {
 }
 
 const LIFE = 3000;
-
-const displayToast = (payload) => {
-  if (payload.severity && payload.message) {
-    // const toast = app.config.globalProperties.$toast;
-    // toast.add({
-    //   severity: payload.severity,
-    //   summary: payload.summary
-    //     ? payload.summary
-    //     : upperCaseFirst(payload.severity),
-    //   detail: payload.message,
-    //   life: payload.life ? payload.life : LIFE,
-    // });
-  }
-};
 
 const useLogStore = defineStore({
   id: "LogStore",
@@ -57,11 +44,35 @@ const useLogStore = defineStore({
       }
     },
     showToast(payload) {
-      displayToast({
-        severity: payload.severity,
-        summary: payload.summary,
-        message: payload.message,
-      });
+      if (payload.summary) {
+        const message = payload.message
+          ? payload.summary + "<br />" + payload.message
+          : payload.summary;
+        const options = {
+          autoClose: 1200,
+          type: toast.TYPE.INFO,
+          hideProgressBar: false,
+          position: toast.POSITION.TOP_RIGHT,
+          theme: "colored",
+          // and so on ...
+        } as ToastOptions;
+
+        switch (payload.severity) {
+          case "error":
+            options.type = toast.TYPE.ERROR;
+            break;
+          case "warning":
+            options.type = toast.TYPE.WARNING;
+            break;
+          case "success":
+            options.type = toast.TYPE.SUCCESS;
+            break;
+          default:
+            options.type = toast.TYPE.INFO;
+            break;
+        }
+        toast(message, options);
+      }
     },
   },
   getters: {

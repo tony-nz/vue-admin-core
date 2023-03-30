@@ -5,6 +5,8 @@ import { initResources } from "./resources";
 import { initErrorLog } from "./errorLog";
 import ApiService from "../services/ApiService";
 import i18n from "./i18n";
+import Vue3Toasity, { type ToastContainerOptions } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 /**
  * Initialize plugins
@@ -15,11 +17,17 @@ export const initPlugins = async function (app: App<Element>, router) {
   await initResources(app, router);
   // Load Api Service
   ApiService.init(app);
-  // // Load Error Log
+  // Load Error Log
   initErrorLog(app);
-  // // Apply locales
+  // Apply locales
   app.use(i18n);
-  // // Load additional plugins
+  // Load additional plugins
   initInlineSvg(app);
   initPrimeVue(app);
+
+  // toast
+  app.use(Vue3Toasity, {
+    autoClose: 3000,
+    // ...
+  } as ToastContainerOptions);
 };

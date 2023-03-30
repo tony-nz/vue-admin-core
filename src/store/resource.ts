@@ -309,8 +309,12 @@ const useResourceStore = function (resource) {
            */
           processStoreData(resourceStore, action, payload, data);
 
+          /**
+           * Set loading to false
+           * and show success message
+           */
           apiStore.setLoading(resourceStore, false);
-          resourceStore.showSuccess(resourceStore, { action, params });
+          resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
            * Return response data if it exists
@@ -360,24 +364,49 @@ const useResourceStore = function (resource) {
       setLastSync(state, lastSync) {
         state.data.lastSync = lastSync;
       },
-      showSuccess(state, { action, params }): any {
+      showSuccess(state, { action, params, data }): any {
+        console.log("showSuccess", action, params);
+        console.log("resource", resource);
         const logStore = useLogStore();
         const messages = {
-          [CREATE]: translate("va.messages.created"),
-          [DELETE]: translate("va.messages.deleted"),
-          [DELETE_MANY]: translate("va.messages.deletedMany"),
-          [GET]: translate("va.messages.fetched"),
-          [GET_LIST]: translate("va.messages.fetched"),
+          [CREATE]: translate("va.messages.created", {
+            resource: resource.getName(1),
+          }),
+          [DELETE]: translate("va.messages.deleted", {
+            resource: resource.getName(1),
+            id: params,
+          }),
+          [DELETE_MANY]: translate("va.messages.deletedMany", {
+            resource: resource.getName(data.length).toLowerCase(),
+            count: data?.length ? data.length : 1,
+          }),
+          [GET]: translate("va.messages.fetched", {
+            resource: resource.getName(data.length).toLowerCase(),
+            count: data?.length ? data.length : 1,
+          }),
+          [GET_LIST]: translate("va.messages.fetched", {
+            resource: resource.getName(data.length).toLowerCase(),
+            count: data?.length ? data.length : 1,
+          }),
           [GET_NODES]: translate("va.messages.fetched"),
-          [GET_ONE]: translate("va.messages.fetched"),
+          [GET_ONE]: translate("va.messages.fetched", {
+            resource: resource.getName(1),
+            id: params,
+          }),
           [GET_TREE]: translate("va.messages.fetched"),
-          [UPDATE]: translate("va.messages.updated"),
-          [UPDATE_MANY]: translate("va.messages.updatedMany"),
+          [UPDATE]: translate("va.messages.updated", {
+            resource: resource.getName(1),
+            id: params,
+          }),
+          [UPDATE_MANY]: translate("va.messages.updatedMany", {
+            resource: resource.getName(data.length).toLowerCase(),
+            count: data?.length ? data.length : 1,
+          }),
         };
-        // logStore.showToast({
-        //   severity: "success",
-        //   summary: messages[action],
-        // });
+        logStore.showToast({
+          severity: "success",
+          summary: messages[action],
+        });
       },
       showError(state, message): any {
         const logStore = useLogStore();

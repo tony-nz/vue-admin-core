@@ -1,4 +1,6 @@
 import { formatKebabCase, upperCaseFirst } from "./functions";
+import i18n from "../plugins/i18n";
+
 // import useAuthStore from "../../store/auth";
 // const authStore = useAuthStore();
 /**
@@ -127,11 +129,10 @@ const buildResourceConfig = (resource) => {
     }
   );
   const nameKey = `resources.${resource.name}.name`;
+
   const getName = (count) => {
-    return (
-      resource.name.charAt(0).toUpperCase() +
-      resource.name.slice(1).toLowerCase()
-    );
+    const { t, te, tc } = i18n.global;
+    return te(nameKey) ? tc(nameKey, count) : upperCaseFirst(resource.name);
   };
 
   return {

@@ -1,5 +1,5 @@
 /* eslint-disable vue/multi-word-component-names */
-import { App } from "vue";
+import { App, provide } from "vue";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
@@ -92,4 +92,7 @@ export function initPrimeVue(app: App<Element>) {
   app.component("TabView", TabView);
   app.component("Textarea", Textarea);
   app.component("Tree", Tree);
+
+  // providers
+  app.provide("toast", app.config.globalProperties.$toast);
 }
