@@ -1,11 +1,18 @@
 import { h, resolveComponent, getCurrentInstance, handleError } from "vue";
 import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
+import i18n from "../core/plugins/i18n";
+import useAuthStore from "../store/auth";
+import useLogStore from "../store/log";
 import useResourceStore from "../store/resource";
 import roles from "./middleware/roles";
 
 export const useResourceRoutes = function (resource) {
-  const { name, include, routes, translatable, getTitle, pluralName } =
-    resource;
+  const { name, routes, translatable, getTitle, pluralName } = resource;
+  const { t, te, tc } = i18n.global;
+
+  const setTitle = (to, action, item = null) => {
+    return (to.meta.title = getTitle(action, item));
+  };
 
   /**
    * CRUD Children
@@ -52,18 +59,21 @@ export const useResourceRoutes = function (resource) {
       const store = useResourceStore(resource);
       return {
         path,
-        name: resourceName(resource.name, action),
+        name: resourceName(name, action),
+        props: true,
         component: {
+          props: ["id", "title", "resource", "store", "permissions"],
           render(c) {
+            const authStore = useAuthStore();
             const components = JSON.parse(
               JSON.stringify(getCurrentInstance()?.appContext.components)
             );
             const props = {
-              // id: this.id,
-              // title: route.meta.title,
+              // id: route.params.id,
+              title: getTitle,
               resource,
               store,
-              // permissions: store.getters["auth/getPermissions"],
+              permissions: authStore.getPermissions,
             };
             if (
               Array.prototype.includes.call(
@@ -106,24 +116,24 @@ export const useResourceRoutes = function (resource) {
                 store.setItem(data);
 
                 if (to.params.id) {
-                  // setTitle(to, action, data);
+                  setTitle(to, action, data);
                   return next();
                 }
               } catch ({ status, message }) {
+                const logStore = useLogStore();
+                logStore.showToast({
+                  severity: "error",
+                  summary: message,
+                  message:
+                    status === 404
+                      ? tc("va.pages.notFound", {
+                          resource: resource.singularName,
+                          id,
+                        })
+                      : message,
+                });
                 to.meta.title = message;
                 // document.title = message;
-                console.log(message);
-                // store.commit(`messages/setError`, {
-                //   status,
-                //   message: message,
-                //   // message:
-                //   //   status === 404
-                //   //     ? i18n.t("va.pages.not_found", {
-                //   //         resource: resource.singularName,
-                //   //         id,
-                //   //       })
-                //   //     : message,
-                // });
                 return next();
               }
             }
@@ -142,9 +152,7 @@ export const useResourceRoutes = function (resource) {
           resource,
           middleware: roles,
           roles: resource.roles,
-          // permissions: routerPermissions,
-          // TODO:: rewrite this to loop through and compile a neate array, e.g. users
-          permissions: resource.permissions,
+          permissions: routerPermissions,
         },
       };
     } catch (error) {

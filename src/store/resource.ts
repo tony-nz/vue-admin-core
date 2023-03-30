@@ -325,8 +325,9 @@ const useResourceStore = function (resource) {
 
           return Promise.resolve(response);
         } catch (e: any) {
+          const message = e.response?.data?.message || false;
           apiStore.setLoading(resourceStore, false);
-          resourceStore.showError(resourceStore, e.message);
+          resourceStore.showError(resourceStore, e.message, message);
 
           return Promise.reject(e);
         }
@@ -365,8 +366,6 @@ const useResourceStore = function (resource) {
         state.data.lastSync = lastSync;
       },
       showSuccess(state, { action, params, data }): any {
-        console.log("showSuccess", action, params);
-        console.log("resource", resource);
         const logStore = useLogStore();
         const messages = {
           [CREATE]: translate("va.messages.created", {
@@ -408,11 +407,12 @@ const useResourceStore = function (resource) {
           summary: messages[action],
         });
       },
-      showError(state, message): any {
+      showError(state, summary, message): any {
         const logStore = useLogStore();
         logStore.showToast({
           severity: "error",
-          summary: message,
+          summary,
+          message,
         });
       },
     },

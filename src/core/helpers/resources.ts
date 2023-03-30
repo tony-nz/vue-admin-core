@@ -144,28 +144,29 @@ const buildResourceConfig = (resource) => {
     nameKey,
     singularName: getName(1),
     pluralName: getName(10),
-    // getTitle: (action, item: any = null) => {
-    //   const titleKey = `resources.${r.name}.titles.${action}`;
+    getTitle: (action, item: any = null) => {
+      const { t, te, tc } = i18n.global;
+      const titleKey = `resources.${resource.name}.titles.${action}`;
 
-    //   if (item) {
-    //     return (
-    //       (translate(titleKey)
-    //         ? translate(titleKey, item)
-    //         : i18n.t(`va.pages.${action}`, {
-    //             resource: getName(1).toLowerCase(),
-    //             label:
-    //               typeof r.label === "function"
-    //                 ? r.label(item)
-    //                 : item[r.label],
-    //           })) + ` #${item.id}`
-    //     );
-    //   }
-    //   return i18n.te(titleKey)
-    //     ? i18n.t(titleKey)
-    //     : i18n.t(`va.pages.${action}`, {
-    //         resource: getName(action === "list" ? 10 : 1).toLowerCase(),
-    //       });
-    // },
+      if (item) {
+        return (
+          (te(titleKey)
+            ? tc(titleKey, item)
+            : tc(`va.pages.${action}`, {
+                resource: getName(1).toLowerCase(),
+                label:
+                  typeof resource.label === "function"
+                    ? resource.label(item)
+                    : item[resource.label],
+              })) + ` #${item.id}`
+        );
+      }
+      return te(titleKey)
+        ? t(titleKey)
+        : tc(`va.pages.${action}`, {
+            resource: getName(action === "list" ? 10 : 1).toLowerCase(),
+          });
+    },
     canAction: (action) => {
       /**
        * Test if action exist for this resource

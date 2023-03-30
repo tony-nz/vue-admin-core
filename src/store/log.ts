@@ -46,15 +46,15 @@ const useLogStore = defineStore({
     showToast(payload) {
       if (payload.summary) {
         const message = payload.message
-          ? payload.summary + "<br />" + payload.message
+          ? `<strong>${payload.summary}</strong>\n` + payload.message
           : payload.summary;
         const options = {
+          dangerouslyHTMLString: true, // "dangerous"
           autoClose: 1200,
           type: toast.TYPE.INFO,
           hideProgressBar: false,
           position: toast.POSITION.TOP_RIGHT,
           theme: "colored",
-          // and so on ...
         } as ToastOptions;
 
         switch (payload.severity) {

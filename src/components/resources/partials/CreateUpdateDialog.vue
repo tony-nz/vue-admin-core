@@ -12,7 +12,6 @@
     >
       <div class="m-0">
         <VueFormGenerator
-          @onChange="updateData"
           @updateData="updateData"
           @validated="validated"
           :allowedFields="allowedFields"
@@ -20,6 +19,7 @@
           :fetchData="fetchData"
           :form="fields"
           :type="'form'"
+          :submit="submit"
         />
       </div>
       <template #footer>
@@ -30,64 +30,39 @@
           class="p-button-text"
         />
         <Button
-          v-if="type == 'create'"
-          label="Create"
+          :label="type === 'create' ? 'Create' : 'Update'"
           icon="pi pi-check"
           class="btn bg-primary-500"
-          @click="onCreate"
+          @click="onSubmit"
           autofocus
         />
-        <Button
-          v-else
-          label="Update"
-          icon="pi pi-check"
-          class="btn bg-primary-500"
-          @click="onUpdate"
-          autofocus
-        />
-        <!-- <Button
-          v-else
-          label="Update"
-          icon="pi pi-check"
-          class="btn bg-primary-500"
-          @click="isValid = true"
-          autofocus
-        /> -->
       </template>
     </Dialog>
   </div>
 </template>
 
 <script>
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, watch, ref } from "vue";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
   methods: {
-    updateData(data) {
-      this.modalData = data;
-    },
-    onCreate() {
-      if (this.dataValues) {
-        // add dataValues to modalData
-        this.modalData = { ...this.modalData, ...this.dataValues };
-      }
-      this.$emit("create", this.modalData, this.subId);
-      this.$emit("close");
-    },
-    onUpdate() {
-      if (this.dataValues) {
-        // add dataValues to modalData
-        this.modalData = { ...this.modalData, ...this.dataValues };
-      }
-      this.$emit("update", this.modalData, this.dataId, this.subId);
-      this.$emit("close");
-    },
     close() {
       this.$emit("close");
     },
-    validated(valid) {
+    onSubmit() {
+      this.submit = true;
+    },
+    updateData(data) {
+      this.modalData = data;
+    },
+    validated(valid, data = null) {
+      this.modalData = data;
       if (valid) {
+        if (this.dataValues) {
+          // add dataValues to modalData
+          this.modalData = { ...this.modalData, ...this.dataValues };
+        }
         if (this.modalType == "create") {
           this.$emit("create", this.modalData, this.dataId, this.subId);
         } else if (this.modalType == "update") {
@@ -95,7 +70,7 @@ export default defineComponent({
         }
         this.$emit("close");
       }
-      this.isValid = false;
+      this.submit = false;
     },
   },
   props: {
@@ -138,10 +113,10 @@ export default defineComponent({
   setup(props) {
     const dataId = ref();
     const dataValues = ref();
-    const isValid = ref(false);
     const modalData = ref();
     const modalType = ref(props.type);
     const showModal = ref(false);
+    const submit = ref(false);
     const resource = ref();
 
     function fetchData(params) {
@@ -181,10 +156,10 @@ export default defineComponent({
       dataId,
       dataValues,
       fetchData,
-      isValid,
       modalData,
       modalType,
       showModal,
+      submit,
     };
   },
 });
