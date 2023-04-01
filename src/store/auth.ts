@@ -83,6 +83,7 @@ const useAuthStore = defineStore({
       });
     },
     logout() {
+      ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         this.purgeAuth();
         ApiService.post(this.AuthConfig("api.logout"), {})
