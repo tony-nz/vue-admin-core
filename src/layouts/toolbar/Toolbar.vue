@@ -5,8 +5,8 @@
     <div
       id="vueadmin-toolbar"
       :class="{
-        'container-fluid': toolbarWidthFluid == 'fluid',
-        container: toolbarWidthFluid == 'fixed',
+        'container-fluid': contentWidth == 'fluid',
+        container: contentWidth == 'fixed',
       }"
       class="px-6 mx-auto flex flex-row items-start lg:items-center justify-between"
     >
@@ -32,8 +32,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { contentWidth } from "../../core/helpers/config";
 import { goBack } from "../../core/helpers/functions";
-import { toolbarWidthFluid } from "../../core/helpers/config";
 import Breadcrumb from "./Breadcrumb.vue";
 import Duotone from "../../components/ui/icons/Duotone.vue";
 
@@ -50,8 +50,8 @@ export default defineComponent({
   },
   setup() {
     return {
+      contentWidth,
       goBack,
-      toolbarWidthFluid,
     };
   },
 });

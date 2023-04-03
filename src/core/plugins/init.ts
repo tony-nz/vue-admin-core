@@ -6,8 +6,9 @@ import { initErrorLog } from "./errorLog";
 import ApiService from "../services/ApiService";
 import i18n from "./i18n";
 import Vue3Toasity, { type ToastContainerOptions } from "vue3-toastify";
+import { LoadingPlugin } from "vue-loading-overlay";
 import "vue3-toastify/dist/index.css";
-
+import "vue-loading-overlay/dist/css/index.css";
 /**
  * Initialize plugins
  * @param app vue instance
@@ -40,4 +41,7 @@ export const initPlugins = async function (app: App<Element>, router, options) {
       i18n.global.setLocaleMessage(key, Object.assign({}, value));
     }
   }
+
+  // loader
+  app.use(LoadingPlugin);
 };

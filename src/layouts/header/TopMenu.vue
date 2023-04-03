@@ -1,5 +1,4 @@
 <template>
-  <!-- TopMenu starts -->
   <nav
     class="w-full mx-auto dark:bg-slate-900 relative z-20"
     :class="slugBackground ? slugBackground : 'bg-primary-500'"
@@ -7,8 +6,8 @@
     <div
       id="vueadmin-topMenu"
       :class="{
-        'container-fluid': topMenuWidthFluid == 'fluid',
-        container: topMenuWidthFluid == 'fixed',
+        'container-fluid': layoutWidth == 'fluid',
+        container: layoutWidth == 'fixed',
       }"
       class="px-6 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
     >
@@ -19,7 +18,7 @@
         <ul class="pr-32 hidden lg:flex lg:grow items-center h-full">
           <div v-if="displayLogo">
             <img
-              :src="darkMode ? themeDarkLogo : themeLightLogo"
+              :src="darkMode ? logoDark : logoLight"
               :class="logoClass"
               :alt="logoAlt"
             />
@@ -52,7 +51,6 @@
       </div>
     </div>
   </nav>
-  <!-- TopMenu ends -->
 </template>
 
 <script lang="ts">
@@ -62,9 +60,9 @@ import {
   displayLogo,
   logoAlt,
   logoClass,
-  themeDarkLogo,
-  themeLightLogo,
-  topMenuWidthFluid,
+  logoDark,
+  logoLight,
+  layoutWidth,
 } from "../../core/helpers/config";
 import { translate } from "../../core/helpers/functions";
 import OffCanvas from "../offcanvas/OffCanvas.vue";
@@ -113,9 +111,9 @@ export default defineComponent({
       logoClass,
       mainMenuConfig,
       slugBackground,
-      themeDarkLogo,
-      themeLightLogo,
-      topMenuWidthFluid,
+      logoDark,
+      logoLight,
+      layoutWidth,
       translate,
     };
   },

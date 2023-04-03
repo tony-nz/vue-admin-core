@@ -1,22 +1,42 @@
 import LayoutConfigTypes from "../types/LayoutConfigTypes";
 
 const config: LayoutConfigTypes = {
-  themeName: "VueAdmin",
-  themeVersion: "1.0.0",
-  themeStyle: "style2",
-  display: "fluid",
-  darkMode: false,
-  demo: true,
-  main: {
-    type: "default",
-    primaryColor: "#009EF7",
-    logo: {
-      alt: "VueAdmin",
-      class: "h-8 w-auto mr-2",
-      display: true,
-      dark: "media/logos/logo-light.svg",
-      light: "media/logos/logo-light.svg",
+  theme: {
+    name: "VueAdminDefault",
+    version: "1.0.0",
+    darkMode: false,
+    display: "fluid",
+    light: {
+      black: "#000000",
+      white: "#ffffff",
+      primary: "#3f51b5",
+      secondary: "#ff4081",
+      success: "#4caf50",
+      info: "#2196f3",
+      warning: "#ffc107",
+      danger: "#f44336",
+      light: "#eceff1",
+      dark: "#212121",
     },
+    dark: {
+      black: "#000000",
+      white: "#ffffff",
+      primary: "#3f51b5",
+      secondary: "#ff4081",
+      success: "#4caf50",
+      info: "#2196f3",
+      warning: "#ffc107",
+      danger: "#f44336",
+      light: "#eceff1",
+      dark: "#212121",
+    },
+  },
+  logo: {
+    display: true,
+    dark: "media/logos/logo-dark.svg",
+    light: "media/logos/logo-light.svg",
+    alt: "VueAdmin",
+    class: "h-8 w-auto mr-2",
   },
   loader: {
     logo: "media/logos/logo-dark.svg",
@@ -28,23 +48,13 @@ const config: LayoutConfigTypes = {
   },
   header: {
     display: true,
-    menuIcon: "font",
     width: "fluid",
     fixed: {
       desktop: true,
       tabletAndMobile: true,
     },
   },
-  topMenu: {
-    display: true,
-    menuIcon: "font",
-    width: "fluid",
-    fixed: {
-      desktop: true,
-      tabletAndMobile: true,
-    },
-  },
-  secondaryMenu: {
+  menu: {
     display: true,
     menuIcon: "font",
     width: "fluid",
@@ -56,24 +66,8 @@ const config: LayoutConfigTypes = {
   toolbar: {
     display: true,
     width: "fluid",
-    fixed: {
-      desktop: true,
-      tabletAndMobile: true,
-    },
-  },
-  aside: {
-    display: true,
-    theme: "dark",
-    fixed: true,
-    menuIcon: "font",
-    minimized: false,
-    minimize: true,
-    hoverable: true,
   },
   content: {
-    width: "fluid",
-  },
-  footer: {
     width: "fluid",
   },
 };

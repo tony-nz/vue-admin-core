@@ -23,8 +23,8 @@
       <div
         id="vueadmin-content"
         :class="{
-          'container-fluid': contentWidthFluid == 'fluid',
-          container: contentWidthFluid == 'fixed',
+          'container-fluid': contentWidth == 'fluid',
+          container: contentWidth == 'fixed',
         }"
         class="mx-auto py-6 px-6 flex flex-col"
       >
@@ -53,9 +53,10 @@
 </template>
 
 <script lang="ts">
-import { contentWidthFluid, displayToolbar } from "../core/helpers/config";
-import { computed, defineComponent, onBeforeMount } from "vue";
+import { contentWidth, displayLoader, displayToolbar } from "../core/helpers/config";
+import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
 import { darkMode } from "../core/helpers/config";
+import { useLoading } from "vue-loading-overlay";
 import { useRoute } from "vue-router";
 import Header from "./header/Header.vue";
 import LayoutService from "../core/services/LayoutService";
@@ -74,6 +75,11 @@ export default defineComponent({
   },
   setup() {
     const currentRoute = useRoute();
+    const loading = useLoading({
+      //
+    });
+    let loader;
+
     const breadcrumbStore = useBreadcrumbStore();
 
     const breadcrumbs = computed(() => {
@@ -91,11 +97,29 @@ export default defineComponent({
 
     onBeforeMount(() => {
       LayoutService.init();
+      if (displayLoader) {
+        loader = loading.show({
+          container: false,
+          color: "#00ab00",
+          backgroundColor: "#ffffff",
+          height: 64,
+          width: 64,
+          loader: "spinner",
+        });
+      }
+    });
+
+    onMounted(() => {
+      if (displayLoader) {
+        setTimeout(() => {
+          loader.hide();
+        }, 1000);
+      }
     });
 
     return {
       breadcrumbs,
-      contentWidthFluid,
+      contentWidth,
       currentPage,
       displayToolbar,
       pageTitle,

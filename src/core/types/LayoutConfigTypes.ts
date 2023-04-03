@@ -1,13 +1,40 @@
-interface Main {
-  type: "default";
-  primaryColor: string;
-  logo: {
-    alt: string;
-    class: string;
-    display: boolean;
-    dark: string;
+interface Theme {
+  name: string;
+  version: string;
+  darkMode: boolean;
+  display: "fixed" | "fluid";
+  light: {
+    black: string;
+    white: string;
+    primary: string;
+    secondary: string;
+    success: string;
+    info: string;
+    warning: string;
+    danger: string;
     light: string;
+    dark: string;
   };
+  dark: {
+    black: string;
+    white: string;
+    primary: string;
+    secondary: string;
+    success: string;
+    info: string;
+    warning: string;
+    danger: string;
+    light: string;
+    dark: string;
+  };
+}
+
+interface Logo {
+  display: boolean;
+  dark: string;
+  light: string;
+  alt: string;
+  class: string;
 }
 
 interface Loader {
@@ -28,80 +55,46 @@ interface Fixed {
 interface Header {
   display: boolean;
   width: "fixed" | "fluid";
-  menuIcon: "svg" | "font";
   fixed: Fixed;
 }
 
-interface TopMenu {
+interface Menu {
   display: boolean;
   width: "fixed" | "fluid";
   menuIcon: "svg" | "font";
   fixed: Fixed;
 }
 
-interface SecondaryMenu {
+interface Toolbar {
   display: boolean;
   width: "fixed" | "fluid";
-  menuIcon: "svg" | "font";
-  fixed: Fixed;
-}
-
-interface Aside {
-  display: boolean;
-  theme: "dark" | "light";
-  fixed: boolean;
-  menuIcon: "svg" | "font";
-  minimized: boolean;
-  minimize: boolean;
-  hoverable: boolean;
 }
 
 interface Content {
   width: "fixed" | "fluid";
 }
 
-interface Toolbar {
-  display: boolean;
-  width: "fixed" | "fluid";
-  fixed: Fixed;
-}
-
-interface Footer {
-  width: "fixed" | "fluid";
-}
-
 interface LayoutConfig {
-  themeName?: string;
-  themeVersion?: string;
-  themeStyle?: string;
-  display?: "fixed" | "fluid";
-  darkMode?: boolean;
-  demo?: boolean;
-  main?: Main;
+  theme: Theme;
+  logo: Logo;
   loader?: Loader;
   scrollTop?: ScrollTop;
   header?: Header;
-  topMenu?: TopMenu;
-  secondaryMenu?: SecondaryMenu;
+  menu?: Menu;
   toolbar?: Toolbar;
-  aside?: Aside;
   content?: Content;
-  footer?: Footer;
 }
 
 export default LayoutConfig;
 
 export type {
-  Main,
+  Theme,
   Loader,
   ScrollTop,
   Fixed,
   Header,
-  TopMenu,
-  SecondaryMenu,
-  Aside,
-  Content,
+  Menu,
   Toolbar,
-  Footer,
+  Content,
   LayoutConfig,
 };

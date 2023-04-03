@@ -6,8 +6,8 @@
     <div
       id="vueadmin-secondaryMenu"
       :class="{
-        'container-fluid': secondaryMenuWidthFluid == 'fluid',
-        container: secondaryMenuWidthFluid == 'fixed',
+        'container-fluid': layoutWidth == 'fluid',
+        container: layoutWidth == 'fixed',
       }"
       class="justify-between px-6 py-6 h-14 flex items-center lg:items-stretch mx-auto"
     >
@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { secondaryMenuWidthFluid } from "../../core/helpers/config";
+import { layoutWidth } from "../../core/helpers/config";
 import { translate } from "../../core/helpers/functions";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanel from "../../components/ui/tabs/TabPanel.vue";
@@ -127,7 +127,7 @@ export default defineComponent({
       checkRoute,
       mainMenuConfig,
       routeClass,
-      secondaryMenuWidthFluid,
+      layoutWidth,
       translate,
     };
   },
