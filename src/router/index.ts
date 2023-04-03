@@ -33,16 +33,15 @@ export async function initRouter(router) {
     // NProgress.start();
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       const authStore = useAuthStore();
-      const user = await authStore
+      await authStore
         .verifyAuth()
         .then((res) => {
-          console.log("verified");
+          return res;
         })
         .catch((err) => {
           console.log(err);
         });
 
-      console.log(user);
       if (!authStore.isUserAuthenticated) {
         next({
           path: "/login",

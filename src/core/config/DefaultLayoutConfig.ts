@@ -11,6 +11,9 @@ const config: LayoutConfigTypes = {
     type: "default",
     primaryColor: "#009EF7",
     logo: {
+      alt: "VueAdmin",
+      class: "h-8 w-auto mr-2",
+      display: true,
       dark: "media/logos/logo-light.svg",
       light: "media/logos/logo-light.svg",
     },

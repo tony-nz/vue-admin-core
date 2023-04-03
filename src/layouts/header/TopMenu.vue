@@ -17,6 +17,13 @@
           <OffCanvas />
         </div>
         <ul class="pr-32 hidden lg:flex lg:grow items-center h-full">
+          <div v-if="displayLogo">
+            <img
+              :src="darkMode ? themeDarkLogo : themeLightLogo"
+              :class="logoClass"
+              :alt="logoAlt"
+            />
+          </div>
           <Tabs v-model="activeTab">
             <template v-for="(item, i) in mainMenuConfig" :key="i">
               <Tab
@@ -50,7 +57,15 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { topMenuWidthFluid } from "../../core/helpers/config";
+import {
+  darkMode,
+  displayLogo,
+  logoAlt,
+  logoClass,
+  themeDarkLogo,
+  themeLightLogo,
+  topMenuWidthFluid,
+} from "../../core/helpers/config";
 import { translate } from "../../core/helpers/functions";
 import OffCanvas from "../offcanvas/OffCanvas.vue";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
@@ -92,8 +107,14 @@ export default defineComponent({
     return {
       activeTab,
       changeBackground,
+      darkMode,
+      displayLogo,
+      logoAlt,
+      logoClass,
       mainMenuConfig,
       slugBackground,
+      themeDarkLogo,
+      themeLightLogo,
       topMenuWidthFluid,
       translate,
     };

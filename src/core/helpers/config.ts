@@ -11,12 +11,48 @@ export const config = computed(() => {
 });
 
 /**
+ * Set the aside display
+ * @returns {boolean}
+ */
+export const displayAside = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("aside.display");
+});
+
+/**
+ * Set the logo display
+ * @returns {boolean}
+ */
+export const displayLogo = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("main.logo.display");
+});
+
+/**
  * Set the sidebar display
  * @returns {boolean}
  */
 export const displaySidebar = computed(() => {
   const configStore = useConfigStore();
   return configStore.getLayoutConfig("sidebar.display");
+});
+
+/**
+ * Set the subheader display
+ * @returns {boolean}
+ */
+export const displaySubheader = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("toolbar.display");
+});
+
+/**
+ * Set the toolbar display
+ * @returns {boolean}
+ */
+export const displayToolbar = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("toolbar.display");
 });
 
 /**
@@ -47,39 +83,12 @@ export const secondaryMenuWidthFluid = computed(() => {
 });
 
 /**
- * Returns header left part type
- * @returns {string}
- */
-export const headerLeft = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("header.left");
-});
-
-/**
- * Set the aside display
- * @returns {boolean}
- */
-export const asideDisplay = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("aside.display");
-});
-
-/**
  * Check if toolbar width is fluid
  * @returns {boolean}
  */
 export const toolbarWidthFluid = computed(() => {
   const configStore = useConfigStore();
   return configStore.getLayoutConfig("toolbar.width");
-});
-
-/**
- * Set the toolbar display
- * @returns {boolean}
- */
-export const toolbarDisplay = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("toolbar.display");
 });
 
 /**
@@ -110,6 +119,24 @@ export const loaderLogo = computed(() => {
 });
 
 /**
+ * Logo alt attribute
+ * @returns {string}
+ */
+export const logoAlt = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("main.logo.alt");
+});
+
+/**
+ * Logo class attribute
+ * @returns {string}
+ */
+export const logoClass = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("main.logo.class");
+});
+
+/**
  * Check if the aside menu is enabled
  * @returns {boolean}
  */
@@ -125,15 +152,6 @@ export const asideEnabled = computed(() => {
 export const asideTheme = computed(() => {
   const configStore = useConfigStore();
   return configStore.getLayoutConfig("aside.theme");
-});
-
-/**
- * Set the subheader display
- * @returns {boolean}
- */
-export const subheaderDisplay = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("toolbar.display");
 });
 
 /**

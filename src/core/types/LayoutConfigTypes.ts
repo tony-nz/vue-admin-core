@@ -2,6 +2,9 @@ interface Main {
   type: "default";
   primaryColor: string;
   logo: {
+    alt: string;
+    class: string;
+    display: boolean;
     dark: string;
     light: string;
   };

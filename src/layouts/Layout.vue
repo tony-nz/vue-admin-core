@@ -12,13 +12,14 @@
       <slot name="header"></slot>
     </Header>
     <Toolbar
+      v-if="displayToolbar"
       :title="pageTitle"
       :breadcrumbs="breadcrumbs"
       :currentPage="currentPage"
     >
       <slot name="toolbar"></slot>
     </Toolbar>
-    <main class="relative flex flex-grow -mt-16 pb-16">
+    <main class="relative flex flex-grow pb-16" :class="displayToolbar ? '-mt-16' : ''">
       <div
         id="vueadmin-content"
         :class="{
@@ -52,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { contentWidthFluid } from "../core/helpers/config";
+import { contentWidthFluid, displayToolbar } from "../core/helpers/config";
 import { computed, defineComponent, onBeforeMount } from "vue";
 import { darkMode } from "../core/helpers/config";
 import { useRoute } from "vue-router";
@@ -93,9 +94,10 @@ export default defineComponent({
     });
 
     return {
-      contentWidthFluid,
       breadcrumbs,
+      contentWidthFluid,
       currentPage,
+      displayToolbar,
       pageTitle,
       viewKey,
       darkMode,
