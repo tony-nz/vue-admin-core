@@ -1,4 +1,3 @@
-import { darkMode } from "../helpers/config";
 import useConfigStore from "../../store/config";
 
 class LayoutService {

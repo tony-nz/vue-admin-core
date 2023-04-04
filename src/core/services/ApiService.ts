@@ -1,7 +1,7 @@
 import { App } from "vue";
+import { AxiosResponse, AxiosRequestConfig } from "axios";
 import axios from "axios";
 import VueAxios from "vue-axios";
-import { AxiosResponse, AxiosRequestConfig } from "axios";
 
 /**
  * @description service to call HTTP request via Axios
@@ -32,7 +32,7 @@ class ApiService {
     ] = "*";
     // ApiService.vueInstance.axios.defaults.headers.common[
     //   "Authorization"
-    // ] = `Token ${JwtService.getToken()}`;
+    // ] = `Token ${getToken()}`;
   }
 
   /**
