@@ -3,9 +3,9 @@
     <span class="duotone svg-icon">
       <inline-svg
         id="duotone"
-        :src="source"
-        :width="getWidth"
-        :height="getHeight"
+        :src="icon"
+        :width="width"
+        :height="height"
         :aria-label="ariaLabel"
         :fill="color"
       />
@@ -35,17 +35,9 @@ export default defineComponent({
     hover: {
       type: String,
     },
-    name: {
-      type: String,
-      // required: true,
-    },
     icon: {
       type: String,
-      // required: true,
-    },
-    path: {
-      type: String,
-      // required: true,
+      required: true,
     },
     width: {
       type: String,
@@ -53,16 +45,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const source = props.path + "/" + props.icon + ".svg";
-
-    const getHeight = computed(() => {
-      return props.height;
-    });
-
-    const getWidth = computed(() => {
-      return props.width;
-    });
-
     const getColor = computed(() => {
       const element = document.querySelector(".duotone");
       if (element && !props.color) {
@@ -72,12 +54,7 @@ export default defineComponent({
       return props.color;
     });
 
-    return {
-      getHeight,
-      getWidth,
-      source,
-      getColor,
-    };
+    return { getColor };
   },
 });
 </script>

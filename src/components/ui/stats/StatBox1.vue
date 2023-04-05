@@ -1,7 +1,7 @@
 <template>
   <div class="border border-gray-300 border-dashed rounded p-2.5">
     <span class="block flex flex-row gap-2" :class="classTitle">
-      <Duotone v-if="icon" :name="icon" :ariaLabel="ariaLabel" />
+      <Duotone v-if="icon" :icon="icon" :ariaLabel="ariaLabel" />
       {{ title }}
     </span>
     <span class="mt-1 block" :class="classDescription">{{ description }}</span>

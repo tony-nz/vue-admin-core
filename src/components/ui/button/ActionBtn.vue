@@ -1,10 +1,10 @@
 <template>
   <button type="button" :class="btnClass">
     <Duotone
-      :name="icon"
+      :icon="icon"
       :ariaLabel="ariaLabel"
-      :height="getHeight"
-      :width="getWidth"
+      :height="height"
+      :width="width"
       v-tooltip="tooltip ? tooltip : ariaLabel"
     />
   </button>
@@ -54,13 +54,6 @@ export default defineComponent({
     Duotone,
   },
   setup(props) {
-    const getHeight = computed(() => {
-      return props.height;
-    });
-
-    const getWidth = computed(() => {
-      return props.width;
-    });
     const btnClass = computed(() => {
       const bg =
         props.type === "delete"
@@ -70,7 +63,7 @@ export default defineComponent({
         ? props.class
         : "transition duration-150 ease-in-out rounded-lg p-2 shadow " + bg;
     });
-    return { btnClass, getHeight, getWidth };
+    return { btnClass };
   },
 });
 </script>

@@ -50,7 +50,7 @@
                       class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-indigo-500 text-white sm:h-12 sm:w-12"
                     >
                       <Duotone
-                        :name="item.icon['name']"
+                        :icon="item.icon['name']"
                         :class="item.icon['fill']"
                         aria-hidden="true"
                       />
@@ -83,7 +83,7 @@
                 >
                   <Duotone
                     v-if="item.icon"
-                    :name="item.icon['name']"
+                    :icon="item.icon['name']"
                     class="fill-gray-400"
                     aria-hidden="true"
                   />
