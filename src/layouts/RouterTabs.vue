@@ -23,6 +23,12 @@
           }"
           class="p-3"
         >
+          <span
+            v-if="item.icon && item.icon['path']"
+            class="svg-icon svg-icon-2x svg-icon-white mr-2"
+          >
+            <inline-svg :src="item.icon['path']" class="h-6 w-6" />
+          </span>
           {{ item.title }}
         </div>
       </router-link>

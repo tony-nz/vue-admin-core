@@ -147,6 +147,7 @@ export const useResourceRoutes = function (resource) {
         meta: {
           isCache: true,
           requiresAuth: true,
+          icon: resource.icon,
           layout: resource.layout,
           store,
           resource,
@@ -167,6 +168,7 @@ export const useResourceRoutes = function (resource) {
     path: `${formatKebabCase(resource.url)}`,
     meta: {
       title: upperCaseFirst(resource.name),
+      icon: resource.icon,
       isCache: resource.keepAlive || false,
     },
     children: crudChildren

@@ -33,15 +33,11 @@
                 @click="changeBackground(item)"
               >
                 <span
-                  v-if="item.icon && item.icon['svg']"
+                  v-if="item.icon && item.icon['path']"
                   class="svg-icon svg-icon-2x svg-icon-white mr-2"
                 >
-                  <inline-svg :src="item.icon['svg']" class="h-6 w-6" />
+                  <inline-svg :src="item.icon['path']" class="h-6 w-6" />
                 </span>
-                <i
-                  v-else-if="item.icon && item.icon['name']"
-                  :class="'text-green-600 mr-2 fa-sm ' + item.icon['name']"
-                ></i>
                 {{ translate(item.label) }}
               </Tab>
             </template>

@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export interface ITabsItem {
   name: string;
   path: string;
+  icon: string;
   activePath?: string;
   title: string;
   query?: {
@@ -23,6 +24,7 @@ const HOME_PAGE = {
   name: "home",
   path: "/dashboard",
   title: "Dashboard",
+  icon: "",
 };
 
 export const useTabsStore = defineStore({
@@ -49,6 +51,7 @@ export const useTabsStore = defineStore({
       this.tabs.push({
         name: route.name,
         path: route.path,
+        icon: route.meta.icon,
         title: route.meta.title,
         activePath: route.meta.activeMenu,
         query: route.query,
