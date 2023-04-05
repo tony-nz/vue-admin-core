@@ -72,14 +72,14 @@ export default defineComponent({
     });
 
     const getUserEmail = computed(() => {
-      return getUser.value["primaryEmail"]
-        ? getUser.value["primaryEmail"]
+      return getUser.value["email"]
+        ? getUser.value["email"]
         : "Missing email";
     });
 
     const getUserName = computed(() => {
-      return getUser.value["fullName"]
-        ? getUser.value["fullName"]
+      return getUser.value["name"]
+        ? getUser.value["name"]
         : "Missing name";
     });
 

@@ -16,38 +16,44 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 
-const iconPath = "/media/icons/duotone/";
-
 export default defineComponent({
   props: {
-    color: {
+    ariaLabel: {
       type: String,
-    },
-    hover: {
-      type: String,
+      default: null,
     },
     classes: {
       type: String,
     },
-    width: {
+    color: {
       type: String,
-      default: "16",
     },
     height: {
       type: String,
       default: "16",
     },
+    hover: {
+      type: String,
+    },
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
-    ariaLabel: {
+    icon: {
       type: String,
-      default: null,
+      // required: true,
+    },
+    path: {
+      type: String,
+      // required: true,
+    },
+    width: {
+      type: String,
+      default: "16",
     },
   },
   setup(props) {
-    const source = iconPath + props.name + ".svg";
+    const source = props.path + "/" + props.icon + ".svg";
 
     const getHeight = computed(() => {
       return props.height;
