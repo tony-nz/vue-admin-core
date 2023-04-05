@@ -21,7 +21,7 @@
         <div id="toolbar-actions" class="inline-flex" />
         <button
           @click="goBack()"
-          class="flex items-center transition duration-150 ease-in-out rounded-xl bg-opacity-30 bg-primary-700 hover:bg-gray-100 fill-white fill-gray-300 text-sm ml-4 p-2 px-4"
+          class="flex items-center transition duration-150 ease-in-out rounded-xl bg-opacity-30 bg-primary-700 hover:bg-gray-100 fill-white hover:fill-gray-300 text-sm ml-4 p-2 px-4"
         >
           <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
             <path d="M192 448c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25l160-160c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l137.4 137.4c12.5 12.5 12.5 32.75 0 45.25C208.4 444.9 200.2 448 192 448z" />

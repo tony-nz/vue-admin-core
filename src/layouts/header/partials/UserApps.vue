@@ -12,13 +12,36 @@
       >
         <span class="sr-only">Open user menu</span>
         <button
-          class="fill-white hover:bg-white hover:fill-slate-400 dark:hover:bg-slate-800 rounded-lg p-1"
+          class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 rounded-lg p-1"
         >
-          <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <!-- <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
               <rect id="bound" x="0" y="0" width="24" height="24"></rect>
-              <rect id="Rectangle-7" fill="#000000" x="4" y="4" width="7" height="7" rx="1.5"></rect>
-              <path d="M5.5,13 L9.5,13 C10.3284271,13 11,13.6715729 11,14.5 L11,18.5 C11,19.3284271 10.3284271,20 9.5,20 L5.5,20 C4.67157288,20 4,19.3284271 4,18.5 L4,14.5 C4,13.6715729 4.67157288,13 5.5,13 Z M14.5,4 L18.5,4 C19.3284271,4 20,4.67157288 20,5.5 L20,9.5 C20,10.3284271 19.3284271,11 18.5,11 L14.5,11 C13.6715729,11 13,10.3284271 13,9.5 L13,5.5 C13,4.67157288 13.6715729,4 14.5,4 Z M14.5,13 L18.5,13 C19.3284271,13 20,13.6715729 20,14.5 L20,18.5 C20,19.3284271 19.3284271,20 18.5,20 L14.5,20 C13.6715729,20 13,19.3284271 13,18.5 L13,14.5 C13,13.6715729 13.6715729,13 14.5,13 Z" id="Combined-Shape" fill="#000000" opacity="0.3"></path>
+              <rect id="Rectangle-7" x="4" y="4" width="7" height="7" rx="1.5"></rect>
+              <path d="M5.5,13 L9.5,13 C10.3284271,13 11,13.6715729 11,14.5 L11,18.5 C11,19.3284271 10.3284271,20 9.5,20 L5.5,20 C4.67157288,20 4,19.3284271 4,18.5 L4,14.5 C4,13.6715729 4.67157288,13 5.5,13 Z M14.5,4 L18.5,4 C19.3284271,4 20,4.67157288 20,5.5 L20,9.5 C20,10.3284271 19.3284271,11 18.5,11 L14.5,11 C13.6715729,11 13,10.3284271 13,9.5 L13,5.5 C13,4.67157288 13.6715729,4 14.5,4 Z M14.5,13 L18.5,13 C19.3284271,13 20,13.6715729 20,14.5 L20,18.5 C20,19.3284271 19.3284271,20 18.5,20 L14.5,20 C13.6715729,20 13,19.3284271 13,18.5 L13,14.5 C13,13.6715729 13.6715729,13 14.5,13 Z"></path>
+            </g>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6" viewBox="0 0 16 16">
+            <path d="M1 1H7V7H1V1Z" />
+            <path d="M9 1H15V7H9V1Z" />
+            <path d="M1 9H7V15H1V9Z" />
+            <path d="M9 9H15V15H9V9Z" />
+          </svg> -->
+          <svg
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" 
+            class="h-5 w-5 rounded-sm"
+            viewBox="0 0 35 35"
+            xml:space="preserve"
+          >
+            <g>
+              <g>
+                <rect width="16" height="16" />
+                <rect x="19" width="16" height="16" />
+                <rect y="19" width="16" height="16" />
+                <rect x="19" y="19" width="16" height="16" />
+              </g>
             </g>
           </svg>
         </button>
@@ -50,7 +73,7 @@
                       class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-indigo-500 text-white sm:h-12 sm:w-12"
                     >
                       <Duotone
-                        :icon="item.icon['name']"
+                        :icon="item.icon['path']"
                         :class="item.icon['fill']"
                         aria-hidden="true"
                       />
@@ -83,7 +106,7 @@
                 >
                   <Duotone
                     v-if="item.icon"
-                    :icon="item.icon['name']"
+                    :icon="item.icon['path']"
                     class="fill-gray-400"
                     aria-hidden="true"
                   />
