@@ -1,7 +1,8 @@
-import { AuthConfig } from "../types/AuthTypes";
+import { AuthConfig } from "../types/AuthConfigTypes";
 
 const config: AuthConfig = {
   api: {
+    baseURL: "http://localhost:8000",
     csrfCookie: "/sanctum/csrf-cookie",
     login: "/login",
     logout: "/logout",

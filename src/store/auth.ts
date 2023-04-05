@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AuthConfig } from "../core/types/AuthTypes";
+import { AuthConfig } from "../core/types/AuthConfigTypes";
 import ApiService from "../core/services/ApiService";
 import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";

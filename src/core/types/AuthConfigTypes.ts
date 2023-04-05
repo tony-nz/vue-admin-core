@@ -1,4 +1,5 @@
 interface API {
+  baseURL: string;
   csrfCookie: string;
   login: string;
   logout: string;
@@ -18,7 +19,6 @@ interface AuthConfig {
   api: API;
   oauth: OAuth;
 }
-
 
 export default AuthConfig;
 

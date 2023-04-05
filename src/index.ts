@@ -30,7 +30,7 @@ import { useTabsStore } from "./store/tabs";
 /**
  * Types
  */
-import { AuthConfig } from "./core/types/AuthTypes";
+import { AuthConfig } from "./core/types/AuthConfigTypes";
 import { Item, ChildField, Field } from "./core/types/FieldTypes";
 import {
   Theme,

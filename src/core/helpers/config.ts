@@ -25,7 +25,7 @@ export const displayLoader = computed(() => {
  */
 export const displayLogo = computed(() => {
   const configStore = useConfigStore();
-  return configStore.getLayoutConfig("main.logo.display");
+  return configStore.getLayoutConfig("logo.display");
 });
 
 /**

@@ -1,7 +1,10 @@
 import { App } from "vue";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import axios from "axios";
+import useAuthStore from "../../store/auth";
 import VueAxios from "vue-axios";
+
+const BASE_URL = "http://localhost:8000";
 
 /**
  * @description service to call HTTP request via Axios
@@ -16,10 +19,15 @@ class ApiService {
    * @description initialize vue axios
    */
   public static init(app: App<Element>) {
+    const authStore = useAuthStore();
+
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    // TODO move this to env file
-    ApiService.vueInstance.axios.defaults.baseURL = "http://localhost:8000";
+    ApiService.vueInstance.axios.defaults.baseURL = authStore.AuthConfig(
+      "api.baseURL"
+    )
+      ? authStore.AuthConfig("api.baseURL")
+      : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
   }
 

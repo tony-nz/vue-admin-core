@@ -8,18 +8,12 @@ export default defineConfig({
   plugins: [
     dts({
       include: "src/*.d.ts",
+      // insertTypesEntry: true,
     }),
     copy({
       targets: [{ src: "./src/index.d.ts", dest: "./dist" }],
     }),
     vue(),
-    // {
-    //   name: "copy-index-dts",
-    //   writeBundle: async () => {
-    //     const { promises } = require("fs");
-    //     await promises.copyFile("./src/index.d.ts", "./dist/index.d.ts");
-    //   },
-    // },
   ],
   build: {
     commonjsOptions: {
