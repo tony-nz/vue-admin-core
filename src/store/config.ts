@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import defaultLayoutConfig from "../core/config/DefaultLayoutConfig";
 import LayoutConfigTypes from "../core/types/LayoutConfigTypes";
+import UserMenu from "../core/types/UserMenuTypes";
 import UserAppMenu from "../core/types/UserAppsMenuTypes";
 import type MainMenu from "../core/types/MainMenuTypes";
 import objectPath from "object-path";
@@ -13,7 +14,7 @@ interface Config {
   locale: string;
   menu: {
     apps: UserAppMenu;
-    user: UserAppMenu[];
+    user: UserMenu[];
     main: MainMenu[];
   };
   resources: any;
@@ -155,7 +156,7 @@ const useConfigStore = defineStore({
     getMainMenu(): MainMenu[] {
       return this.config.menu.main;
     },
-    getUserMenu(): UserAppMenu[] {
+    getUserMenu(): UserMenu[] {
       return this.config.menu.user;
     },
     getResources(): any[] {
