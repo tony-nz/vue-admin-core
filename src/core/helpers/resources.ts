@@ -137,7 +137,7 @@ const buildResourceConfig = (resource) => {
 
   return {
     ...resource,
-    icon: resource.icon || "mdi-view-grid",
+    icon: resource.icon || "",
     routes,
     actions,
     getName,

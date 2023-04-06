@@ -12,7 +12,7 @@
       >
         <span class="sr-only">Open user menu</span>
         <button
-          class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 rounded-lg p-1"
+          class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 rounded-lg p-2"
         >
           <!-- <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
