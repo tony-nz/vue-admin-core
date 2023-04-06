@@ -11,11 +11,6 @@ import useNotificationStore from "./notification";
 const stores = {};
 let storeActions = {};
 
-/**
- * TODO
- * Rewrite state.whatever* to getters and setters...
- */
-
 const {
   CREATE,
   DELETE,

@@ -6,7 +6,7 @@
           @updateData="updateData"
           @validated="validated"
           :allowedFields="allowedFields"
-          :data="modalData"
+          :data="data"
           :fetchData="fetchData"
           :form="fields"
           :type="'form'"
@@ -94,7 +94,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const dataId = ref();
     const dataValues = ref();
-    const modalData = ref(props.data);
+    const modalData = ref();
     const modalType = ref(props.type);
     const showModal = ref(false);
     const submit = ref(false);

@@ -16,7 +16,7 @@ interface Config {
     user: UserAppMenu[];
     main: MainMenu[];
   };
-  resources: any[];
+  resources: any;
 }
 
 interface IState {
@@ -35,7 +35,7 @@ const useConfigStore = defineStore({
         main: [],
         user: [],
       },
-      resources: [],
+      resources: {},
     },
   }),
   actions: {
@@ -72,7 +72,7 @@ const useConfigStore = defineStore({
        * Initialize Resources
        */
       if (payload?.resources) {
-        this.setResources(Object.assign({}, payload.resources));
+        this.setResources(payload.resources);
       }
     },
     setMenuMain(payload): void {
@@ -86,7 +86,7 @@ const useConfigStore = defineStore({
       this.config.menu.user = payload;
     },
     setResources(payload): void {
-      this.config.resources = payload;
+      this.config.resources = Object.assign({}, payload);
     },
     setLayout(payload): void {
       this.config.layout = payload;

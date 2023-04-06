@@ -15,7 +15,7 @@ function init(router) {
    * Install resources
    */
   Object.values(resources).forEach((item: any) => {
-    const resource = buildResourceConfig(item.resource);
+    const resource = buildResourceConfig(item);
     useResourceStore(resource)();
     router.addRoute("home", useResourceRoutes(resource));
   });
