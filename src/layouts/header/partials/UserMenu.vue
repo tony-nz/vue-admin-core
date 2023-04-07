@@ -6,63 +6,65 @@
       <span class="sr-only">Open user menu</span>
       <img class="h-10 w-10 rounded-lg" :src="getUserAvatar" alt="" />
     </button>
-    <ContextMenu id="userMenu" ref="contextMenu" :model="userMenuConfig" :autoZIndex="true" class="p-2 w-72">
+    <ContextMenu id="userMenu" ref="contextMenu" :model="userMenuConfig" :autoZIndex="true" class="p-0 w-72">
       <template #item="{ item }">
-        <div v-if="item.header">
-          <div class="flex-shrink-0 flex pb-4">
-            <div class="flex-shrink-0 w-full group block">
-              <div class="flex items-center">
-                <div>
-                  <img class="w-14 h-14 rounded" :src="getUserAvatar" alt="" />
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
-                    {{ getUserName }}
-                  </p>
-                  <p class="text-xs font-medium text-gray-500 group-hover:text-gray-700">
-                    {{ getUserEmail }}
-                  </p>
-                </div>
-              </div>
+        <div v-if="item.header" class="flex-shrink-0 flex p-2 rounded-t bg-slate-100 border-b-2 border-emerald-500">
+          <div class="flex items-center">
+            <div>
+              <img class="w-12 h-12 rounded-full ring-offset-2 ring-2 ring-emerald-500" :src="getUserAvatar" alt="" />
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                {{ getUserName }}
+              </p>
+              <p class="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                {{ getUserEmail }}
+              </p>
             </div>
           </div>
         </div>
         <router-link v-if="item.to" :to="item.to" custom v-slot="{ navigate, isActive, isExactActive }">
           <button @click="processMenuCommand(navigate)"
-            class="hover:bg-gray-100 hover:bg-opacity-50 hover:text-blue-500 w-full hover:rounded-lg items-center overflow-hidden flex p-4 py-3"
+            class="flex p-4 py-3 overflow-hidden text-sm font-medium text-gray-700 group-hover:text-gray-900 hover:bg-gray-100 hover:bg-opacity-50 hover:text-blue-500 "
             :class="{
               'active-link': isActive,
               'active-link-exact': isExactActive,
             }">
-            {{ item.label }}
+            {{ translate(item.label) }}
           </button>
         </router-link>
         <button v-else-if="item.label" @click="processMenuCommand(item.command)"
           class="hover:bg-gray-100 hover:bg-opacity-50 hover:text-blue-500 w-full hover:rounded-lg items-center overflow-hidden flex p-4 py-3">
-          {{ item.label }}
+          {{ translate(item.label) }}
           <div v-if="item.label == 'Language'" class="py-1 px-2 bg-gray-200 rounded ml-auto mr-2 text-xs">
             {{ getUserLocale }}
           </div>
           <span v-if="item.items" :class="{ 'p-menuitem-language': item.label == 'Language' }"
             class="p-submenu-icon pi pi-angle-right"></span>
         </button>
-        <div v-if="item.footer" class="ml-auto w-20 grid grid-cols-3 gap-10 place-items-end">
-          <button @click="toggleFullscreen()"
-            class="bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60 p-2 rounded-lg">
+        <div v-if="item.footer" class="flex justify-end p-2">
+          <button
+            @click="toggleContentWidth()"
+            :class="btnClass"
+          >
             <span class="hover:fill-gray-400 fill-blue-400">
               <inline-svg v-if="isFullscreen" class="h-4 w-4" src="/media/icons/duotone/brightness.svg" />
               <inline-svg v-if="!isFullscreen" class="h-4 w-4" src="/media/icons/duotone/moon-stars.svg" />
             </span>
           </button>
-          <button @click="toggleContentWidth()"
-            class="bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60 p-2 rounded-lg">
+          <button
+            @click="toggleContentWidth()"
+            :class="btnClass"
+          >
             <span class="hover:fill-gray-400 fill-blue-400">
               <inline-svg v-if="isFluid" class="h-4 w-4" src="/media/icons/duotone/compress-wide.svg" />
               <inline-svg v-if="!isFluid" class="h-4 w-4" src="/media/icons/duotone/expand-wide.svg" />
             </span>
           </button>
-          <button @click="toggleFullscreen()"
-            class="bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60 p-2 rounded-lg">
+          <button
+            @click="toggleFullscreen()"
+            :class="btnClass"
+          >
             <span class="hover:fill-gray-400 fill-blue-400">
               <inline-svg v-if="isFullscreen" class="h-4 w-4"
                 src="/media/icons/duotone/down-left-and-up-right-to-center.svg" />
@@ -77,7 +79,6 @@
 </template>
 
 <script lang="ts">
-import Duotone from "../../../components/ui/icons/Duotone.vue";
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { darkMode, toggleDarkMode } from "../../../core/helpers/config";
 import { translate } from "../../../core/helpers/functions";
@@ -87,14 +88,11 @@ import useConfigStore from "../../../store/config";
 
 export default defineComponent({
   name: "UserMenu",
-  components: {
-    // TODO change this back to menu
-    Duotone,
-  },
   setup() {
     const isMounted = ref(false);
     const userMenuConfig = useConfigStore().getUserMenu;
     const contextMenu = ref();
+    const btnClass = ref("w-8 ml-2 p-2 rounded-lg bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60")
     const store = useAuthStore();
 
     const toggle = (event) => {
@@ -245,6 +243,7 @@ export default defineComponent({
       showMenu,
       focusedIndex,
       isMounted,
+      btnClass,
     };
   },
 });
