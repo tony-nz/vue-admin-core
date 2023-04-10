@@ -15,55 +15,49 @@
         <TabPanels v-model="activeTab">
           <template v-for="(menu, i) in mainMenuConfig" :key="i">
             <TabPanel v-if="menu.items">
-              <Menubar :model="menu.items">
-                <template #item="{ item }">
+              <nav
+                class="flex-col flex-grow hidden pb-4 md:pb-0 md:flex md:justify-end md:flex-row"
+              >
+                <template v-for="item in menu.items" :key="item.to">
                   <router-link
-                    v-if="!item.divider"
-                    :to="item.to ? item.to : ''"
+                    v-if="item && !item.items && !item.external && item.to"
+                    v-slot="{ isActive, isExactActive, navigate }"
+                    :to="item.to"
                     custom
-                    v-slot="{
-                      href,
-                      navigate,
-                      isActive,
-                      isExactActive,
-                    }"
                   >
                     <button
-                      v-if="item.label && item.to && item.items"
-                      :class="[
-                        {
-                          'bg-red-200 bg-opacity-70 text-blue-300': checkRoute(
-                            item.to
-                          ),
-                          'bg-red-400': isActive,
-                          'bg-red-500': isExactActive,
-                        },
-                        routeClass,
-                      ]"
-                    >
-                      {{ translate(item.label) }}
-                    </button>
-                    <a
-                      v-else
-                      :href="href"
                       @click="navigate"
                       :class="[
-                        {
-                          'bg-slate-200 bg-opacity-70 dark:bg-slate-700 dark:text-white dark:hover:text-slate-300 text-slate-800': checkRoute(
-                            item.to
-                          ),
-                          'bg-gray-200 dark:bg-slate-700': isActive && !item.items,
-                          'bg-gray-200 ':
-                            isExactActive && item.items && checkChild(item),
-                        },
-                        'hover:bg-slate-200 hover:bg-opacity-70 hover:text-slate-800 dark:hover:bg-slate-700 dark:hover:text-white shadow-none rounded-lg px-3 py-2 mr-2',
+                        defaultClass,
+                        (isActive || isExactActive) && activeClass,
                       ]"
                     >
-                      {{ translate(item.label) }}
-                    </a>
+                      <div class="flex flex-row items-center justify-center">
+                        <div v-if="item.icon" class="mr-2">
+                          <inline-svg :src="item.icon" class="h-4 w-4" />
+                        </div>
+                        {{ translate(item.label) }}
+                      </div>
+                    </button>
                   </router-link>
+                  <a
+                    v-if="item.external"
+                    :href="item.to"
+                    target="_blank"
+                    :class="defaultClass"
+                  >
+                    <div class="flex flex-row items-center justify-center">
+                      <div v-if="item.icon" :class="{ 'mr-2': item.label.length > 0 }">
+                        <inline-svg :src="item.icon" class="h-4 w-4" />
+                      </div>
+                      {{ translate(item.label) }}
+                    </div>
+                  </a>
+                  <div v-if="item.items" class="relative md:ml-4">
+                    <DropdownMenu :activeClass="activeClass" :item="item" />
+                  </div>
                 </template>
-              </Menubar>
+              </nav>
             </TabPanel>
           </template>
         </TabPanels>
@@ -80,13 +74,15 @@ import { translate } from "../../core/helpers/functions";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanel from "../../components/ui/tabs/TabPanel.vue";
 import useConfigStore from "../../store/config";
-import MainMenu from "../../core/types/MainMenuTypes";
+import type { MainMenu } from "../../core/types/MainMenuTypes";
 import useAuthStore from "../../store/auth";
+import DropdownMenu from "./partials/DropdownMenu.vue";
 
 export default defineComponent({
   name: "SecondaryMenu",
   props: ["tab"],
   components: {
+    DropdownMenu,
     TabPanels,
     TabPanel,
   },
@@ -97,7 +93,7 @@ export default defineComponent({
   },
   setup(props) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useConfigStore().getMainMenu;
+    const mainMenuConfig: MainMenu[] = useConfigStore().getMainMenu;
     const routeClass = ref(
       "hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2"
     );
@@ -120,7 +116,12 @@ export default defineComponent({
     };
 
     const store = useAuthStore();
+    const activeClass = ref("text-gray-900 bg-gray-200");
+    const defaultClass = ref("px-4 py-2 mt-2 text-sm font-semibold rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline");
+
     return {
+      activeClass,
+      defaultClass,
       store,
       activeTab,
       checkChild,
@@ -133,3 +134,10 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+.p-menubar {
+  padding: 1rem 0 !important;
+  background: none !important;
+  border: none !important;
+}
+</style>

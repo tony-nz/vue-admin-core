@@ -7,22 +7,23 @@ interface MenuItemIcon {
 
 interface MenuItem {
   divider: boolean;
+  external: string;
   label: string;
   to: string;
-  icon?: Array<MenuItemIcon>;
+  icon?: string;
   items?: Array<MenuItem>;
 }
 
 interface MainMenu {
-  label: string;
+  label?: string;
   to?: string;
   bg?: string;
   color?: string;
   class?: string;
   slug?: string;
-  svgIcon: string;
+  svgIcon?: string;
   icon?: Array<MenuItemIcon>;
-  items: Array<any>;
+  items?: Array<MenuItem>;
 }
 
 export default MainMenu;
