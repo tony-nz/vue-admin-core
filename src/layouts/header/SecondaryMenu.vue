@@ -53,7 +53,7 @@
                       {{ translate(item.label) }}
                     </div>
                   </a>
-                  <div v-if="item.items" class="relative md:ml-4">
+                  <div v-if="item.items" class="relative md:mr-4">
                     <DropdownMenu :activeClass="activeClass" :item="item" />
                   </div>
                 </template>
@@ -117,7 +117,7 @@ export default defineComponent({
 
     const store = useAuthStore();
     const activeClass = ref("text-gray-900 bg-gray-200");
-    const defaultClass = ref("px-4 py-2 mt-2 text-sm font-semibold rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline");
+    const defaultClass = ref("px-4 py-2 mt-2 text-sm rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline");
 
     return {
       activeClass,
