@@ -32,6 +32,7 @@ interface IState {
     lastSync: number;
     userList: any[];
   };
+  loading: boolean;
   resource: ResourceConfig;
 }
 
@@ -308,7 +309,7 @@ const useResourceStore = function (resource) {
            * Set loading to false
            * and show success message
            */
-          apiStore.setLoading(resourceStore, false);
+          apiStore.setLoading(state, false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -321,7 +322,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           const message = e.response?.data?.message || false;
-          apiStore.setLoading(resourceStore, false);
+          apiStore.setLoading(state, false);
           resourceStore.showError(resourceStore, e.message, message);
 
           return Promise.reject(e);
@@ -337,6 +338,7 @@ const useResourceStore = function (resource) {
         list: [],
         userList: [],
       },
+      loading: false,
       resource,
     }),
     actions: {

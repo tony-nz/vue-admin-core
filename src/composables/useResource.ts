@@ -179,17 +179,6 @@ export default function useResource(
           stateList: stateList.value,
           stateUser: stateUser.value,
         });
-        // resourceData.value = await store
-        //   .dispatch(`${upperCaseFirst(resource.name + "Resource/getList")}`, {
-        //     apiUrl: options?.params?.apiUrl ? options?.params.apiUrl : null,
-        //     params: options?.params ? options?.params : null,
-        //     routeId: routeId.value,
-        //     stateList: stateList.value,
-        //     stateUser: stateUser.value,
-        //   })
-        //   .then(({ data }) => {
-        //     return data;
-        //   });
       }
     }
   }

@@ -125,9 +125,7 @@ export default defineComponent({
     function fetchData(params) {
       const configStore = useConfigStore();
       const resources = configStore.getResources;
-
-      console.log(params);
-      console.log(resources);
+      
       if (params.resourceName) {
         try {
           for (const [key, value] of Object.entries(resources)) {
@@ -136,7 +134,7 @@ export default defineComponent({
             }
           }
           const resourceStore = useResourceStore(resource.value)();
-          return resourceStore.getList().then(({ data }) => {
+          return resourceStore.getList({}).then(({ data }) => {
             if (typeof data == "undefined") {
               return null;
             }

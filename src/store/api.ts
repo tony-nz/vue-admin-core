@@ -13,7 +13,7 @@ const useApiStore = defineStore({
   }),
   actions: {
     setLoading(state, loading) {
-      state.loading = loading;
+      state.loading = loading ? loading : false;
       if (!loading) {
         state.refresh = false;
       }
