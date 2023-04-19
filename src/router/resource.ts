@@ -62,7 +62,8 @@ export const useResourceRoutes = function (resource) {
         name: resourceName(name, action),
         props: true,
         component: {
-          props: ["id", "title", "resource", "store", "permissions"],
+          // TODO: Remove this after testing
+          // props: ["id", "title", "resource", "store", "permissions"],
           render(c) {
             const authStore = useAuthStore();
             const components = JSON.parse(
@@ -70,7 +71,7 @@ export const useResourceRoutes = function (resource) {
             );
             const props = {
               // id: route.params.id,
-              title: getTitle,
+              title: getTitle(action),
               resource,
               store,
               permissions: authStore.getPermissions,
