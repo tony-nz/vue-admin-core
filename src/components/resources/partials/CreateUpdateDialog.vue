@@ -126,6 +126,8 @@ export default defineComponent({
       const configStore = useConfigStore();
       const resources = configStore.getResources;
 
+      console.log(params);
+      console.log(resources);
       if (params.resourceName) {
         try {
           for (const [key, value] of Object.entries(resources)) {
