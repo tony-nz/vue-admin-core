@@ -16,6 +16,11 @@ import "./assets/style.css";
 import { createPinia } from "pinia";
 
 /**
+ * Services
+ */
+import ApiService from "./core/services/ApiService";
+
+/**
  * Stores
  */
 import useApiStore from "./store/api";
@@ -156,6 +161,11 @@ export {
   useCurrentTime,
   upperCaseFirst,
 
+  /**
+   * Services
+   */
+  ApiService,
+  
   /**
    * Stores
    */

@@ -160,7 +160,7 @@ export default defineComponent({
   },
   setup(props) {
     // layout with grid or list
-    const layout = ref("grid");
+    const layout = ref();
     const sortKey = ref();
     const sortOrder = ref();
     const sortField = ref();

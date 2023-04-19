@@ -43,6 +43,9 @@
 
 <script>
 import { defineComponent, onMounted, watch, ref } from "vue";
+import ApiService from "../../../core/services/ApiService";
+import useConfigStore from "../../../store/config";
+import useResourceStore from "../../../store/resource";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
@@ -120,29 +123,32 @@ export default defineComponent({
     const resource = ref();
 
     function fetchData(params) {
-      // if (params.resourceName) {
-      //   try {
-      //     for (const [key, value] of Object.entries(resources)) {
-      //       if (value.resource.name == params.resourceName) {
-      //         resource.value = value.resource;
-      //       }
-      //     }
-      //     const resourceStore = useResourceStore(resource.value)();
-      //     return resourceStore.getList().then(({ data }) => {
-      //       if (typeof data == "undefined") {
-      //         return null;
-      //       }
-      //       return data;
-      //     });
-      //   } catch (e) {
-      //     // TODO ERROR LOG
-      //     console.log(e);
-      //   }
-      // }
-      // return ApiService.get(params.url).then((res) => {
-      //   // state.value.options[fieldId] = res.data.data;
-      //   return res.data.data;
-      // });
+      const configStore = useConfigStore();
+      const resources = configStore.getResources;
+
+      if (params.resourceName) {
+        try {
+          for (const [key, value] of Object.entries(resources)) {
+            if (value.name == params.resourceName) {
+              resource.value = value;
+            }
+          }
+          const resourceStore = useResourceStore(resource.value)();
+          return resourceStore.getList().then(({ data }) => {
+            if (typeof data == "undefined") {
+              return null;
+            }
+            return data;
+          });
+        } catch (e) {
+          // TODO ERROR LOG
+          console.log(e);
+        }
+      }
+      return ApiService.get(params.url).then((res) => {
+        // state.value.options[fieldId] = res.data.data;
+        return res.data.data;
+      });
     }
 
     onMounted(() => {
