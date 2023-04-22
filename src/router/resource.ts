@@ -73,7 +73,7 @@ export const useResourceRoutes = function (resource) {
               // id: route.params.id,
               title: getTitle(action),
               resource,
-              store,
+              // store,
               permissions: authStore.getPermissions,
             };
             if (
