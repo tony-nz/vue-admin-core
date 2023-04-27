@@ -103,12 +103,6 @@ import TreeTable from "primevue/treetable";
 import TriStateCheckbox from "primevue/tristatecheckbox";
 import VirtualScroller from "primevue/virtualscroller";
 
-// styling
-// import "primevue/resources/themes/tailwind-light/theme.css";
-// import "../../assets/tailwind-light/theme.css";
-// import "primevue/resources/primevue.min.css";
-// import "primeicons/primeicons.css";
-
 /**
  * Initialize PrimeVUE component
  * @param app vue instance
