@@ -1,8 +1,7 @@
 import { formatKebabCase, upperCaseFirst } from "./functions";
 import i18n from "../plugins/i18n";
+import useConfigStore from "../../store/config";
 
-// import useAuthStore from "../../store/auth";
-// const authStore = useAuthStore();
 /**
  * Permissions helper & directive
  */
@@ -135,7 +134,8 @@ const buildResourceConfig = (resource) => {
     return te(nameKey) ? tc(nameKey, count) : upperCaseFirst(resource.name);
   };
 
-  return {
+  // convert below into const
+  const resourceConfig = {
     ...resource,
     icon: resource.icon || "",
     routes,
@@ -197,6 +197,11 @@ const buildResourceConfig = (resource) => {
       return permissions.length && can(permissions);
     },
   };
+  
+  // update resource config
+  useConfigStore().updateResource(resourceConfig);
+
+  return resourceConfig;
 };
 
 const dataFilter = (filters, resource) => {

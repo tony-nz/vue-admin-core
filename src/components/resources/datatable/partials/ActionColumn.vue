@@ -74,7 +74,7 @@ export default defineComponent({
       default: 3,
     },
     flex: {
-      type: String,
+      type: [String, undefined],
       default: "justify-end",
       required: false,
     },

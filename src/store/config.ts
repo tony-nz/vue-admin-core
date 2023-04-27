@@ -132,6 +132,9 @@ const useConfigStore = defineStore({
         );
       }
     },
+    updateResource(resource): void {
+      this.config.resources[resource.name] = resource;
+    },
   },
   getters: {
     getDarkMode(): boolean {
