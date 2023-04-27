@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @import "./fontawesome/css/all.css"; */
 @import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
 html {
@@ -25,12 +24,6 @@ body {
 /* for 100% screen realstate */
 .container-fluid {
   width: 100%;
-}
-
-.p-component {
-  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-size: 0.9rem;
-  font-weight: normal;
 }
 
 .p-menuitem-language {

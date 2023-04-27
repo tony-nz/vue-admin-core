@@ -105,9 +105,9 @@ import VirtualScroller from "primevue/virtualscroller";
 
 // styling
 // import "primevue/resources/themes/tailwind-light/theme.css";
-import "../../assets/tailwind-light/theme.css";
-import "primevue/resources/primevue.min.css";
-import "primeicons/primeicons.css";
+// import "../../assets/tailwind-light/theme.css";
+// import "primevue/resources/primevue.min.css";
+// import "primeicons/primeicons.css";
 
 /**
  * Initialize PrimeVUE component
