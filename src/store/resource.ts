@@ -417,6 +417,7 @@ const useResourceStore = function (resource) {
     },
     getters: {
       getDataItem(): any {
+        console.log("getDataItem", this.data.item);
         return this.data.item;
       },
       getDataList(): any {
