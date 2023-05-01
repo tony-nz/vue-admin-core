@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-emerald-600 bg-breadcrumb-hero pt-8 pb-16 relative"
+    class="bg-secondary-600 bg-breadcrumb-hero pt-8 pb-16 relative"
   >
     <div
       id="vueadmin-toolbar"
