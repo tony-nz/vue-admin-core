@@ -26,17 +26,29 @@
           class="bg-primary-500 hover:bg-primary-400 text-white text-sm py-2 px-4 rounded shadow whitespace-nowrap"
           @click="showCreateEdit('dialog', 'create')"
         >
-          Create {{ getSingularizedLabel(resource.label) }}
+          <span v-if="!simpleCreate">{{ translate("va.messages.create")}} {{ getSingularizedLabel(resource.label) }}</span>
+          <span v-else>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M0 192C0 174.3 14.33 160 32 160H352C369.7 160 384 174.3 384 192C384 209.7 369.7 224 352 224V256C352 333.4 297 397.1 224 412.8V512H160V412.8C86.97 397.1 32 333.4 32 256V224C14.33 224 0 209.7 0 192V192z" />
+              <path class="opacity-40" d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
+            </svg>
+          </span>
         </button>
         <router-link
           v-else-if="
             resource?.create?.page && toolbar?.teleport?.createBtn != false
           "
-          to="/sms/classrooms/create"
+          :to="resource.url + '/create'"
           type="button"
           class="bg-primary-500 hover:bg-primary-400 text-white text-sm py-2 px-8 rounded shadow whitespace-nowrap"
         >
-          Create {{ getSingularizedLabel(resource.label) }}
+          <span v-if="!simpleCreate">{{ translate("va.messages.create")}} {{ getSingularizedLabel(resource.label) }}</span>
+          <span v-else>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+              <path d="M0 192C0 174.3 14.33 160 32 160H352C369.7 160 384 174.3 384 192C384 209.7 369.7 224 352 224V256C352 333.4 297 397.1 224 412.8V512H160V412.8C86.97 397.1 32 333.4 32 256V224C14.33 224 0 209.7 0 192V192z" />
+              <path class="opacity-40" d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
+            </svg>
+          </span>
         </router-link>
       </div>
     </Teleport>
@@ -207,6 +219,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, PropType, ref } from "vue";
+import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import {
   upperCaseFirst,
@@ -317,6 +330,10 @@ export default defineComponent({
       default: true,
     },
     showTeleportToolbar: {
+      type: Boolean,
+      default: false,
+    },
+    simpleCreate: {
       type: Boolean,
       default: false,
     },
@@ -432,6 +449,7 @@ export default defineComponent({
       showCreateEdit,
       showDeletePopup,
       getSingularizedLabel,
+      translate,
     };
   },
 });
