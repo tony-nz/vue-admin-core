@@ -344,7 +344,9 @@ const useResourceStore = function (resource) {
     actions: {
       ...storeActions,
       setItem(state, item) {
-        state.data.item = item;
+        console.log("setItem", item);
+        console.log("setItem", item);
+        this.data.item = item;
       },
       setList(state, { stateList, stateUser, data }) {
         if (stateUser && data) {

@@ -56,7 +56,7 @@ export const useResourceRoutes = function (resource) {
   const buildRoute = (resource: any, action, path) => {
     try {
       const routerPermissions = buildPermissions(resource);
-      const store = useResourceStore(resource);
+      const store = useResourceStore(resource)();
       return {
         path,
         name: resourceName(name, action),
@@ -107,14 +107,14 @@ export const useResourceRoutes = function (resource) {
                * Route model binding
                */
               try {
-                const { data } = await store.getOne({
+                const { data } = await store.getOne({}, {
                   params: { id },
                 });
 
                 /**
                  * Insert model into route & resource store
                  */
-                store.setItem(data);
+                store.setItem({}, data);
 
                 if (to.params.id) {
                   setTitle(to, action, data);
