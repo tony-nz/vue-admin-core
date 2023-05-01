@@ -12,7 +12,7 @@ import Card from "../../ui/card/Card.vue";
 import DataTable from "../datatable/AdvDataTable.vue";
 
 export default defineComponent({
-  name: "MyListGuesser",
+  name: "ListGuesser",
   props: {
     name: {
       type: String,

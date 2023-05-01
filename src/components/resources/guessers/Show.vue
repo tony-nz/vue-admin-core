@@ -1,9 +1,17 @@
 <template>
   <VaCard v-if="isMounted">
+    <template v-slot:toolbar>
+      <Button
+        label="va.actions.save"
+        @click="submit = true"
+        :class="{ 'opacity-50': submit }"
+        :disabled="submit"
+      />
+    </template>
     <VueFormGenerator
       @updateData="updateData"
       @validated="validated"
-      :data="data"
+      :data="modalData"
       :fetchData="fetchData"
       :form="resource.fields"
       :type="'form'"
@@ -17,36 +25,10 @@ import { defineComponent, onMounted, watch, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useConfigStore from "../../../store/config";
 import useResourceStore from "../../../store/resource";
+import { useRoute } from "vue-router";
 
 export default defineComponent({
-  name: "Show",
-  methods: {
-    close() {
-      this.$emit("close");
-    },
-    onSubmit() {
-      this.submit = true;
-    },
-    updateData(data) {
-      this.modalData = data;
-    },
-    validated(valid, data = null) {
-      this.modalData = data;
-      if (valid) {
-        if (this.dataValues) {
-          // add dataValues to modalData
-          this.modalData = { ...this.modalData, ...this.dataValues };
-        }
-        if (this.modalType == "create") {
-          this.$emit("create", this.modalData, this.dataId, this.subId);
-        } else if (this.modalType == "update") {
-          this.$emit("update", this.modalData, this.dataId, this.subId);
-        }
-        this.$emit("close");
-      }
-      this.submit = false;
-    },
-  },
+  name: "ShowGuesser",
   props: {
     resource: {
       type: Object,
@@ -54,15 +36,17 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const dataId = ref();
     const dataValues = ref();
-    const modalData = ref();
-    const modalType = ref(props.type);
-    const showModal = ref(false);
-    const submit = ref(false);
-    const data = ref();
     const isMounted = ref(false);
+    const modalData = ref();
+    const route = useRoute();
+    const store = useResourceStore(props.resource)();
+    const submit = ref(false);
 
+    /**
+     * fetchData
+     * @param {object} params
+     */
     function fetchData(params) {
       const configStore = useConfigStore();
       const resources = configStore.getResources;
@@ -91,8 +75,36 @@ export default defineComponent({
       });
     }
 
+    /**
+     * updateData
+     * @param {object} data
+     */
+    const updateData = (data) => {
+      modalData.value = data;
+    };
+
+    /**
+     * validated
+     * @param {boolean} valid
+     * @param {object} data
+     */
+    const validated = (valid, data = null) => {
+      modalData.value = data;
+      if (valid) {
+        if (dataValues.value) {
+          // add dataValues to modalData
+          modalData.value = { ...modalData.value, ...dataValues.value };
+        }
+        store.update({}, {
+          params: modalData.value,
+          routeId: route.params.id,
+        });
+      }
+      submit.value = false;
+    };
+
     onMounted(() => {
-      data.value = useResourceStore(props.resource)().getDataItem;
+      modalData.value = store.getDataItem;
       isMounted.value = true;
     });
 
@@ -101,10 +113,9 @@ export default defineComponent({
       fetchData,
       isMounted,
       modalData,
-      modalType,
-      showModal,
       submit,
-      data,
+      validated,
+      updateData,
     };
   },
 });
