@@ -72,7 +72,7 @@ import { contentWidth, displayLoader, displayToolbar } from "../core/helpers/con
 import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
 import { darkMode } from "../core/helpers/config";
 import { useLoading } from "vue-loading-overlay";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import Header from "./header/Header.vue";
 import LayoutService from "../core/services/LayoutService";
 import RouterTabs from "./RouterTabs.vue";
@@ -81,7 +81,7 @@ import Toolbar from "./toolbar/Toolbar.vue";
 import useBreadcrumbStore from "../store/breadcrumb";
 
 export default defineComponent({
-  name: "Dashboard",
+  name: "VueAdmin",
   components: {
     Header,
     RouterTabs,
@@ -90,6 +90,7 @@ export default defineComponent({
   },
   setup() {
     const currentRoute = useRoute();
+    const router = useRouter();
     const loading = useLoading({
       //
     });
@@ -115,6 +116,7 @@ export default defineComponent({
         content.scrollTo(0, 0);
       }
     };
+    const cacheArr = [];
 
     onBeforeMount(() => {
       LayoutService.init();
@@ -147,6 +149,7 @@ export default defineComponent({
       viewKey,
       darkMode,
       scrollToTop,
+      cacheArr,
     };
   },
 });

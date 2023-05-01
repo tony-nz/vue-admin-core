@@ -164,6 +164,7 @@ function processStoreData(state, action, payload, data) {
     case MOVE_NODE:
       break;
     case UPDATE:
+      console.log("UPDATE");
       /**
        * Check for param Id
        */
@@ -344,8 +345,6 @@ const useResourceStore = function (resource) {
     actions: {
       ...storeActions,
       setItem(state, item) {
-        console.log("setItem", item);
-        console.log("setItem", item);
         this.data.item = item;
       },
       setList(state, { stateList, stateUser, data }) {

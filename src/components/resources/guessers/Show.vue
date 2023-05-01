@@ -1,5 +1,5 @@
 <template>
-  <VaCard v-if="isMounted">
+  <VaCard v-if="isMounted" :key="viewKey">
     <template v-slot:toolbar>
       <Button
         label="va.actions.save"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, watch, ref } from "vue";
+import { defineComponent, onActivated, onMounted, watch, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useConfigStore from "../../../store/config";
 import useResourceStore from "../../../store/resource";
@@ -42,6 +42,7 @@ export default defineComponent({
     const route = useRoute();
     const store = useResourceStore(props.resource)();
     const submit = ref(false);
+    const viewKey = ref(0);
 
     /**
      * fetchData
@@ -103,6 +104,11 @@ export default defineComponent({
       submit.value = false;
     };
 
+    onActivated(() => {
+      viewKey.value += 1;
+      modalData.value = store.getDataItem;
+    });
+
     onMounted(() => {
       modalData.value = store.getDataItem;
       isMounted.value = true;
@@ -116,6 +122,7 @@ export default defineComponent({
       submit,
       validated,
       updateData,
+      viewKey,
     };
   },
 });
