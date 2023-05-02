@@ -23,13 +23,17 @@
             resource?.create?.modal && toolbar?.teleport?.createBtn != false
           "
           type="button"
-          class="bg-primary-500 hover:bg-primary-400 text-white text-sm py-2 px-4 rounded shadow whitespace-nowrap"
+          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          :class="{
+            'fill-white p-2': simpleCreate,
+            'text-white py-2 px-4': !simpleCreate,
+          }"
           @click="showCreateEdit('dialog', 'create')"
         >
           <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
           <span v-else>
             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-              <path class="opacity-40" d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+              <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
             </svg>
           </span>
         </button>
@@ -39,12 +43,16 @@
           "
           :to="resource.url + '/create'"
           type="button"
-          class="bg-primary-500 hover:bg-primary-400 text-white text-sm py-2 px-8 rounded shadow whitespace-nowrap"
+          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          :class="{
+            'fill-white p-2': simpleCreate,
+            'text-white py-2 px-4': !simpleCreate,
+          }"
         >
           <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
           <span v-else>
             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-              <path class="opacity-40" d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+              <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
             </svg>
           </span>
         </router-link>
@@ -110,14 +118,18 @@
           <button
             v-if="resource?.create?.modal && toolbar?.createBtn != false"
             type="button"
-            class="bg-primary-500 hover:bg-primary-400 text-white py-2 px-4 rounded shadow whitespace-nowrap"
+            class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+            :class="{
+              'fill-white p-2': simpleCreate,
+              'text-white py-2 px-4': !simpleCreate,
+            }"
             @click="showCreateEdit('dialog', 'create')"
           >
             <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
             <span v-else>
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                 <path d="M0 192C0 174.3 14.33 160 32 160H352C369.7 160 384 174.3 384 192C384 209.7 369.7 224 352 224V256C352 333.4 297 397.1 224 412.8V512H160V412.8C86.97 397.1 32 333.4 32 256V224C14.33 224 0 209.7 0 192V192z" />
-                <path class="opacity-40" d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
+                <path d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
               </svg>
             </span>
           </button>
@@ -125,13 +137,17 @@
             v-else-if="resource?.create?.page && toolbar?.createBtn != false"
             :to="resource.url + '/create'"
             type="button"
-            class="bg-primary-500 hover:bg-primary-400 text-white py-2 px-8 rounded shadow whitespace-nowrap"
+            class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+            :class="{
+              'fill-white p-2': simpleCreate,
+              'text-white py-2 px-4': !simpleCreate,
+            }"
           >
             <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
             <span v-else>
               <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                 <path d="M0 192C0 174.3 14.33 160 32 160H352C369.7 160 384 174.3 384 192C384 209.7 369.7 224 352 224V256C352 333.4 297 397.1 224 412.8V512H160V412.8C86.97 397.1 32 333.4 32 256V224C14.33 224 0 209.7 0 192V192z" />
-                <path class="opacity-40" d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
+                <path d="M128 160H64V32C64 14.33 78.33 0 96 0C113.7 0 128 14.33 128 32V160zM320 160H256V32C256 14.33 270.3 0 288 0C305.7 0 320 14.33 320 32V160z" />
               </svg>
             </span>
           </router-link>
