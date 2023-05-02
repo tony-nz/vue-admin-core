@@ -5,7 +5,7 @@
       :key="item.name"
       :class="{ active: currentRouteName === item.name }"
       @contextmenu.prevent="(e) => handleOpenContext(e, item, index)"
-      class="flex mr-2 text-gray-500 bg-white hover:bg-gray-400 hover:text-white shadow-lg rounded-lg dark:bg-gray-800 dark:text-gray-400"
+      class="flex mr-2 text-gray-500 bg-white hover:bg-primary-500 hover:text-white shadow-lg rounded-lg dark:bg-gray-800 dark:text-gray-400"
     >
       <router-link
         :to="{
