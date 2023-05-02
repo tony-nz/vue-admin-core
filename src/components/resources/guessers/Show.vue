@@ -2,7 +2,7 @@
   <VaCard v-if="isMounted" :key="viewKey">
     <template v-slot:toolbar>
       <Button
-        label="va.actions.save"
+        :label="translate('va.actions.save')"
         @click="submit = true"
         :class="{ 'opacity-50': submit }"
         :disabled="submit"
@@ -22,10 +22,11 @@
 
 <script>
 import { defineComponent, onActivated, onMounted, watch, ref } from "vue";
+import { translate } from "../../../core/helpers/functions";
+import { useRoute } from "vue-router";
 import ApiService from "../../../core/services/ApiService";
 import useConfigStore from "../../../store/config";
 import useResourceStore from "../../../store/resource";
-import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "ShowGuesser",
@@ -120,8 +121,9 @@ export default defineComponent({
       isMounted,
       modalData,
       submit,
-      validated,
+      translate,
       updateData,
+      validated,
       viewKey,
     };
   },

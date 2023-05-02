@@ -164,7 +164,6 @@ function processStoreData(state, action, payload, data) {
     case MOVE_NODE:
       break;
     case UPDATE:
-      console.log("UPDATE");
       /**
        * Check for param Id
        */
@@ -416,7 +415,6 @@ const useResourceStore = function (resource) {
     },
     getters: {
       getDataItem(): any {
-        console.log("getDataItem", this.data.item);
         return this.data.item;
       },
       getDataList(): any {
