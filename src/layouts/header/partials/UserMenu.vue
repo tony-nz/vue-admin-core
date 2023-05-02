@@ -4,7 +4,7 @@
       class="flex text-sm rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white w-10"
       id="userMenuBtn" x-ref="button" aria-haspopup="true" aria-controls="userMenu">
       <span class="sr-only">Open user menu</span>
-      <button class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 rounded-lg p-2">
+      <button class="fill-white hover:bg-white hover:fill-primary-300 dark:hover:bg-slate-800 rounded-lg p-2">
         <img v-if="getUser['avatar']" class="h-10 w-10 rounded-lg" :src="getUser['avatar']" :alt="getUser['name']" />
         <span v-else>
           <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
@@ -16,10 +16,10 @@
     </button>
     <ContextMenu id="userMenu" ref="contextMenu" :model="userMenuConfig" :autoZIndex="true" class="p-0 w-72">
       <template #item="{ item }">
-        <div v-if="item.header" class="flex-shrink-0 flex p-2 rounded-t bg-slate-100 border-b-2 border-emerald-500">
+        <div v-if="item.header" class="flex-shrink-0 flex p-2 rounded-t bg-slate-100 border-b-2 border-primary-500">
           <div class="flex items-center">
             <div>
-              <img class="w-12 h-12 rounded-full ring-offset-2 ring-2 ring-emerald-500" :src="getUserAvatar" alt="" />
+              <img class="w-12 h-12 rounded-full ring-offset-2 ring-2 ring-primary-500" :src="getUserAvatar" alt="" />
             </div>
             <div class="ml-3">
               <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
