@@ -20,22 +20,22 @@
           :class="{
             'bg-gray-400 text-white rounded-l-lg': isExactActive,
           }"
-          class="flex p-3"
+          class="flex p-2 text-sm"
         >
           <span
             v-if="item.icon && item.icon['path']"
             class="mr-2"
           >
-            <inline-svg :src="item.icon['path']" class="h-5 w-5" />
+            <inline-svg :src="item.icon['path']" class="h-4 w-4" />
           </span>
           {{ item.title }}
         </div>
       </router-link>
       <button
         @click="handleClose(item, index)"
-        class="p-3 bg-gray-200 hover:bg-red-500 rounded-r-lg"
+        class="p-2 bg-gray-200 hover:bg-red-500 rounded-r-lg"
       >
-        <svg class="fill-black hover:fill-white w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+        <svg class="fill-black hover:fill-white w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
           <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/>
         </svg>
       </button>
@@ -47,7 +47,7 @@
         @click="handleCloseAll()"
         class="p-3 bg-gray-200 hover:bg-red-500 rounded-lg"
       >
-        <svg class="fill-black hover:fill-white w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+        <svg class="fill-black hover:fill-white w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
           <path d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/>
         </svg>
       </button>
