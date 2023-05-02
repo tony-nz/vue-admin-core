@@ -132,6 +132,25 @@ const useConfigStore = defineStore({
         );
       }
     },
+    toggleToolbar(): void {
+      const localStorageConfig = Object.assign(
+        {},
+        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
+      );
+      if (this.config.layout.toolbar?.display) {
+        localStorageConfig["toolbar.display"] = false;
+        this.config.layout.toolbar.display = false;
+      } else if (this.config.layout.toolbar?.display == false) {
+        localStorageConfig["toolbar.display"] = true;
+        this.config.layout.toolbar.display = true;
+      }
+      if (localStorageConfig) {
+        localStorage.setItem(
+          "layoutConfig",
+          JSON.stringify(localStorageConfig)
+        );
+      }
+    },
     updateResource(resource): void {
       this.config.resources[resource.name] = resource;
     },

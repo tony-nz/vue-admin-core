@@ -33,7 +33,7 @@
         </div>
         <router-link v-if="item.to" :to="item.to" custom v-slot="{ navigate, isActive, isExactActive }">
           <button @click="processMenuCommand(navigate)"
-            class="flex p-4 py-3 overflow-hidden text-sm font-medium text-gray-700 group-hover:text-gray-900 hover:bg-gray-100 hover:bg-opacity-50 hover:text-blue-500 "
+            class="flex p-4 py-3 overflow-hidden text-sm font-medium text-gray-700 group-hover:text-gray-900 hover:bg-gray-100 hover:bg-opacity-50 hover:text-primary-500 "
             :class="{
               'active-link': isActive,
               'active-link-exact': isExactActive,
@@ -42,7 +42,7 @@
           </button>
         </router-link>
         <button v-else-if="item.label" @click="processMenuCommand(item.command)"
-          class="hover:bg-gray-100 hover:bg-opacity-50 hover:text-blue-500 w-full hover:rounded-lg items-center overflow-hidden flex p-4 py-3">
+          class="hover:bg-gray-100 hover:bg-opacity-50 hover:text-primary-500 w-full hover:rounded-lg items-center overflow-hidden flex p-4 py-3">
           {{ translate(item.label) }}
           <div v-if="item.label == 'Language'" class="py-1 px-2 bg-gray-200 rounded ml-auto mr-2 text-xs">
             {{ getUserLocale }}
@@ -52,10 +52,25 @@
         </button>
         <div v-if="item.footer" class="flex justify-end p-2">
           <button
+            @click="toggleToolbar()"
+            :class="btnClass"
+          >
+            <span class="hover:fill-gray-400 fill-primary-400">
+              <svg v-if="displayToolbar" class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                <path d="M480 256C480 309 437 352 384 352C330.1 352 288 309 288 256C288 202.1 330.1 160 384 160C437 160 480 202.1 480 256z" />
+                <path class="opacity-40" d="M384 64C490 64 576 149.1 576 256C576 362 490 448 384 448H192C85.96 448 0 362 0 256C0 149.1 85.96 64 192 64H384zM384 352C437 352 480 309 480 256C480 202.1 437 160 384 160C330.1 160 288 202.1 288 256C288 309 330.1 352 384 352z" />
+              </svg>
+              <svg v-if="!displayToolbar" class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                <path d="M192 160C245 160 288 202.1 288 256C288 309 245 352 192 352C138.1 352 96 309 96 256C96 202.1 138.1 160 192 160z" />
+                <path class="opacity-40" d="M384 64C490 64 576 149.1 576 256C576 362 490 448 384 448H192C85.96 448 0 362 0 256C0 149.1 85.96 64 192 64H384zM64 256C64 326.7 121.3 384 192 384H384C454.7 384 512 326.7 512 256C512 185.3 454.7 128 384 128H192C121.3 128 64 185.3 64 256z" />
+              </svg>
+            </span>
+          </button>
+          <button
             @click="toggleContentWidth()"
             :class="btnClass"
           >
-            <span class="hover:fill-gray-400 fill-blue-400">
+            <span class="hover:fill-gray-400 fill-primary-400">
               <inline-svg v-if="isFullscreen" class="h-4 w-4" src="/media/icons/duotone/brightness.svg" />
               <inline-svg v-if="!isFullscreen" class="h-4 w-4" src="/media/icons/duotone/moon-stars.svg" />
             </span>
@@ -64,7 +79,7 @@
             @click="toggleContentWidth()"
             :class="btnClass"
           >
-            <span class="hover:fill-gray-400 fill-blue-400">
+            <span class="hover:fill-gray-400 fill-primary-400">
               <inline-svg v-if="isFluid" class="h-4 w-4" src="/media/icons/duotone/compress-wide.svg" />
               <inline-svg v-if="!isFluid" class="h-4 w-4" src="/media/icons/duotone/expand-wide.svg" />
             </span>
@@ -73,7 +88,7 @@
             @click="toggleFullscreen()"
             :class="btnClass"
           >
-            <span class="hover:fill-gray-400 fill-blue-400">
+            <span class="hover:fill-gray-400 fill-primary-400">
               <inline-svg v-if="isFullscreen" class="h-4 w-4"
                 src="/media/icons/duotone/down-left-and-up-right-to-center.svg" />
               <inline-svg v-if="!isFullscreen" class="h-4 w-4"
@@ -88,7 +103,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
-import { darkMode, toggleDarkMode } from "../../../core/helpers/config";
+import { darkMode, toggleDarkMode, displayToolbar, toggleToolbar } from "../../../core/helpers/config";
 import { translate } from "../../../core/helpers/functions";
 import useAuthStore from "../../../store/auth";
 import useConfigStore from "../../../store/config";
@@ -111,6 +126,7 @@ export default defineComponent({
 
     const isFullscreen = ref(false);
     const isFluid = ref(false);
+    const hasToolbar = ref(false);
 
     const toggleFullscreen = () => {
       if (!document.fullscreenElement) {
@@ -253,6 +269,8 @@ export default defineComponent({
       focusedIndex,
       isMounted,
       btnClass,
+      toggleToolbar,
+      displayToolbar,
     };
   },
 });

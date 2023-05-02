@@ -126,3 +126,11 @@ export const toggleDarkMode = computed(() => {
   const configStore = useConfigStore();
   return configStore.toggleDarkMode;
 });
+/**
+ * Toggle toolbar
+ * @returns {boolean}
+ */
+export const toggleToolbar = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.toggleToolbar;
+});
