@@ -16,6 +16,11 @@ import "./assets/style.css";
 import { createPinia } from "pinia";
 
 /**
+ * Composables
+ */
+import useResource from "./composables/useResource";
+
+/**
  * Services
  */
 import ApiService from "./core/services/ApiService";
@@ -146,6 +151,11 @@ export type {
 };
 
 export {
+  /**
+   * Composables
+   */
+  useResource,
+
   /**
    * Helpers
    */
