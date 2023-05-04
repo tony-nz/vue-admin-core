@@ -11,6 +11,7 @@
       :class="{ hidden: isLoading }"
     >
       <div class="ml-6 my-2">
+        <slot name="header" />
         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
           {{ title }}
         </h3>
