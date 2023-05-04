@@ -221,7 +221,7 @@ const useResourceStore = function (resource) {
 
   Object.values(methods).forEach(
     (action) =>
-      (storeActions[action] = async (state, payload, userApiUrl) => {
+      (storeActions[action] = async (payload, userApiUrl) => {
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
 
@@ -235,7 +235,7 @@ const useResourceStore = function (resource) {
            * Set loading for certain methods
            */
           if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-            apiStore.setLoading(state, true);
+            apiStore.setLoading({}, true);
           }
 
           /**
@@ -255,7 +255,7 @@ const useResourceStore = function (resource) {
               !resourceStore.getLastSync === null &&
               action === "getList")
           ) {
-            apiStore.setLoading(state, false);
+            apiStore.setLoading({}, false);
 
             if (stateList) {
               return Promise.resolve({
@@ -309,7 +309,7 @@ const useResourceStore = function (resource) {
            * Set loading to false
            * and show success message
            */
-          apiStore.setLoading(state, false);
+          apiStore.setLoading({}, false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -322,7 +322,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           const message = e.response?.data?.message || false;
-          apiStore.setLoading(state, false);
+          apiStore.setLoading({}, false);
           resourceStore.showError(resourceStore, e.message, message);
 
           return Promise.reject(e);

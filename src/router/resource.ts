@@ -107,7 +107,7 @@ export const useResourceRoutes = function (resource) {
                * Route model binding
                */
               try {
-                const { data } = await store.getOne({}, {
+                const { data } = await store.getOne({
                   params: { id },
                 });
 
