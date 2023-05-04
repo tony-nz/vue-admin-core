@@ -6,7 +6,7 @@
   >
     <Loading v-if="isLoading" />
     <div
-      v-if="title || slots.toolbar"
+      v-if="title || slots.header || slots.toolbar"
       class="flex justify-between items-center flex-wrap border-b border-gray-200 pb-2 sm:flex-nowrap dark:border-gray-600"
       :class="{ hidden: isLoading }"
     >
