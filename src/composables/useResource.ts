@@ -166,7 +166,6 @@ export default function useResource(
   }
 
   async function getResourceData(apiUrl?: string) {
-    console.log("getResourceData", options, routeId, stateList, stateUser);
     if (resource?.name) {
       if (apiUrl) {
         resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
