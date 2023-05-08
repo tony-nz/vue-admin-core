@@ -67,9 +67,9 @@ export default defineComponent({
           this.modalData = { ...this.modalData, ...this.dataValues };
         }
         if (this.modalType == "create") {
-          this.$emit("create", this.modalData, this.dataId, this.subId);
+          this.$emit("create", this.modalData, this.dataId, this.subId, this.stateUser);
         } else if (this.modalType == "update") {
-          this.$emit("update", this.modalData, this.dataId, this.subId);
+          this.$emit("update", this.modalData, this.dataId, this.subId, this.stateUser);
         }
         this.$emit("close");
       }
@@ -108,6 +108,10 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    stateUser: {
+      type: Boolean,
+      default: false,
+    },
     subId: {
       type: Number,
       default: null,
@@ -119,6 +123,7 @@ export default defineComponent({
     const modalData = ref();
     const modalType = ref(props.type);
     const showModal = ref(false);
+    const stateUser = ref(props.stateUser);
     const submit = ref(false);
     const resource = ref();
 
@@ -165,6 +170,7 @@ export default defineComponent({
       modalData,
       modalType,
       showModal,
+      stateUser,
       submit,
     };
   },

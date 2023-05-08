@@ -51,50 +51,50 @@ export default function useResource(
     return resourceData.value?.data;
   });
 
-  function create(params: unknown, subId?: number) {
+  function create(params: unknown, subId?: number, vStateUser?: boolean) {
     if (params && resourceName) {
-      resourceStore.create(resourceStore, {
+      resourceStore.create({
         params,
         routeId: routeId.value,
         stateList: stateList.value,
-        stateUser: stateUser.value,
+        stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
       });
     }
   }
 
-  function update(params, id, subId?: number) {
+  function update(params, id, subId?: number, vStateUser?: boolean) {
     if (params && id && resourceName) {
       params.id = id;
-      resourceStore.update(resourceStore, {
+      resourceStore.update({
         params,
         routeId: routeId.value,
         stateList: stateList.value,
-        stateUser: stateUser.value,
+        stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
       });
     }
   }
 
-  function remove(id, subId?: number) {
+  function remove(id, subId?: number, vStateUser?: boolean) {
     if (id && resourceName) {
-      resourceStore.delete(resourceStore, {
+      resourceStore.delete({
         params: { id },
         routeId: routeId.value,
         stateList: stateList.value,
-        stateUser: stateUser.value,
+        stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
       });
     }
   }
 
-  function bulkRemove(data, subId?: number) {
+  function bulkRemove(data, subId?: number, vStateUser?: boolean) {
     if (data && resourceName) {
-      resourceStore.deleteMany(resourceStore, {
+      resourceStore.deleteMany({
         params: { data },
         routeId: routeId.value,
         stateList: stateList.value,
-        stateUser: stateUser.value,
+        stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
       });
     }

@@ -222,6 +222,7 @@ const useResourceStore = function (resource) {
   Object.values(methods).forEach(
     (action) =>
       (storeActions[action] = async (payload, userApiUrl) => {
+        console.log("storeActions[action]", action, payload, userApiUrl);
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
 
