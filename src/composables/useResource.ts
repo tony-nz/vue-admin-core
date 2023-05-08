@@ -16,6 +16,7 @@ export default function useResource(
   options?: Options | undefined
 ) {
   const confirmDelete = useConfirm();
+  const apiUrl = ref();
   const modalData = ref([]);
   const modalType = ref();
   const resourceData = ref();
@@ -56,6 +57,7 @@ export default function useResource(
       resourceStore.create({
         params,
         routeId: routeId.value,
+        apiUrl: apiUrl.value,
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
@@ -69,6 +71,7 @@ export default function useResource(
       resourceStore.update({
         params,
         routeId: routeId.value,
+        apiUrl: apiUrl.value,
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
@@ -81,6 +84,7 @@ export default function useResource(
       resourceStore.delete({
         params: { id },
         routeId: routeId.value,
+        apiUrl: apiUrl.value,
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
@@ -93,6 +97,7 @@ export default function useResource(
       resourceStore.deleteMany({
         params: { data },
         routeId: routeId.value,
+        apiUrl: apiUrl.value,
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
@@ -165,21 +170,21 @@ export default function useResource(
     }
   }
 
-  async function getResourceData(apiUrl?: string) {
+  async function getResourceData() {
     if (resource?.name) {
-      if (apiUrl) {
-        resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
-          return data.data;
-        });
-      } else {
-        resourceData.value = await resourceStore.getList({
-          apiUrl: options?.params?.apiUrl ? options?.params.apiUrl : null,
-          params: options?.params ? options?.params : null,
-          routeId: routeId.value,
-          stateList: stateList.value,
-          stateUser: stateUser.value,
-        });
-      }
+    // if (apiUrl) {
+    //   resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
+    //     return data.data;
+    //   });
+    // } else {}
+    // }
+      resourceData.value = await resourceStore.getList({
+        params: options?.params ? options?.params : null,
+        routeId: routeId.value,
+        apiUrl: apiUrl.value,
+        stateList: stateList.value,
+        stateUser: stateUser.value,
+      });
     }
   }
 
@@ -188,6 +193,7 @@ export default function useResource(
   });
 
   return {
+    apiUrl,
     bulkRemove,
     create,
     modalData,

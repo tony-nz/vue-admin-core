@@ -219,7 +219,6 @@
       :type="modalType"
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
       :resource="resource"
-      :stateList="stateList"
       :subId="params?.id ? params.id : null"
     />
     <!-- End:CreateUpdate dialog -->
@@ -236,8 +235,6 @@
       :type="modalType"
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
       :resource="resource"
-      :stateList="stateList"
-      :stateUser="params?.stateUser"
       :subId="params?.id ? params.id : null"
     />
     <!-- End:CreateUpdate dialog -->
@@ -392,6 +389,7 @@ export default defineComponent({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const {
+      apiUrl,
       bulkRemove,
       closeModal,
       closeSidebar,
@@ -444,8 +442,9 @@ export default defineComponent({
     }
 
     onMounted(async () => {
-      stateList.value = props.stateList;
-      stateUser.value = props.stateUser;
+      apiUrl.value = props?.apiUrl;
+      stateList.value = props?.stateList;
+      stateUser.value = props?.stateUser;
       try {
         getResourceData();
       } catch (e) {
@@ -481,6 +480,8 @@ export default defineComponent({
       showDeletePopup,
       getSingularizedLabel,
       translate,
+      stateList,
+      stateUser,
     };
   },
 });

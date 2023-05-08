@@ -40,6 +40,7 @@ interface IState {
  * Function to figure out the correct apiUrl
  */
 function getApiUrl(state, apiUrl, action, payload) {
+  console.log("getApiUrl", state, apiUrl, action, payload);
   const replaceUrlId = (url, id) => {
     return url.replace(":id", id);
   };
@@ -84,25 +85,26 @@ function getApiUrl(state, apiUrl, action, payload) {
  */
 function processStoreData(state, action, payload, data) {
   const params = payload?.params ? payload.params : {};
-  const stateList = params?.stateList ? params.stateList : "";
-  const stateUser = params?.stateUser ? params.stateUser : false;
+  const stateList = payload?.stateList ? payload.stateList : "";
+  const stateUser = payload?.stateUser ? payload.stateUser : false;
 
   switch (action) {
     case CREATE:
       if (stateUser) {
-        state.data.user.push(data);
-      }
-      if (stateList) {
-        state.data.list[stateList].push(data);
+        state.data.userList.push(data);
       } else {
-        state.data.list.push(data);
+        if (stateList) {
+          state.data.list[stateList].push(data);
+        } else {
+          state.data.list.push(data);
+        }
       }
       break;
     case DELETE:
       if (params.id) {
-        if (stateUser && state.data.user) {
-          state.data.user.splice(
-            state.data.user.map((item) => item.id).indexOf(params.id),
+        if (stateUser && state.data.userList) {
+          state.data.userList.splice(
+            state.data.userList.map((item) => item.id).indexOf(params.id),
             1
           );
         } else {
@@ -124,10 +126,10 @@ function processStoreData(state, action, payload, data) {
       break;
     case DELETE_MANY:
       if (params.values) {
-        if (stateUser && state.data.user) {
+        if (stateUser && state.data.userList) {
           params.values.forEach((id) => {
-            state.data.user.splice(
-              state.data.user.map((item) => id).indexOf(id),
+            state.data.userList.splice(
+              state.data.userList.map((item) => id).indexOf(id),
               1
             );
           });
@@ -170,8 +172,8 @@ function processStoreData(state, action, payload, data) {
       let stateListResource: string[] = [];
       if (stateUser) {
         stateListResource =
-          params?.id && state.data.user
-            ? state.data.user.find((val) => val["id"] === params.id)
+          params?.id && state.data.userList
+            ? state.data.userList.find((val) => val["id"] === params.id)
             : null;
       } else if (stateList) {
         stateListResource =
@@ -221,15 +223,15 @@ const useResourceStore = function (resource) {
 
   Object.values(methods).forEach(
     (action) =>
-      (storeActions[action] = async (payload, userApiUrl) => {
-        console.log("storeActions[action]", action, payload, userApiUrl);
+      (storeActions[action] = async (payload) => {
+        console.log("storeActions[action]", action, payload);
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
 
         try {
           let params = payload?.params ? payload.params : {};
-          const stateList = params?.stateList ? params.stateList : "";
-          const stateUser = params?.stateUser ? params.stateUser : false;
+          const stateList = payload?.stateList ? payload.stateList : "";
+          const stateUser = payload?.stateUser ? payload.stateUser : false;
           const currentDate = new Date();
 
           /**
@@ -283,8 +285,10 @@ const useResourceStore = function (resource) {
             ? params.id
             : params;
 
+          console.log("stateUser", stateUser);
+          console.log("payload", payload);
           const newApiUrl = stateUser
-            ? userApiUrl
+            ? payload?.apiUrl
             : resourceStore.resource.apiUrl;
           let response = await ApiService[
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
