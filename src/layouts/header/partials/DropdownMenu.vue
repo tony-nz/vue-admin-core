@@ -30,9 +30,9 @@
     </router-link>
     <div
       v-show="isOpen"
-      class="absolute right-0 w-full origin-top-right z-30"
+      class="absolute left-0 origin-top-right z-30"
       :class="{
-        'w-full mx-auto rounded-md shadow-lg md:w-48': item.type === 'list',
+        'rounded-md shadow-lg md:w-52': item.type === 'list',
         'md:max-w-screen-sm md:w-screen': item.type === 'grid',
       }"
     >
