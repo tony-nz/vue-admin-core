@@ -2,7 +2,7 @@
   <div class="flex-col flex lg:flex-row items-start lg:items-center w-4/12">
     <div>
       <h4 class="text-2xl font-bold leading-tight text-white mb-2">
-        <router-link to="/main/dashboard"> {{ title }} </router-link>
+        {{ title }}
       </h4>
       <p
         class="flex items-center text-gray-300 text-xs bg-emerald-700 bg-opacity-30 rounded-xl p-2 px-4"
