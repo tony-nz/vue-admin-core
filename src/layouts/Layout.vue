@@ -122,7 +122,7 @@ export default defineComponent({
       LayoutService.init();
       if (displayLoader) {
         loader = loading.show({
-          container: false,
+          // container: false,
           color: "#00ab00",
           backgroundColor: "#ffffff",
           height: 64,

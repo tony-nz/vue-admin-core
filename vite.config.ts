@@ -40,6 +40,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@tony-nz/vue-admin-core": "./node_modules/@tony-nz/vue-admin-core",
+      'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
     },
     dedupe: ["vue"],
   },
