@@ -100,7 +100,7 @@
               :key="index"
               :class="{ 'mt-4': index > 0 }"
             >
-              <router-link :to="item.to" class="flex lg:items-center group">
+              <router-link v-if="item.to" :to="item.to" class="flex lg:items-center group">
                 <div
                   class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-md text-white"
                 >

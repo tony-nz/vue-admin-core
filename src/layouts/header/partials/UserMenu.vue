@@ -19,7 +19,7 @@
         <div v-if="item.header" class="flex-shrink-0 flex p-2 rounded-t bg-slate-100 border-b-2 border-primary-500">
           <div class="flex items-center">
             <div>
-              <img class="w-12 h-12 rounded-full ring-offset-2 ring-2 ring-primary-500" :src="getUserAvatar" alt="" />
+              <img v-if="getUser['avatar']" class="w-12 h-12 rounded-full ring-offset-2 ring-2 ring-primary-500" :src="getUser['avatar']" :alt="getUser['name']" />
             </div>
             <div class="ml-3">
               <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900">
