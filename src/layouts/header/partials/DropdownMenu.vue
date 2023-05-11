@@ -1,6 +1,6 @@
 <template>
   <div v-on:mouseover="isOpen = true" v-on:mouseleave="isOpen = false">
-    <router-link :to="item.to" v-slot="{ isActive }" custom>
+    <router-link v-if="item.to" :to="item.to" v-slot="{ isActive }" custom>
       <button
         class="flex flex-row items-center mx-auto px-4 py-2 text-sm text-left rounded-md dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:focus:bg-gray-600 dark-mode:hover:bg-gray-600 md:w-auto md:inline md:mt-0 md:ml-4 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
         @click="isOpen = !isOpen"

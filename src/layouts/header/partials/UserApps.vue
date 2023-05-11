@@ -68,7 +68,7 @@
                     class="flex group"
                   >
                     <div
-                      v-if="item.icon"
+                      v-if="item.icon && item.icon['path']"
                       :class="item.icon['bg']"
                       class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-indigo-500 text-white sm:h-12 sm:w-12"
                     >
