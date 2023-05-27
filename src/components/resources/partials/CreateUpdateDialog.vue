@@ -134,7 +134,9 @@ export default defineComponent({
             }
           }
           const resourceStore = useResourceStore(resource.value)();
-          return resourceStore.getList({}).then(({ data }) => {
+          return resourceStore.getList({
+              subId: props.subId,
+            }).then(({ data }) => {
             if (typeof data == "undefined") {
               return null;
             }
