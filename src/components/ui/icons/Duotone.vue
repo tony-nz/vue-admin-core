@@ -59,7 +59,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 svg [fill]:not(g) {
   transition: fill 0.3s ease;
   fill: v-bind(getColor);
