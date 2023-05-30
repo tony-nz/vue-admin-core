@@ -70,10 +70,13 @@
       :rowHover="true"
       :rowsPerPageOptions="[10, 20]"
       :value="resourceDataFiltered"
+      :selectionMode="selectionMode"
       @row-collapse="onLocalRowCollapse"
       @row-expand="onLocalRowExpand"
       @rowCollapse="onRowCollapse"
       @rowExpand="onRowExpand"
+      @rowSelect="onRowSelect"
+      @rowUnselect="onRowUnselect"
       v-bind="options"
       v-model:expandedRows="expandedRows"
       v-model:filters="filters"
@@ -268,6 +271,7 @@ interface DataTableToolbar {
 }
 
 type DataTableEditModeType = "cell" | "row";
+type DataTableSelectModeType = "single" | "multiple";
 
 export default defineComponent({
   name: "AdvDataTable",
@@ -325,6 +329,10 @@ export default defineComponent({
     routeId: {
       type: String,
     },
+    selectionMode: {
+      type: String as PropType<DataTableSelectModeType>,
+      default: "single",
+    },
     showActive: {
       type: Boolean,
       default: true,
@@ -377,7 +385,7 @@ export default defineComponent({
       type: Object as PropType<DataTableToolbar>,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const globalFilterFields = ref();
     const expandedRows = ref([] as unknown[]);
     const selectedResources = ref();
@@ -441,6 +449,15 @@ export default defineComponent({
       }
     }
 
+    const onRowSelect = (event) => {
+      console.log(event);
+      emit("onRowSelect", event);
+    };
+
+    const onRowUnselect = (event) => {
+      emit("onRowUnselect", event);
+    };
+
     onMounted(async () => {
       apiUrl.value = props?.apiUrl;
       stateList.value = props?.stateList;
@@ -454,6 +471,8 @@ export default defineComponent({
     });
 
     return {
+      onRowSelect,
+      onRowUnselect,
       onLocalRowExpand,
       onLocalRowCollapse,
       bulkRemove,
