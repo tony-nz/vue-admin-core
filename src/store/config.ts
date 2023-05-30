@@ -4,6 +4,7 @@ import LayoutConfigTypes from "../core/types/LayoutConfigTypes";
 import UserMenu from "../core/types/UserMenuTypes";
 import UserAppMenu from "../core/types/UserAppsMenuTypes";
 import type MainMenu from "../core/types/MainMenuTypes";
+import type ResourceConfig from "../core/types/ResourceConfigTypes";
 import objectPath from "object-path";
 import merge from "deepmerge";
 import i18n from "../core/plugins/i18n";
@@ -153,6 +154,20 @@ const useConfigStore = defineStore({
     },
     updateResource(resource): void {
       this.config.resources[resource.name] = resource;
+    },
+    findResource(payload: any): any[] {
+      try {
+        for (const [key, value] of Object.entries(this.config.resources)) {
+          const foundResource = value as { name: string } | any;
+          if (foundResource?.name === payload) {
+            return foundResource;
+          }
+        }
+      } catch (e) {
+        // TODO ERROR LOG
+        console.log(e);
+      }
+      return [];
     },
   },
   getters: {
