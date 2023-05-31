@@ -36,19 +36,20 @@ export default function useResource(
    * e.g. filters = { name: "Reading", id: 1 }
    */
   const resourceDataFiltered = computed(() => {
-    // const filters = ref(options?.dataFilters);
-    // if (filters.value && Object.keys(filters.value).length !== 0) {
-    //   return resourceData.value?.filter((item) => {
-    //     for (const key in filters.value) {
-    //       if (filters.value[key] === true && item[key] !== null) {
-    //         return true;
-    //       }
-    //       if (item[key] === undefined || item[key] != filters.value[key])
-    //         return false;
-    //     }
-    //     return true;
-    //   });
-    // }
+    const filters = ref(options?.dataFilters);
+    
+    if (filters.value && Object.keys(filters.value).length !== 0) {
+      return resourceData.value?.data.filter((item) => {
+        for (const key in filters.value) {
+          if (filters.value[key] === true && item[key] !== null) {
+            return true;
+          }
+          if (item[key] === undefined || item[key] != filters.value[key])
+            return false;
+        }
+        return true;
+      });
+    }
     return resourceData.value?.data;
   });
 
