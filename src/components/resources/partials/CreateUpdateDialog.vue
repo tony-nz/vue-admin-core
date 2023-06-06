@@ -126,15 +126,18 @@ export default defineComponent({
       const configStore = useConfigStore();
       const resources = configStore.getResources;
       
-      if (params.resourceName) {
+      console.log("fetchData", params);
+      if (params.resource.name) {
         try {
           for (const [key, value] of Object.entries(resources)) {
-            if (value.name == params.resourceName) {
+            if (value.name == params.resource.name) {
               resource.value = value;
             }
           }
           const resourceStore = useResourceStore(resource.value)();
           return resourceStore.getList({
+              stateList: params.resource.stateList ? params.resource.stateList : null,
+              stateUser: params.resource.stateUser ? params.resource.stateUser : null,
               subId: props.subId,
             }).then(({ data }) => {
             if (typeof data == "undefined") {

@@ -258,14 +258,20 @@ const useResourceStore = function (resource) {
           ) {
             apiStore.setLoading({}, false);
 
-            if (stateList) {
+            if (stateList && resourceStore.data.list[stateList].length > 0) {
               return Promise.resolve({
                 data: resourceStore.data.list[stateList],
               });
+            } else if (stateUser && resourceStore.data.userList.length > 0) {
+              return Promise.resolve({
+                data: resourceStore.data.userList,
+              });
             }
-            return Promise.resolve({
-              data: resourceStore.data.list,
-            });
+            if (resourceStore.data.list.length > 0) {
+              return Promise.resolve({
+                data: resourceStore.data.list,
+              });
+            }
           }
 
           /**
@@ -284,7 +290,7 @@ const useResourceStore = function (resource) {
             : params;
 
           const newApiUrl = stateUser
-            ? payload?.apiUrl
+            ? payload?.apiUrl ? payload?.apiUrl : resourceStore.resource.apiUrl
             : resourceStore.resource.apiUrl;
           let response = await ApiService[
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
