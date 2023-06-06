@@ -40,7 +40,6 @@ interface IState {
  * Function to figure out the correct apiUrl
  */
 function getApiUrl(state, apiUrl, action, payload) {
-  console.log("getApiUrl", state, apiUrl, action, payload);
   const replaceUrlId = (url, id) => {
     return url.replace(":id", id);
   };
@@ -224,7 +223,6 @@ const useResourceStore = function (resource) {
   Object.values(methods).forEach(
     (action) =>
       (storeActions[action] = async (payload) => {
-        console.log("storeActions[action]", action, payload);
         const apiStore = useApiStore();
         const resourceStore = useResourceStore(resource)();
 
@@ -285,8 +283,6 @@ const useResourceStore = function (resource) {
             ? params.id
             : params;
 
-          console.log("stateUser", stateUser);
-          console.log("payload", payload);
           const newApiUrl = stateUser
             ? payload?.apiUrl
             : resourceStore.resource.apiUrl;
