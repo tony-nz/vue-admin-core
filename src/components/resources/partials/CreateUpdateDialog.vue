@@ -126,7 +126,6 @@ export default defineComponent({
       const configStore = useConfigStore();
       const resources = configStore.getResources;
       
-      console.log("fetchData", params);
       if (params.resource.name) {
         try {
           for (const [key, value] of Object.entries(resources)) {
