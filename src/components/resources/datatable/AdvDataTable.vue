@@ -450,7 +450,6 @@ export default defineComponent({
     }
 
     const onRowSelect = (event) => {
-      console.log(event);
       emit("onRowSelect", event);
     };
 

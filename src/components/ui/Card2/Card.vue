@@ -1,5 +1,5 @@
 <template>
-  <div class="relative h-full">
+  <div :class="mergedClass.base">
     <Loading v-if="isLoading" />
     <div :class="mergedClass.card">
       <div v-if="isHeaderVisible" :class="mergedClass.header">
@@ -59,6 +59,7 @@ import Dropdown from "./partials/Dropdown.vue";
 import Loading from "./partials/Loading.vue";
 
 interface Class {
+  base?: Array<string>;
   card?: Array<string>;
   content?: string[];
   description?: Array<string>;
@@ -106,6 +107,7 @@ export default defineComponent({
   setup(props, { slots }) {
     const transitions = ["transition", "ease-in-out", "duration-200"];
     const defaultClass = {
+      base: ["relative", "h-full"],
       card: [
         "flex",
         "flex-col",
@@ -122,7 +124,7 @@ export default defineComponent({
         "flex",
         "justify-between",
         "items-center",
-        "mt-2",
+        "rounded-t-lg",
         "px-6",
         "py-4",
       ],
