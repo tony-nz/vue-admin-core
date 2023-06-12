@@ -77,7 +77,7 @@
       @row-expand="onLocalRowExpand"
       @rowCollapse="onRowCollapse"
       @rowExpand="onRowExpand"
-      @rowReorder="onRowReorder"
+      @rowReorder="rowReorder"
       @rowSelect="onRowSelect"
       @rowUnselect="onRowUnselect"
       v-bind="options"
@@ -456,6 +456,10 @@ export default defineComponent({
       }
     }
 
+    const columnReorder = (event) => {
+      emit("columnReorder", event);
+    };
+
     const onRowSelect = (event) => {
       emit("onRowSelect", event);
     };
@@ -463,13 +467,8 @@ export default defineComponent({
     const onRowUnselect = (event) => {
       emit("onRowUnselect", event);
     };
-
-    const columnReorder = (event) => {
-      emit("columnReorder", event);
-    };
-
-    const onRowReorder = (event) => {
-      emit("onRowReorder", event);
+    const rowReorder = (event) => {
+      emit("rowReorder", event);
     };
 
     onMounted(async () => {
@@ -501,12 +500,12 @@ export default defineComponent({
       modalType,
       onLocalRowCollapse,
       onLocalRowExpand,
-      onRowReorder,
       onRowSelect,
       onRowUnselect,
       remove,
       resourceData,
       resourceDataFiltered,
+      rowReorder,
       selectedResources,
       showCreateEdit,
       showDeletePopup,
