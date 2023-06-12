@@ -66,15 +66,18 @@
       :loading="isLoading"
       :paginator="showPaginator"
       :paginatorTemplate="paginatorTemplate"
-      :rows="rows"
+      :reorderableColumns="reorderableColumns"
       :rowHover="true"
+      :rows="rows"
       :rowsPerPageOptions="[10, 20]"
-      :value="resourceDataFiltered"
       :selectionMode="selectionMode"
+      :value="resourceDataFiltered"
+      @columnReorder="columnReorder"
       @row-collapse="onLocalRowCollapse"
       @row-expand="onLocalRowExpand"
       @rowCollapse="onRowCollapse"
       @rowExpand="onRowExpand"
+      @rowReorder="onRowReorder"
       @rowSelect="onRowSelect"
       @rowUnselect="onRowUnselect"
       v-bind="options"
@@ -318,6 +321,10 @@ export default defineComponent({
         "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
       // "FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown",
     },
+    reorderableColumns: {
+      type: Boolean,
+      default: false,
+    },
     resource: {
       type: Object,
       required: true,
@@ -331,7 +338,7 @@ export default defineComponent({
     },
     selectionMode: {
       type: String as PropType<DataTableSelectModeType>,
-      default: "single",
+      default: "",
     },
     showActive: {
       type: Boolean,
@@ -457,6 +464,14 @@ export default defineComponent({
       emit("onRowUnselect", event);
     };
 
+    const columnReorder = (event) => {
+      emit("columnReorder", event);
+    };
+
+    const onRowReorder = (event) => {
+      emit("onRowReorder", event);
+    };
+
     onMounted(async () => {
       apiUrl.value = props?.apiUrl;
       stateList.value = props?.stateList;
@@ -470,36 +485,38 @@ export default defineComponent({
     });
 
     return {
-      onRowSelect,
-      onRowUnselect,
-      onLocalRowExpand,
-      onLocalRowCollapse,
       bulkRemove,
+      closeModal,
+      closeSidebar,
+      columnReorder,
       create,
       displayHeader,
       expandedRows,
       filters,
+      getResourceFields,
+      getSingularizedLabel,
       globalFilterFields,
       isLoading,
       modalData,
       modalType,
+      onLocalRowCollapse,
+      onLocalRowExpand,
+      onRowReorder,
+      onRowSelect,
+      onRowUnselect,
       remove,
       resourceData,
       resourceDataFiltered,
       selectedResources,
-      showModal,
-      showSidebar,
-      upperCaseFirst,
-      update,
-      getResourceFields,
-      closeModal,
-      closeSidebar,
       showCreateEdit,
       showDeletePopup,
-      getSingularizedLabel,
-      translate,
+      showModal,
+      showSidebar,
       stateList,
       stateUser,
+      translate,
+      update,
+      upperCaseFirst,
     };
   },
 });
