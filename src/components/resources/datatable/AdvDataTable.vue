@@ -71,6 +71,8 @@
       :rows="rows"
       :rowsPerPageOptions="[10, 20]"
       :selectionMode="selectionMode"
+      :sortField="sortField"
+      :sortOrder="sortOrder"
       :value="resourceDataFiltered"
       @columnReorder="columnReorder"
       @row-collapse="onLocalRowCollapse"
@@ -375,6 +377,13 @@ export default defineComponent({
     simpleCreate: {
       type: Boolean,
       default: false,
+    },
+    sortField: {
+      type: String,
+    },
+    sortOrder: {
+      type: Number,
+      default: 1,
     },
     stateList: {
       type: String,
