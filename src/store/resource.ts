@@ -279,7 +279,7 @@ const useResourceStore = function (resource) {
            * is UPDATE and params.id is not set
            */
           if (action === UPDATE && !params.id) {
-            params.id = resourceStore.item.id;
+            params.id = resourceStore.data.item.id;
           }
 
           /**
@@ -301,7 +301,7 @@ const useResourceStore = function (resource) {
             params,
             action === UPDATE ? payload.params : null
           );
-
+          
           // if the response contains a data object, use that,
           // otherwise use the response itself
           const data = response.data?.data ? response.data.data : response.data;

@@ -74,6 +74,7 @@
       :sortField="sortField"
       :sortOrder="sortOrder"
       :value="resourceDataFiltered"
+      @cell-edit-complete="onCellEditComplete"
       @columnReorder="columnReorder"
       @row-collapse="onLocalRowCollapse"
       @row-expand="onLocalRowExpand"
@@ -464,6 +465,9 @@ export default defineComponent({
         });
       }
     }
+    const onCellEditComplete = (event) => {
+      emit("cellEditComplete", event);
+    };
 
     const columnReorder = (event) => {
       emit("columnReorder", event);
@@ -507,6 +511,7 @@ export default defineComponent({
       isLoading,
       modalData,
       modalType,
+      onCellEditComplete,
       onLocalRowCollapse,
       onLocalRowExpand,
       onRowSelect,
