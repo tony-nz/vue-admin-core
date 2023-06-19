@@ -18,6 +18,7 @@
           :data="modalData"
           :fetchData="fetchData"
           :form="fields"
+          :hiddenFields="hidden"
           :type="'form'"
           :submit="submit"
         />
@@ -96,6 +97,9 @@ export default defineComponent({
     fieldValues: {
       type: Object,
       required: false,
+    },
+    hidden: {
+      type: Array,
     },
     type: {
       type: String,

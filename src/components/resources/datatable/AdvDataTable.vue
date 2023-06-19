@@ -28,7 +28,7 @@
             'fill-white p-2': simpleCreate,
             'text-white py-2 px-4': !simpleCreate,
           }"
-          @click="showCreateEdit('dialog', 'create')"
+          @click="showCreateEdit('dialog', 'create', modalData)"
         >
           <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
           <span v-else>
@@ -132,7 +132,7 @@
               'fill-white p-2': simpleCreate,
               'text-white py-2 px-4': !simpleCreate,
             }"
-            @click="showCreateEdit('dialog', 'create')"
+            @click="showCreateEdit('dialog', 'create', modalData)"
           >
             <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
             <span v-else>
@@ -224,6 +224,7 @@
       @create="create"
       @update="update"
       :data="modalData"
+      :hidden="formHidden"
       :fields="getResourceFields(stateList, true)"
       :type="modalType"
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
@@ -302,6 +303,12 @@ export default defineComponent({
     editMode: {
       type: String as PropType<DataTableEditModeType>,
       default: "cell",
+    },
+    formData: {
+      type: Object,
+    },
+    formHidden: {
+      type: Array,
     },
     idKey: {
       type: String,
@@ -488,6 +495,12 @@ export default defineComponent({
       apiUrl.value = props?.apiUrl;
       stateList.value = props?.stateList;
       stateUser.value = props?.stateUser;
+
+      if(props.formData) {
+        // merge props.formData (object) with modalData.value (array)
+        modalData.value = {...props.formData, ...modalData.value};
+      }
+
       try {
         getResourceData();
       } catch (e) {
