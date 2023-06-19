@@ -184,7 +184,7 @@ export default defineComponent({
 
       for (const key in props.classes) {
         if (merged[key] && Array.isArray(props.classes[key])) {
-          merged[key] = [...merged[key], ...props.classes[key]];
+          merged[key] = [...props.classes[key], ...merged[key]];
         }
       }
 
