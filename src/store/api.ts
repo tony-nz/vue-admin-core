@@ -12,14 +12,15 @@ const useApiStore = defineStore({
     refresh: false,
   }),
   actions: {
-    setLoading(state, loading) {
-      state.loading = loading ? loading : false;
+    setLoading(loading) {
+      console.log("loading", loading);
+      this.loading = loading;
       if (!loading) {
-        state.refresh = false;
+        this.refresh = false;
       }
     },
-    setRefresh(state, refresh) {
-      state.refresh = refresh;
+    setRefresh(refresh) {
+      this.refresh = refresh;
     },
   },
   getters: {
@@ -27,15 +28,15 @@ const useApiStore = defineStore({
      * Get api loading state
      * @returns object
      */
-    getLoading(state): boolean {
-      return state.loading;
+    getLoading(): boolean {
+      return this.loading;
     },
     /**
      * Get api refresh state
      * @returns object
      */
-    getRefresh(state): boolean {
-      return state.refresh;
+    getRefresh(): boolean {
+      return this.refresh;
     },
   },
 });

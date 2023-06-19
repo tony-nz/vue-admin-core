@@ -236,7 +236,7 @@ const useResourceStore = function (resource) {
            * Set loading for certain methods
            */
           if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-            apiStore.setLoading({}, true);
+            apiStore.setLoading(true);
           }
 
           /**
@@ -256,7 +256,7 @@ const useResourceStore = function (resource) {
               !resourceStore.getLastSync === null &&
               action === "getList")
           ) {
-            apiStore.setLoading({}, false);
+            apiStore.setLoading(false);
 
             if (stateList && resourceStore.data.list[stateList].length > 0) {
               return Promise.resolve({
@@ -316,7 +316,7 @@ const useResourceStore = function (resource) {
            * Set loading to false
            * and show success message
            */
-          apiStore.setLoading({}, false);
+          apiStore.setLoading(false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -329,7 +329,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           const message = e.response?.data?.message || false;
-          apiStore.setLoading({}, false);
+          apiStore.setLoading(false);
           resourceStore.showError(resourceStore, e.message, message);
 
           return Promise.reject(e);

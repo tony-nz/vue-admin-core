@@ -1,6 +1,5 @@
 <template>
   <div :class="mergedClass.base">
-    <Loading v-if="isLoading" />
     <div :class="mergedClass.card">
       <div v-if="isHeaderVisible" :class="mergedClass.header">
         <div class="flex items-center mr-4">
@@ -31,6 +30,7 @@
 
       <!-- Content section -->
       <div :class="mergedClass.content">
+        <Loading v-if="isLoading" />
         <slot />
         <slot name="content"></slot>
       </div>
