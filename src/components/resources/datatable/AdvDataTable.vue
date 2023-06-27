@@ -609,4 +609,11 @@ export default defineComponent({
 /* .p-paginator-first {
   margin-left: auto !important;
 } */
+
+/* fix for icon on search input */
+.p-input-icon-left > i:first-of-type {
+    position: absolute !important;
+    left: 1.5rem !important;
+    top: 1.5rem !important;
+}
 </style>
