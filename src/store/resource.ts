@@ -424,8 +424,8 @@ const useResourceStore = function (resource) {
       getDataItem(): any {
         return this.data.item;
       },
-      getDataList(): any {
-        return this.data.list;
+      getDataList(state): any {
+        return state.data.list;
       },
       getDataUserList(): any {
         return this.data.userList;
