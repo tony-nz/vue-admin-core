@@ -1,99 +1,241 @@
 <template>
-  <div
-    class="rounded-lg bg-white overflow-hidden mb-4 py-4 shadow w-full dark:bg-slate-900"
-    :class="getClasses"
-    :style="style"
-  >
-    <Loading v-if="isLoading" />
-    <div
-      v-if="title || slots.toolbar"
-      class="flex justify-between items-center flex-wrap border-b border-gray-200 pb-2 sm:flex-nowrap dark:border-gray-600"
-      :class="{ hidden: isLoading }"
-    >
-      <div class="ml-6 my-2">
-        <slot name="header" />
-        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-          {{ title }}
-        </h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-600">
-          {{ description }}
-        </p>
+  <div :class="mergedClass.base">
+    <div :class="mergedClass.card">
+      <div v-if="isHeaderVisible" :class="mergedClass.header">
+        <div class="flex items-center mr-4">
+          <!-- Icon -->
+          <div v-if="isIconVisible" :class="mergedClass.icon">
+            <slot name="icon"></slot>
+          </div>
+
+          <!-- Title and description -->
+          <div>
+            <h3 :class="mergedClass.title">{{ title }}</h3>
+            <p :class="mergedClass.description">{{ description }}</p>
+          </div>
+        </div>
+        <div v-if="isHeaderLeftVisible" class="grow">
+          <slot name="header_left"></slot>
+        </div>
+        <!-- Right slot with dropdown menu -->
+        <div v-if="isHeaderRightVisible" class="relative flex items-center">
+          <slot name="header_right"></slot>
+          <Dropdown
+            v-if="menuItems.length > 0"
+            :menuItems="menuItems"
+            class="ml-4"
+          />
+        </div>
       </div>
-      <div class="mr-6 my-2 flex-shrink-0">
-        <slot name="toolbar" />
+
+      <!-- Content section -->
+      <div :class="mergedClass.content">
+        <Loading v-if="isLoading" />
+        <slot />
+        <slot name="content"></slot>
       </div>
-    </div>
-    <div :class="getContentClasses">
-      <slot />
-      <slot name="content" />
+
+      <!-- Footer with 3 columns -->
+      <div v-if="isFooterVisible" :class="mergedClass.footer">
+        <div class="w-3/12">
+          <slot name="footer_left"></slot>
+        </div>
+
+        <div class="w-6/12">
+          <slot name="footer_middle"></slot>
+        </div>
+
+        <div class="w-3/12">
+          <slot name="footer_right"></slot>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-import { computed, defineComponent, onMounted, ref, useSlots } from "vue";
+<script lang="ts">
+import { computed, defineComponent } from "vue";
+import Dropdown from "./partials/Dropdown.vue";
 import Loading from "./partials/Loading.vue";
+
+interface Class {
+  base?: Array<string>;
+  card?: Array<string>;
+  content?: string[];
+  description?: Array<string>;
+  footer?: string[];
+  header?: Array<string>;
+  icon?: Array<string>;
+  title?: Array<string>;
+}
+
+interface MenuItem {
+  action: () => void;
+  label: string;
+}
 
 export default defineComponent({
   name: "Card",
   components: {
+    Dropdown,
     Loading,
   },
   props: {
-    contentClass: {
-      type: String,
-    },
-    class: {
-      type: String,
-    },
     title: {
       type: String,
     },
     description: {
       type: String,
     },
+    classes: {
+      type: Object as () => Class,
+      default: () => ({}),
+    },
+    clearCss: {
+      type: Array as () => string[],
+      default: () => [],
+    },
     isLoading: {
       type: Boolean,
       default: false,
     },
-    style: {
-      type: String,
+    menuItems: {
+      type: Array as () => MenuItem[],
+      default: () => [],
     },
   },
-  setup(props) {
-    const slots = useSlots();
-    const headerEmpty = ref(true);
-    const isMounted = ref(false);
-    const getClasses = computed(() => {
-      return props.class ? props.class : "";
-    });
-    const getContentClasses = computed(() => {
-      const hidden = props.isLoading ? " hidden" : "";
-      return props.contentClass
-        ? props.contentClass + hidden
-        : "px-4 py-5 sm:p-6 h-full" + hidden;
+  setup(props, { slots }) {
+    const transitions = ["transition", "ease-in-out", "duration-200"];
+    const defaultClass = {
+      base: ["relative", "h-full"],
+      card: [
+        "flex",
+        "flex-col",
+        "rounded-lg",
+        "bg-white",
+        "shadow-lg",
+        "dark:bg-slate-900",
+        "transition",
+        "duration-150",
+        "ease-in-out",
+        ...transitions,
+      ],
+      header: [
+        "flex",
+        "justify-between",
+        "items-center",
+        "rounded-t-lg",
+        "px-6",
+        "py-6",
+        "border-b",
+        "border-gray-200",
+        "dark:border-gray-600",
+      ],
+      icon: [
+        "h-6",
+        "w-6",
+        "text-gray-500",
+        "mr-2",
+        "dark:text-gray-400",
+        ...transitions,
+      ],
+      title: [
+        "text-lg",
+        "leading-6",
+        "font-medium",
+        "text-gray-900",
+        "dark:text-white",
+        ...transitions,
+      ],
+      description: [
+        "mt-1",
+        "text-sm",
+        "text-gray-500",
+        "dark:text-gray-600",
+        ...transitions,
+      ],
+      content: [
+        "px-6",
+        "py-4",
+        "mb-4",
+        "flex-1",
+        "text-gray-800",
+        "dark:text-white",
+        ...transitions,
+      ],
+      footer: [
+        "flex",
+        "justify-between",
+        "bg-gray-200",
+        "px-6",
+        "py-4",
+        "rounded-b-lg",
+        "dark:bg-gray-700",
+        ...transitions,
+      ],
+    };
+
+    const mergedClass = computed(() => {
+      const merged: Class = { ...defaultClass };
+
+
+      for (const key of props.clearCss) {
+        if (merged[key] && Array.isArray(merged[key])) {
+          merged[key] = [];
+        }
+      }
+
+      for (const key in props.classes) {
+        if (merged[key] && Array.isArray(props.classes[key])) {
+          merged[key] = [...props.classes[key], ...merged[key]];
+        }
+      }
+
+      return merged;
     });
 
-    onMounted(async () => {
-      if (props.title == null) {
-        headerEmpty.value = false;
-      }
-      isMounted.value = true;
+    const hasSlot = (name) => {
+      return slots[name] !== undefined;
+    };
+
+    const isFooterVisible = computed(() => {
+      return (
+        hasSlot("footer_left") ||
+        hasSlot("footer_middle") ||
+        hasSlot("footer_right")
+      );
+    });
+
+    const isHeaderVisible = computed(() => {
+      return (
+        hasSlot("header_left") ||
+        hasSlot("header_right") ||
+        props.title ||
+        props.description
+      );
+    });
+
+    const isHeaderLeftVisible = computed(() => {
+      return hasSlot("header_left");
+    });
+
+    const isHeaderRightVisible = computed(() => {
+      return hasSlot("header_right") || props.menuItems.length > 0;
+    });
+
+    const isIconVisible = computed(() => {
+      return hasSlot("icon");
     });
 
     return {
-      getClasses,
-      getContentClasses,
-      headerEmpty,
-      isMounted,
-      slots,
+      isHeaderVisible,
+      isHeaderLeftVisible,
+      isHeaderRightVisible,
+      isFooterVisible,
+      isIconVisible,
+      defaultClass,
+      mergedClass,
     };
   },
 });
 </script>
-
-<style>
-.panel-footer:empty {
-  display: none;
-}
-</style>

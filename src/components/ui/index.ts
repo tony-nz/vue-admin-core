@@ -3,7 +3,6 @@ import ActionBtn from "./button/ActionBtn.vue";
 
 // card
 import Card from "./card/Card.vue";
-import Card2 from "./Card2/Card.vue";
 
 // colorPicker
 import ColorPicker from "./colorpicker/Index.vue";
@@ -26,7 +25,6 @@ import TabPanels from "./tabs/TabPanels.vue";
 export {
   ActionBtn,
   Card,
-  Card2,
   ColorPicker,
   Duotone,
   StatBox1,
