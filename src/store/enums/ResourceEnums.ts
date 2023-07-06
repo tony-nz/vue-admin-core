@@ -11,7 +11,7 @@ export const UPDATE_MANY = "updateMany";
 export const DELETE = "delete";
 export const DELETE_MANY = "deleteMany";
 export const FIND = "find";
-
+export const PUT = "put";
 /**
  * Specific optional tree actions
  */

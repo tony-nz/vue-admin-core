@@ -10,6 +10,7 @@ const config: AuthConfig = {
     update: "/api/auth/update",
     verify: "/api/auth/verify",
     permissions: "/api/auth/ability",
+    settings: "/api/settings",
   },
   oauth: {
     provider: "google",

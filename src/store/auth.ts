@@ -13,6 +13,7 @@ interface IState {
   permissions: any;
   user: any;
   roles: any;
+  settings: any;
 }
 
 const useAuthStore = defineStore({
@@ -25,6 +26,7 @@ const useAuthStore = defineStore({
     permissions: [],
     user: [],
     roles: [],
+    settings: JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
   }),
   actions: {
     login(credentials) {
@@ -127,6 +129,7 @@ const useAuthStore = defineStore({
         ApiService.get(this.AuthConfig("api.verify"))
           .then(({ data }) => {
             this.setAuth(data.data);
+            this.getApiSettings();
             resolve();
           })
           .catch(({ response }) => {
@@ -137,6 +140,33 @@ const useAuthStore = defineStore({
             reject();
           });
       });
+    },
+    setSettings(settings: any) {
+      this.settings = settings;
+      window.sessionStorage.setItem("settings", JSON.stringify(this.settings));
+    },
+    updateSettings(payload) {
+      return new Promise<void>((resolve, reject) => {
+        ApiService.put(this.AuthConfig("api.settings"), payload)
+          .then(({ data }) => {
+            this.setSettings(data.data);
+            resolve();
+          })
+          .catch(({ response }) => {
+            this.setError(response.data.errors);
+            reject();
+          });
+      });
+    },
+    async getApiSettings() {
+      try {
+        const response = await ApiService.get(this.AuthConfig("api.settings"));
+        this.setSettings(response.data.data ? response.data.data : response.data);
+      } catch (e) {
+        console.log(e);
+      }
+
+      return this.settings;
     },
     setAuth(data) {
       // const locale = data.user.locale ? data.user.locale : "en";
@@ -220,6 +250,13 @@ const useAuthStore = defineStore({
      */
     isUserAuthenticated(): boolean {
       return this.isAuthenticated;
+    },
+    /**
+     * Site settings
+     * @returns array
+     */
+    getSettings(): any {
+      return this.settings;
     },
   },
 });

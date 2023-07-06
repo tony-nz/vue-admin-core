@@ -7,6 +7,7 @@ interface API {
   update: string;
   verify: string;
   permissions: string;
+  settings: string;
 }
 
 interface OAuth {
