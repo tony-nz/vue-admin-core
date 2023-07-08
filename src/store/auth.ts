@@ -238,6 +238,20 @@ const useAuthStore = defineStore({
       return this.roles;
     },
     /**
+     * Get setting from settings
+     * @returns {function(setting): *}
+     */
+    getSetting(): any {
+      return (setting) => {
+        // if setting is "true" or "false" return boolean
+        if (objectPath.get(this.settings, setting) === "true" || objectPath.get(this.settings, setting) === "false") {
+          return objectPath.get(this.settings, setting) == "true";
+        }
+        
+        return objectPath.get(this.settings, setting);
+      };
+    },
+    /**
      * Return current user object
      * @returns User
      */
@@ -256,6 +270,17 @@ const useAuthStore = defineStore({
      * @returns array
      */
     getSettings(): any {
+      Object.keys(this.settings).forEach((key) => {
+        // convert "true" and "false" to boolean
+        if (this.settings[key] === "true" || this.settings[key] === "false") {
+          this.settings[key] = this.settings[key] == "true";
+        }
+        // convert all string integers
+        if (typeof this.settings[key] === "string" && /^\d+$/.test(this.settings[key])) {
+          this.settings[key] = parseInt(this.settings[key]);
+        }
+      });
+
       return this.settings;
     },
   },
