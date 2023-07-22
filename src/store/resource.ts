@@ -290,7 +290,9 @@ const useResourceStore = function (resource) {
             : params;
 
           const newApiUrl = stateUser
-            ? payload?.apiUrl ? payload?.apiUrl : resourceStore.resource.apiUrl
+            ? payload?.apiUrl
+              ? payload?.apiUrl
+              : resourceStore.resource.apiUrl
             : resourceStore.resource.apiUrl;
           let response = await ApiService[
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
@@ -301,7 +303,7 @@ const useResourceStore = function (resource) {
             params,
             action === UPDATE ? payload.params : null
           );
-          
+
           // if the response contains a data object, use that,
           // otherwise use the response itself
           const data = response.data?.data ? response.data.data : response.data;

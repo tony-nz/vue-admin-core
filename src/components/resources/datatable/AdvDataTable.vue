@@ -434,6 +434,7 @@ export default defineComponent({
       remove,
       resourceData,
       resourceDataFiltered,
+      routeId,
       showCreateEdit,
       showDeletePopup,
       showModal,
@@ -495,6 +496,10 @@ export default defineComponent({
       apiUrl.value = props?.apiUrl;
       stateList.value = props?.stateList;
       stateUser.value = props?.stateUser;
+
+      if (props.routeId) {
+        routeId.value = props.routeId;
+      }
 
       if(props.formData) {
         // merge props.formData (object) with modalData.value (array)
