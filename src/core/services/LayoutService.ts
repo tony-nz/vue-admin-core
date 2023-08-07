@@ -20,9 +20,10 @@ class LayoutService {
 
     /**
      * Load config from local storage
+     * TODO:: this bugs out and overwrites user defined layoutconfig
      */
-    if (localStorageConfig) {
-      configStore.overrideLayoutConfig();
+    if (localStorageConfig || !localStorageConfig.layout) {
+      // configStore.overrideLayoutConfig();
     }
   }
 }

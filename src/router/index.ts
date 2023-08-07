@@ -50,7 +50,8 @@ export async function initRouter(router) {
       } else {
         const configStore = useConfigStore();
         const breadcrumbStore = useBreadcrumbStore();
-        configStore.resetLayoutConfig();
+        // TODO:: bug with this
+        // configStore.resetLayoutConfig();
 
         const getPage = to.matched.find((record) => record.meta.page);
         const path = to.path.split("/").filter((item) => item !== "");

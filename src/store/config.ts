@@ -30,7 +30,7 @@ const useConfigStore = defineStore({
   state: (): IState => ({
     config: {
       initial: defaultLayoutConfig,
-      layout: defaultLayoutConfig,
+      layout: {},
       locale: window.localStorage.getItem("locale") || "en",
       menu: {
         apps: {},
@@ -112,13 +112,16 @@ const useConfigStore = defineStore({
     },
     toggleDarkMode(): void {
       const element = document.getElementById("vueadmin-app");
-      this.config.layout.theme.darkMode = !this.config.layout.theme.darkMode;
+      if (this.config.layout.theme?.darkMode) {
+        this.config.layout.theme.darkMode = !this.config.layout.theme?.darkMode;
+      }
+
       const localStorageConfig = Object.assign(
         {},
         JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
       );
       if (element) {
-        if (this.config.layout.theme.darkMode) {
+        if (this.config.layout.theme?.darkMode) {
           localStorageConfig["darkMode"] = true;
           element.classList.add("dark");
         } else {
@@ -172,8 +175,8 @@ const useConfigStore = defineStore({
   },
   getters: {
     getDarkMode(): boolean {
-      return this.config.layout.theme.darkMode
-        ? this.config.layout.theme.darkMode
+      return this.config.layout.theme?.darkMode
+        ? this.config.layout.theme?.darkMode
         : false;
     },
     getLayoutConfig(): any {
