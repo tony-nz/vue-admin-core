@@ -2,7 +2,7 @@
   <Toast />
   <div
     id="vueadmin-app"
-    class="min-h-screen flex flex-col"
+    class="flex flex-col w-full max-h-full overflow-hidden"
     :class="{
       'bg-gray-100': !darkMode,
       'bg-slate-800 dark': darkMode,
@@ -19,14 +19,14 @@
     >
       <slot name="toolbar"></slot>
     </Toolbar>
-    <main class="relative flex flex-col flex-1 pb-16" :class="displayToolbar ? '-mt-16' : ''">
+    <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full" :class="displayToolbar ? '-mt-16' : ''">
       <div
         id="vueadmin-content"
         :class="{
           'container-fluid': contentWidth == 'fluid',
           container: contentWidth == 'fixed',
         }"
-        class="mx-auto py-6 px-6 flex flex-col flex-1"
+        class="mx-auto py-6 px-6 flex flex-col flex-1 overflow-y-auto"
       >
         <router-view v-slot="{ Component, route }">
           <keep-alive>

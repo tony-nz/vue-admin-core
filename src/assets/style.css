@@ -17,7 +17,10 @@ body {
 #app {
   /* @apply grid; */
   /* @apply min-h-full; */
-  @apply h-full;
+  /* @apply h-full; */
+  @apply flex;
+  @apply h-screen;
+  @apply w-full;
 }
 
 /* TODO Move this */
