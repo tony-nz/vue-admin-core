@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Teleport v-if="!isLoading && resource" :to="'#' + teleportLocation">
+    <Teleport v-if="!isLoading && resource && displayToolbar" :to="'#' + teleportLocation">
       <div
         v-if="showTeleportToolbar"
         id="toolbar-datatable"
@@ -253,6 +253,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, onMounted, PropType, ref } from "vue";
+import { displayToolbar } from "../../../core/helpers/config";
 import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import {
@@ -507,9 +508,11 @@ export default defineComponent({
       }
 
       try {
+        console.log("Getting resource data");
         getResourceData();
+        console.log("Got resource data");
       } catch (e) {
-        console.log(e);
+        console.log("Error getting resource data", e);
       }
       isLoading.value = false;
     });
@@ -521,6 +524,7 @@ export default defineComponent({
       columnReorder,
       create,
       displayHeader,
+      displayToolbar,
       expandedRows,
       filters,
       getResourceFields,

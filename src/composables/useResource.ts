@@ -37,7 +37,7 @@ export default function useResource(
    */
   const resourceDataFiltered = computed(() => {
     const filters = ref(options?.dataFilters);
-    
+
     if (filters.value && Object.keys(filters.value).length !== 0) {
       return resourceData.value?.data.filter((item) => {
         for (const key in filters.value) {
@@ -173,12 +173,12 @@ export default function useResource(
 
   async function getResourceData() {
     if (resource?.name) {
-    // if (apiUrl) {
-    //   resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
-    //     return data.data;
-    //   });
-    // } else {}
-    // }
+      // if (apiUrl) {
+      //   resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
+      //     return data.data;
+      //   });
+      // } else {}
+      // }
       resourceData.value = await resourceStore.getList({
         params: options?.params ? options?.params : null,
         routeId: routeId.value,
@@ -186,6 +186,7 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: stateUser.value,
       });
+      console.log(resourceData.value);
     }
   }
 

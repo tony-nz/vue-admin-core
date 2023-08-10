@@ -321,6 +321,7 @@ const useResourceStore = function (resource) {
           apiStore.setLoading(false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
+          console.log("response", response);
           /**
            * Return response data if it exists
            */
