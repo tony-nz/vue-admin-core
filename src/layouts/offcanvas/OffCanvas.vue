@@ -1,7 +1,7 @@
 <template>
   <div
     @click="isVisible = !isVisible"
-    class="z-20 lg:hidden absolute"
+    class="z-30 lg:hidden absolute"
   >
     <svg
       class="w-6 h-6"

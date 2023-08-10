@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex z-20 -mt-[9px] items-center grow justify-end"
+    class="flex z-30 -mt-[9px] items-center grow justify-end"
   >
     <button
       @click="toggleDarkMode()"

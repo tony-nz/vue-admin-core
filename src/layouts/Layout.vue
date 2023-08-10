@@ -18,7 +18,7 @@
     >
       <slot name="toolbar"></slot>
     </Toolbar>
-    <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full" :class="displayToolbar ? '-mt-16' : '-mt-[122px]'">
+    <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full z-0" :class="displayToolbar ? '-mt-16' : '-mt-[122px]'">
       <div
         id="vueadmin-content"
         :class="{

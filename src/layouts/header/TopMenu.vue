@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="w-full mx-auto dark:bg-slate-900 relative z-20"
+    class="w-full mx-auto dark:bg-slate-900 relative z-30"
     :class="slugBackground ? slugBackground : 'bg-primary-500'"
   >
     <div
@@ -12,7 +12,7 @@
       class="px-6 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
     >
       <div class="flex w-full content-end">
-        <div class="z-20 pr-32 lg:hidden items-center h-full w-full">
+        <div class="z-30 pr-32 lg:hidden items-center h-full w-full">
           <OffCanvas />
         </div>
         <ul class="pr-32 hidden lg:flex lg:grow items-center h-full">

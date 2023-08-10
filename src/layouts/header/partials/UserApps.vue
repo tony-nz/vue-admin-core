@@ -51,7 +51,7 @@
       <transition name="mega-menu-fade">
         <div
           v-show="isVisible"
-          class="mega-menu absolute normal-case font-normal bg-white shadow-md rounded-lg overflow-hidden border w-160 z-20 right-0"
+          class="mega-menu absolute normal-case font-normal bg-white shadow-md rounded-lg overflow-hidden border w-160 z-30 right-0"
         >
           <div class="flex flex-col lg:flex-row px-8 py-6 border-b -mx-4 pb-0">
             <ul class="w-full grid grid-cols-2 gap-4 px-4">
