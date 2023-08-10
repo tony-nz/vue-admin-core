@@ -6,6 +6,10 @@ export default {
   props: {
     activeClass: [String],
     inActiveClass: [String],
+    isRoute: {
+      type: Boolean,
+      default: false,
+    },
     classValue: [String],
   },
   setup(props) {
@@ -20,7 +24,9 @@ export default {
     const isActive = computed(() => index.value === active.value);
 
     const activeteTab = () => {
-      selectTab(index.value);
+      if (!props.isRoute) {
+        selectTab(index.value);
+      }
     };
 
     watchEffect(() => {

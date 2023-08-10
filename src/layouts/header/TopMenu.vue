@@ -27,10 +27,14 @@
             <template v-for="(item, i) in mainMenuConfig" :key="i">
               <Tab
                 v-if="item"
-                :class="'top-menu-item cursor-pointer flex items-center text-sm font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1'"
+                :class="[
+                  'top-menu-item cursor-pointer flex items-center text-sm font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1',
+                  !item.items ? 'ml-1.5 my-1 py-2 px-2.5 rounded-lg' : '',
+                ]"
                 :activeClass="'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active'"
                 :inActiveClass="'bg-black bg-opacity-10 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white text-opacity-70'"
-                @click="changeBackground(item)"
+                :isRoute="item.items ? false : true"
+                @click="tabClick(item)"
               >
                 <span
                   v-if="item.icon && item.icon['path']"
@@ -67,6 +71,7 @@ import Tab from "../../components/ui/tabs/Tab.vue";
 import AppBar from "./AppBar.vue";
 import useConfigStore from "../../store/config";
 import MainMenu from "../../core/types/MainMenuTypes";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "TopMenu",
@@ -90,12 +95,20 @@ export default defineComponent({
   setup(props) {
     const activeTab = ref(props.tab);
     const mainMenuConfig: Array<MainMenu> = useConfigStore().getMainMenu;
+    const router = useRouter();
     const slugBackground = ref();
 
     const changeBackground = (menuItem) => {
       // if (menuItem.slug) {
       slugBackground.value = menuItem.backgroundColor;
       // }
+    };
+
+    const tabClick = (item) => {
+      if (!item.items) {
+        router.push({ path: item.to });
+      }
+      changeBackground(item);
     };
 
     return {
@@ -110,6 +123,7 @@ export default defineComponent({
       logoDark,
       logoLight,
       layoutWidth,
+      tabClick,
       translate,
     };
   },
