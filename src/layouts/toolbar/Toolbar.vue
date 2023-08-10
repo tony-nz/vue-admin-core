@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-secondary-600 pt-8 pb-16 relative"
+    class="bg-secondary-600 pb-16 relative"
     :class="[ displayToolbar ? 'pt-8' : 'pt-[60px]' ]"
   >
     <div
