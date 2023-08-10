@@ -63,6 +63,9 @@ const config: LayoutConfigTypes = {
       tabletAndMobile: true,
     },
   },
+  breadcrumbs: {
+    display: true,
+  },
   toolbar: {
     display: true,
     width: "fluid",

@@ -11,6 +11,15 @@ export const config = computed(() => {
 });
 
 /**
+ * Display breadcrumbs
+ * @returns {boolean}
+ */
+export const displayBreadcrumbs = computed(() => {
+  const configStore = useConfigStore();
+  return configStore.getLayoutConfig("breadcrumbs.display");
+});
+
+/**
  * Display page loader
  * @returns {boolean}
  */

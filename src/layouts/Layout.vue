@@ -12,14 +12,13 @@
       <slot name="header"></slot>
     </Header>
     <Toolbar
-      v-if="displayToolbar"
       :title="pageTitle"
       :breadcrumbs="breadcrumbs"
       :currentPage="currentPage"
     >
       <slot name="toolbar"></slot>
     </Toolbar>
-    <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full" :class="displayToolbar ? '-mt-16' : ''">
+    <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full" :class="displayToolbar ? '-mt-16' : '-mt-[122px]'">
       <div
         id="vueadmin-content"
         :class="{
@@ -142,14 +141,14 @@ export default defineComponent({
 
     return {
       breadcrumbs,
+      cacheArr,
       contentWidth,
       currentPage,
+      darkMode,
       displayToolbar,
       pageTitle,
-      viewKey,
-      darkMode,
       scrollToTop,
-      cacheArr,
+      viewKey,
     };
   },
 });

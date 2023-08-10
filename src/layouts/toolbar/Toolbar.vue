@@ -1,8 +1,10 @@
 <template>
   <div
     class="bg-secondary-600 pt-8 pb-16 relative"
+    :class="[ displayToolbar ? 'pt-8' : 'pt-[60px]' ]"
   >
     <div
+      v-if="displayToolbar"
       id="vueadmin-toolbar"
       :class="{
         'container-fluid': contentWidth == 'fluid',
@@ -12,6 +14,7 @@
     >
       <!-- Breadcrumbs starts -->
       <Breadcrumb
+        v-if="displayBreadcrumbs"
         :title="title"
         :breadcrumbs="breadcrumbs"
         :currentPage="currentPage"
@@ -35,7 +38,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { contentWidth } from "../../core/helpers/config";
+import { contentWidth, displayBreadcrumbs, displayToolbar } from "../../core/helpers/config";
 import { goBack } from "../../core/helpers/functions";
 import Breadcrumb from "./Breadcrumb.vue";
 import Duotone from "../../components/ui/icons/Duotone.vue";
@@ -54,6 +57,8 @@ export default defineComponent({
   setup() {
     return {
       contentWidth,
+      displayBreadcrumbs,
+      displayToolbar,
       goBack,
     };
   },

@@ -65,6 +65,10 @@ interface Menu {
   fixed?: Fixed;
 }
 
+interface Breadcrumb {
+  display?: boolean;
+}
+
 interface Toolbar {
   display?: boolean;
   width?: "fixed" | "fluid";
@@ -81,6 +85,7 @@ interface LayoutConfig {
   scrollTop?: ScrollTop;
   header?: Header;
   menu?: Menu;
+  breadcrumbs?: Breadcrumb;
   toolbar?: Toolbar;
   content?: Content;
 }
