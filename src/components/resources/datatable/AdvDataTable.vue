@@ -423,7 +423,7 @@ export default defineComponent({
     const expandedRows = ref([] as unknown[]);
     const selectedResources = ref();
     const displayHeader = ref(props.showHeader ? "table-header-group" : "none");
-    const displayPagination = ref(props.hidePagination ? "flex" : "none");
+    const displayPagination = ref(props.hidePagination ? "none" : "flex");
     const dataFilters = computed(() => {
       return props.dataFilters;
     });
@@ -567,7 +567,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style>
 .p-datatable-header {
   padding: 0px !important;
 }
