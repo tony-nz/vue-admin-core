@@ -312,6 +312,10 @@ export default defineComponent({
     formHidden: {
       type: Array,
     },
+    hidePagination: {
+      type: Boolean,
+      default: false,
+    },
     idKey: {
       type: String,
     },
@@ -419,6 +423,7 @@ export default defineComponent({
     const expandedRows = ref([] as unknown[]);
     const selectedResources = ref();
     const displayHeader = ref(props.showHeader ? "table-header-group" : "none");
+    const displayPagination = ref(props.hidePagination ? "flex" : "none");
     const dataFilters = computed(() => {
       return props.dataFilters;
     });
@@ -528,6 +533,7 @@ export default defineComponent({
       columnReorder,
       create,
       displayHeader,
+      displayPagination,
       displayToolbar,
       expandedRows,
       filters,
@@ -561,7 +567,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .p-datatable-header {
   padding: 0px !important;
 }
@@ -628,5 +634,8 @@ export default defineComponent({
     position: absolute !important;
     left: 1.5rem !important;
     top: 1.5rem !important;
+}
+.p-paginator {
+  display: v-bind("displayPagination");
 }
 </style>
