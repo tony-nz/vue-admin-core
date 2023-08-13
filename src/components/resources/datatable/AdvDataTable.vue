@@ -73,6 +73,7 @@
       :selectionMode="selectionMode"
       :sortField="sortField"
       :sortOrder="sortOrder"
+      :totalRecords="totalRecords"
       :value="resourceDataFiltered"
       @cell-edit-complete="onCellEditComplete"
       @columnReorder="columnReorder"
@@ -409,6 +410,9 @@ export default defineComponent({
     toolbar: {
       type: Object as PropType<DataTableToolbar>,
     },
+    totalRecords: {
+      type: Number,
+    }
   },
   setup(props, { emit }) {
     const globalFilterFields = ref();
