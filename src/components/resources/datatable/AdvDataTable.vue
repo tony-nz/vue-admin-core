@@ -517,9 +517,7 @@ export default defineComponent({
       }
 
       try {
-        console.log("Getting resource data");
         getResourceData();
-        console.log("Got resource data");
       } catch (e) {
         console.log("Error getting resource data", e);
       }

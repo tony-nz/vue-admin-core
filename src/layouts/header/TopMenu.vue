@@ -26,7 +26,7 @@
           <Tabs v-model="activeTab">
             <template v-for="(item, i) in mainMenuConfig" :key="i">
               <Tab
-                v-if="item"
+                v-if="item && item.items"
                 :class="[
                   'top-menu-item cursor-pointer flex items-center text-sm font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1',
                   !item.items ? 'ml-1.5 my-1 py-2 px-2.5 rounded-lg' : '',
@@ -44,6 +44,30 @@
                 </span>
                 {{ translate(item.label) }}
               </Tab>
+
+              <router-link
+                v-else
+                custom
+                :to="item.to ? item.to : ''"
+                v-slot="{ isExactActive, navigate }"
+              >
+                <button
+                  @click="navigate"
+                  class="cursor-pointer flex items-center text-sm font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg"
+                  :class="{
+                    'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active' : isExactActive,
+                    'bg-black bg-opacity-10 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white text-opacity-70' : !isExactActive,
+                  }"
+                >
+                  <span
+                    v-if="item.icon && item.icon['path']"
+                    class="svg-icon svg-icon-2x svg-icon-white mr-2"
+                  >
+                    <inline-svg :src="item.icon['path']" class="h-6 w-6" />
+                  </span>
+                  {{ translate(item.label) }}
+                </button>
+              </router-link>
             </template>
           </Tabs>
         </ul>
