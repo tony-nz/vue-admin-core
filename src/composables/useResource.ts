@@ -186,7 +186,6 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: stateUser.value,
       });
-      console.log(resourceData.value);
     }
   }
 
