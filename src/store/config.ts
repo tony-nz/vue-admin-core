@@ -112,7 +112,9 @@ const useConfigStore = defineStore({
     },
     toggleDarkMode(): void {
       const element = document.getElementById("vueadmin-app");
-      if (this.config.layout.theme?.darkMode) {
+      console.log("toggleDarkMode");
+      console.log(this.config.layout.theme?.darkMode);
+      if (this.config.layout.theme) {
         this.config.layout.theme.darkMode = !this.config.layout.theme?.darkMode;
       }
 

@@ -149,24 +149,29 @@ import useConfigStore from "../../../store/config";
 
 export default defineComponent({
   name: "UserMenu",
+  props: {
+    btnClass: {
+      type: String,
+      default: "w-8 ml-2 p-2 rounded-lg bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60"
+    },
+    mnuClass: {
+      type: String,
+      default: "w-full text-left hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm"
+    }
+  },
   setup() {
-    const isMounted = ref(false);
-    const userMenuConfig = useConfigStore().getUserMenu;
-    const contextMenu = ref();
-    const btnClass = ref("w-8 ml-2 p-2 rounded-lg bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60")
-    const mnuClass = ref("w-full text-left hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm");
-    const store = useAuthStore();
-
-    const toggle = (event) => {
-      contextMenu.value.toggle(event);
-    };
-    const isVisible = ref(false);
-    const focusedIndex = ref(0);
-
     const isFullscreen = ref(false);
     const isFluid = ref(false);
-    const hasToolbar = ref(false);
+    const isMounted = ref(false);
+    const isVisible = ref(false);
+    const focusedIndex = ref(0);
+    const store = useAuthStore();
+    const userMenuConfig = useConfigStore().getUserMenu;
 
+    /**
+     * Toggle app to full screen
+     * @returns void
+     */
     const toggleFullscreen = () => {
       if (!document.fullscreenElement) {
         isFullscreen.value = true;
@@ -177,12 +182,20 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Change the app locale
+     * @param locale 
+     */
     const changeLocale = (locale) => {
       if (locale) {
         store.setLocale(locale);
       }
     };
 
+    /**
+     * Toggle the content width
+     * @returns void
+     */
     const toggleContentWidth = () => {
       const localStorageConfig = Object.assign(
         {},
@@ -225,57 +238,39 @@ export default defineComponent({
       }
     };
 
+    /**
+     * Process menu commands
+     * @param command 
+     */
     const processMenuCommand = (command) => {
       if (command) {
         command();
       }
     };
 
-    const getUserLocale = computed(() => {
-      switch (getUser.value["locale"]) {
-        case "en":
-          return "English";
-        case "maori":
-          return "Maori";
-        default:
-          break;
-      }
-      return null;
-    });
+    /**
+     * Get the current logged in user
+     * @returns object
+     */
     const getUser = computed(() => {
       return store.getUser;
     });
-    const getUserAvatar = computed(() => {
-      return getUser.value["avatar"]
-        ? getUser.value["avatar"]
-        : "/media/icons/duotone/user.svg";
-    });
 
-    const getUserEmail = computed(() => {
-      return getUser.value["email"]
-        ? getUser.value["email"]
-        : "Missing email";
-    });
-
-    const getUserName = computed(() => {
-      return getUser.value["name"]
-        ? getUser.value["name"]
-        : "Missing name";
-    });
+    /**
+     * Hide the menu
+     * 
+     */
     const hideMenu = () => {
       isVisible.value = false;
       focusedIndex.value = 0;
     };
-    const showMenu = () => {
-      isVisible.value = true;
-    };
-
 
     /**
-     * Dropdown menu
+     * Show the menu
+     * @returns void
      */
-    const clickEventType = () => {
-      return document.ontouchstart !== null ? "click" : "touchstart";
+    const showMenu = () => {
+      isVisible.value = true;
     };
 
     onMounted(async () => {
@@ -283,44 +278,25 @@ export default defineComponent({
     });
 
     return {
-      getUserLocale,
       changeLocale,
-      userMenuConfig,
-      contextMenu,
-      toggle,
-      toggleContentWidth,
-      toggleFullscreen,
-      isFullscreen,
-      isFluid,
-      processMenuCommand,
-      getUser,
-      getUserAvatar,
-      getUserEmail,
-      getUserName,
-      toggleDarkMode,
       darkMode,
-      store,
-      translate,
-      isVisible,
-      hideMenu,
-      showMenu,
-      focusedIndex,
-      isMounted,
-      btnClass,
-      toggleToolbar,
       displayToolbar,
-      mnuClass,
+      focusedIndex,
+      getUser,
+      hideMenu,
+      isFluid,
+      isFullscreen,
+      isMounted,
+      isVisible,
+      processMenuCommand,
+      showMenu,
+      toggleContentWidth,
+      toggleDarkMode,
+      toggleFullscreen,
+      toggleToolbar,
+      translate,
+      userMenuConfig,
     };
   },
 });
 </script>
-
-<style>
-/* messy hack to fix userMenu, waiting for reply from PrimeVue */
-.p-contextmenu {
-  position: fixed;
-  display: block !important;
-  top: 53px !important;
-  right: 0px !important;
-}
-</style>
