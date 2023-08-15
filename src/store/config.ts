@@ -15,7 +15,7 @@ interface Config {
   locale: string;
   menu: {
     apps: UserAppMenu;
-    user: UserMenu[];
+    user: UserMenu;
     main: MainMenu[];
   };
   resources: any;
@@ -35,7 +35,7 @@ const useConfigStore = defineStore({
       menu: {
         apps: {},
         main: [],
-        user: [],
+        user: {},
       },
       resources: {},
     },
@@ -196,7 +196,7 @@ const useConfigStore = defineStore({
     getMainMenu(): MainMenu[] {
       return this.config.menu.main;
     },
-    getUserMenu(): UserMenu[] {
+    getUserMenu(): UserMenu {
       return this.config.menu.user;
     },
     getResources(): any[] {

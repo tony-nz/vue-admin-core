@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { AuthConfig } from "../core/types/AuthConfigTypes";
+import { useRoute, useRouter } from "vue-router";
 import ApiService from "../core/services/ApiService";
 import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";
@@ -26,7 +27,8 @@ const useAuthStore = defineStore({
     permissions: [],
     user: [],
     roles: [],
-    settings: JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
+    settings:
+      JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
   }),
   actions: {
     login(credentials) {
@@ -90,6 +92,9 @@ const useAuthStore = defineStore({
         this.purgeAuth();
         ApiService.post(this.AuthConfig("api.logout"), {})
           .then(() => {
+            useRouter().push({
+              path: "/",
+            });
             resolve();
           })
           .catch(() => {
@@ -161,7 +166,9 @@ const useAuthStore = defineStore({
     async getApiSettings() {
       try {
         const response = await ApiService.get(this.AuthConfig("api.settings"));
-        this.setSettings(response.data.data ? response.data.data : response.data);
+        this.setSettings(
+          response.data.data ? response.data.data : response.data
+        );
       } catch (e) {
         console.log(e);
       }
@@ -244,10 +251,13 @@ const useAuthStore = defineStore({
     getSetting(): any {
       return (setting) => {
         // if setting is "true" or "false" return boolean
-        if (objectPath.get(this.settings, setting) === "true" || objectPath.get(this.settings, setting) === "false") {
+        if (
+          objectPath.get(this.settings, setting) === "true" ||
+          objectPath.get(this.settings, setting) === "false"
+        ) {
           return objectPath.get(this.settings, setting) == "true";
         }
-        
+
         return objectPath.get(this.settings, setting);
       };
     },
@@ -276,7 +286,10 @@ const useAuthStore = defineStore({
           this.settings[key] = this.settings[key] == "true";
         }
         // convert all string integers
-        if (typeof this.settings[key] === "string" && /^\d+$/.test(this.settings[key])) {
+        if (
+          typeof this.settings[key] === "string" &&
+          /^\d+$/.test(this.settings[key])
+        ) {
           this.settings[key] = parseInt(this.settings[key]);
         }
       });
