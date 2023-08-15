@@ -92,9 +92,6 @@ const useAuthStore = defineStore({
         this.purgeAuth();
         ApiService.post(this.AuthConfig("api.logout"), {})
           .then(() => {
-            useRouter().push({
-              path: "/",
-            });
             resolve();
           })
           .catch(() => {

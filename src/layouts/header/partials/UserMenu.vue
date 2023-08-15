@@ -21,6 +21,7 @@
       </button>
 
       <transition
+        v-if="isVisible"
         enter-active-class="transition ease-out duration-100"
         enter-from-class="transform opacity-0 scale-95"
         enter-to-class="transform opacity-100 scale-100"
@@ -225,11 +226,9 @@ export default defineComponent({
     };
 
     const processMenuCommand = (command) => {
-      console.log("command", command);
       if (command) {
         command();
       }
-      contextMenu.value.hide();
     };
 
     const getUserLocale = computed(() => {
