@@ -16,7 +16,7 @@
           <template v-for="(menu, i) in mainMenuConfig" :key="i">
             <TabPanel v-if="menu.items">
               <nav
-                class="flex-row hidden pb-4 md:pb-0 md:flex md:justify-end"
+                class="flex-row hidden md:pb-0 md:flex md:justify-end"
               >
                 <template v-for="item in menu.items" :key="item.to">
                   <router-link
