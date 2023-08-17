@@ -243,6 +243,7 @@ export default defineComponent({
      * @param command 
      */
     const processMenuCommand = (command) => {
+      hideMenu();
       if (command) {
         command();
       }
