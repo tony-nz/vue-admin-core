@@ -423,7 +423,7 @@ const useResourceStore = function (resource) {
         const logStore = useNotificationStore();
         if (
           !this.resource.notifications ||
-          this.resource.notifications["error"]
+          this.resource.notifications["error"] === true
         ) {
           logStore.showToast({
             severity: "error",
