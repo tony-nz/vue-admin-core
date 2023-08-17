@@ -319,7 +319,6 @@ const useResourceStore = function (resource) {
            * and show success message
            */
           apiStore.setLoading(false);
-          if (this.resource.notifications.)
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -409,7 +408,11 @@ const useResourceStore = function (resource) {
             count: data?.length ? data.length : 1,
           }),
         };
-        if (!this.resource.notifications || this.resource.notifications["all"] || this.resource.notifications[action]) {
+        if (
+          !this.resource.notifications ||
+          this.resource.notifications["all"] ||
+          this.resource.notifications[action]
+        ) {
           logStore.showToast({
             severity: "success",
             summary: messages[action],
@@ -418,7 +421,10 @@ const useResourceStore = function (resource) {
       },
       showError(state, summary, message): any {
         const logStore = useNotificationStore();
-        if (!this.resource.notifications || this.resource.notifications["error"]) {
+        if (
+          !this.resource.notifications ||
+          this.resource.notifications["error"]
+        ) {
           logStore.showToast({
             severity: "error",
             summary,
