@@ -31,29 +31,25 @@ const useAuthStore = defineStore({
       JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
   }),
   actions: {
-    login(credentials) {
-      ApiService.setHeader();
+    // checkXsrfToken() {
+
+    // },
+    async login(credentials) {
+      await ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.AuthConfig("api.csrfCookie"))
+        ApiService.post(this.AuthConfig("api.login"), credentials)
           .then(({ data }) => {
-            ApiService.post(this.AuthConfig("api.login"), credentials)
-              .then(({ data }) => {
-                this.verifyAuth()
-                  .then(() => {
-                    resolve();
-                  })
-                  .catch(() => {
-                    reject();
-                  });
+            this.verifyAuth()
+              .then(() => {
+                resolve();
               })
-              .catch(({ response }) => {
-                this.setError(response.data.error);
+              .catch(() => {
                 reject();
               });
           })
           .catch(({ response }) => {
             this.setError(response.data.error);
-            reject();
+            reject(response);
           });
       });
     },
@@ -87,7 +83,7 @@ const useAuthStore = defineStore({
       });
     },
     logout() {
-      ApiService.setHeader();
+      // ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         this.purgeAuth();
         ApiService.post(this.AuthConfig("api.logout"), {})
@@ -126,7 +122,7 @@ const useAuthStore = defineStore({
       });
     },
     async verifyAuth() {
-      ApiService.setHeader();
+      // ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.verify"))
           .then(({ data }) => {
