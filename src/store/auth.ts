@@ -54,7 +54,6 @@ const useAuthStore = defineStore({
       });
     },
     loginOauth() {
-      ApiService.setHeader();
       ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("oauth.login"))
@@ -68,7 +67,6 @@ const useAuthStore = defineStore({
       });
     },
     loginOauthCallback(payload) {
-      ApiService.setHeader();
       ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("oauth.callback"), payload)
@@ -122,22 +120,30 @@ const useAuthStore = defineStore({
       });
     },
     async verifyAuth() {
-      // ApiService.setHeader();
-      return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.AuthConfig("api.verify"))
-          .then(({ data }) => {
-            this.setAuth(data.data);
-            this.getApiSettings();
-            resolve();
-          })
-          .catch(({ response }) => {
-            this.purgeAuth();
-            if (response) {
-              this.setError(response.message);
-            }
-            reject();
-          });
+      const cookies = document.cookie.split(";");
+      const token = cookies.find((cookie) => {
+        return cookie.trim().startsWith("XSRF-TOKEN=");
       });
+      if (token) {
+        ApiService.setHeader();
+        return new Promise<void>((resolve, reject) => {
+          ApiService.get(this.AuthConfig("api.verify"))
+            .then(({ data }) => {
+              this.setAuth(data.data);
+              this.getApiSettings();
+              resolve();
+            })
+            .catch(({ response }) => {
+              this.purgeAuth();
+              if (response) {
+                this.setError(response.message);
+              }
+              reject();
+            });
+        });
+      } else {
+        this.purgeAuth();
+      }
     },
     setSettings(settings: any) {
       this.settings = settings;

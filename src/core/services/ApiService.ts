@@ -35,12 +35,17 @@ class ApiService {
    * @description set the default HTTP request headers
    */
   public static setHeader(): void {
+    const cookies = document.cookie.split(";");
+    const token = cookies.find((cookie) => {
+      return cookie.trim().startsWith("XSRF-TOKEN=");
+    });
+
     ApiService.vueInstance.axios.defaults.headers.common[
       "Access-Control-Allow-Origin"
     ] = "*";
-    // ApiService.vueInstance.axios.defaults.headers.common[
-    //   "Authorization"
-    // ] = `Token ${getToken()}`;
+    ApiService.vueInstance.axios.defaults.headers.common[
+      "Authorization"
+    ] = `Token ${token}`;
   }
 
   /**
