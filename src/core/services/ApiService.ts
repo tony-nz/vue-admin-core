@@ -40,7 +40,7 @@ class ApiService {
     ] = "*";
     // ApiService.vueInstance.axios.defaults.headers.common[
     //   "Authorization"
-    // ] = `Token ${token}`;
+    // ] = `Token ${getToken()}`;
   }
 
   /**
