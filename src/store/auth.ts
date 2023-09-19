@@ -124,6 +124,7 @@ const useAuthStore = defineStore({
       });
     },
     async verifyAuth() {
+      ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.verify"))
           .then(({ data }) => {
