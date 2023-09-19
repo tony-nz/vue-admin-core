@@ -31,25 +31,29 @@ const useAuthStore = defineStore({
       JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
   }),
   actions: {
-    // checkXsrfToken() {
-
-    // },
     async login(credentials) {
-      await ApiService.get(this.AuthConfig("api.csrfCookie"));
+      // await ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.login"), credentials)
-          .then(({ data }) => {
-            this.verifyAuth()
-              .then(() => {
-                resolve();
+        ApiService.get(this.AuthConfig("api.csrfCookie"))
+          .then(() => {
+            ApiService.post(this.AuthConfig("api.login"), credentials)
+              .then(({ data }) => {
+                this.verifyAuth()
+                  .then(() => {
+                    resolve();
+                  })
+                  .catch(() => {
+                    reject();
+                  });
               })
-              .catch(() => {
-                reject();
+              .catch(({ response }) => {
+                this.setError(response.data.error);
+                reject(response);
               });
           })
-          .catch(({ response }) => {
-            this.setError(response.data.error);
-            reject(response);
+          .catch((e) => {
+            console.log(e);
+            reject(e);
           });
       });
     },
@@ -120,30 +124,22 @@ const useAuthStore = defineStore({
       });
     },
     async verifyAuth() {
-      const cookies = document.cookie.split(";");
-      const token = cookies.find((cookie) => {
-        return cookie.trim().startsWith("XSRF-TOKEN=");
+      return new Promise<void>((resolve, reject) => {
+        ApiService.get(this.AuthConfig("api.verify"))
+          .then(({ data }) => {
+            this.setAuth(data.data);
+            this.getApiSettings();
+            resolve();
+          })
+          .catch(({ response }) => {
+            this.purgeAuth();
+            if (response) {
+              this.setError(response.message);
+            }
+            this.purgeAuth();
+            reject();
+          });
       });
-      if (token) {
-        ApiService.setHeader();
-        return new Promise<void>((resolve, reject) => {
-          ApiService.get(this.AuthConfig("api.verify"))
-            .then(({ data }) => {
-              this.setAuth(data.data);
-              this.getApiSettings();
-              resolve();
-            })
-            .catch(({ response }) => {
-              this.purgeAuth();
-              if (response) {
-                this.setError(response.message);
-              }
-              reject();
-            });
-        });
-      } else {
-        this.purgeAuth();
-      }
     },
     setSettings(settings: any) {
       this.settings = settings;
