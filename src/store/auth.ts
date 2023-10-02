@@ -36,6 +36,7 @@ const useAuthStore = defineStore({
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.csrfCookie"))
           .then(() => {
+            // ApiService.setHeader();
             ApiService.post(this.AuthConfig("api.login"), credentials)
               .then(({ data }) => {
                 this.verifyAuth()
