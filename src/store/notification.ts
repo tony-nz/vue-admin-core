@@ -1,11 +1,14 @@
 import { defineStore } from "pinia";
 import { toast, type ToastOptions } from "vue3-toastify";
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
 interface IState {
   api: any;
   error: any;
   warning: any;
   success: any;
+  echo: any;
 }
 
 const LIFE = 3000;
@@ -17,8 +20,29 @@ const useNotificationStore = defineStore({
     error: [],
     warning: [],
     success: [],
+    echo: null,
   }),
   actions: {
+    initEchoPusher() {
+      window.Pusher = Pusher;
+
+      this.echo = new Echo({
+        broadcaster: "pusher",
+        key: process.env.VUE_APP_PUSHER_APP_KEY,
+        cluster: process.env.VUE_APP_PUSHER_APP_CLUSTER,
+        forceTLS: true,
+        // Other configurations if needed
+      });
+    },
+
+    listenToChannel() {
+      // Access Echo instance and listen to events
+      this.echo.channel("notification").listen("YourEventName", (event) => {
+        console.log("Received event:", event);
+        // Handle the received event data here within the store
+        // Update state or trigger mutations/actions as needed
+      });
+    },
     addLog(payload) {
       if (payload.log === "error") {
         this.error.push(payload.message);

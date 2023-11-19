@@ -30,6 +30,8 @@
   },
   "dependencies": {
     "i18n": "^0.15.1",
+    "laravel-echo": "^1.15.3",
+    "pusher-js": "^8.3.0",
     "rollup-plugin-copy": "^3.4.0",
     "vite-plugin-dts": "^2.0.2"
   },
