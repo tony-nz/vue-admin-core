@@ -43,14 +43,16 @@ export async function initRouter(router) {
         });
 
       if (!authStore.isUserAuthenticated) {
+        // clear csrf token cookie
+        authStore.clearCsrfToken();
         next({
           path: "/login",
           query: { redirect: to.fullPath },
         });
       } else {
-        const configStore = useConfigStore();
         const breadcrumbStore = useBreadcrumbStore();
         // TODO:: bug with this
+        // const configStore = useConfigStore();
         // configStore.resetLayoutConfig();
 
         const getPage = to.matched.find((record) => record.meta.page);

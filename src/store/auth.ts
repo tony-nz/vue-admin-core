@@ -202,6 +202,9 @@ const useAuthStore = defineStore({
     setAuthConfig(config) {
       this.config = config;
     },
+    clearCsrfToken() {
+      document.cookie = "XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    },
   },
   getters: {
     /**
