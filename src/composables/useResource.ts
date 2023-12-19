@@ -63,9 +63,9 @@ export default function useResource(
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
       }).then(() => {
-        return true;
+        return Promise.resolve();
       }).catch((e) => {
-        return e;
+        return Promise.reject(e);
       });
     }
   }
@@ -80,6 +80,10 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
+      }).then(() => {
+        return Promise.resolve();
+      }).catch((e) => {
+        return Promise.reject(e);
       });
     }
   }
@@ -93,6 +97,10 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
+      }).then(() => {
+        return Promise.resolve();
+      }).catch((e) => {
+        return Promise.reject(e);
       });
     }
   }
@@ -106,6 +114,10 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
+      }).then(() => {
+        return Promise.resolve();
+      }).catch((e) => {
+        return Promise.reject(e);
       });
     }
   }

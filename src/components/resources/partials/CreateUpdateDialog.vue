@@ -1,7 +1,7 @@
 <template>
   <div>
     <Dialog
-      :header="type == 'create' ? 'Create' : 'Update'"
+      :header="type == 'create' ? 'Create ' + resource.name : 'Update ' + resource.name"
       v-model:visible="showModal"
       :modal="true"
       :maximizable="true"
@@ -22,6 +22,19 @@
           :type="'form'"
           :submit="submit"
         />
+      </div>
+      <div v-if="errors">
+        <div class="bg-red-100 border-red-600 p-4">
+          <ul class="mb-0">
+            <li v-for="(error, key) in errors" :key="key">
+              <ul>
+                <li v-for="(message, index) in error" :key="index">
+                  {{ message }}
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
       <template #footer>
         <Button
@@ -62,6 +75,7 @@ export default defineComponent({
     },
     validated(valid, data = null) {
       this.modalData = data;
+
       if (valid) {
         if (this.dataValues) {
           // add dataValues to modalData
@@ -72,14 +86,14 @@ export default defineComponent({
           this.create(this.modalData, this.dataId, this.subId).then(() => {
             this.$emit("close");
           }).catch((e) => {
-            console.log(e);
+            this.errors = e.response.data.errors;
           });
         } else if (this.modalType == "update") {
           // this.$emit("update", this.modalData, this.dataId, this.subId);
           this.update(this.modalData, this.dataId, this.subId).then(() => {
             this.$emit("close");
           }).catch((e) => {
-            console.log(e);
+            this.errors = e.response.data.errors;
           });
         }
         // this.$emit("close");
@@ -135,7 +149,8 @@ export default defineComponent({
     const showModal = ref(false);
     const submit = ref(false);
     const resource = ref();
-    const { create, update } = useResourceStore(resource.value)();
+    const { create, update } = useResourceStore(props.resource)();
+    const errors = ref();
 
     function fetchData(params) {
       const configStore = useConfigStore();
@@ -178,13 +193,16 @@ export default defineComponent({
     });
 
     return {
+      create,
       dataId,
       dataValues,
+      errors,
       fetchData,
       modalData,
       modalType,
       showModal,
       submit,
+      update,
     };
   },
 });
