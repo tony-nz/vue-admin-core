@@ -68,11 +68,21 @@ export default defineComponent({
           this.modalData = { ...this.modalData, ...this.dataValues };
         }
         if (this.modalType == "create") {
-          this.$emit("create", this.modalData, this.dataId, this.subId);
+          // this.$emit("create", this.modalData, this.dataId, this.subId);
+          this.create(this.modalData, this.dataId, this.subId).then(() => {
+            this.$emit("close");
+          }).catch((e) => {
+            console.log(e);
+          });
         } else if (this.modalType == "update") {
-          this.$emit("update", this.modalData, this.dataId, this.subId);
+          // this.$emit("update", this.modalData, this.dataId, this.subId);
+          this.update(this.modalData, this.dataId, this.subId).then(() => {
+            this.$emit("close");
+          }).catch((e) => {
+            console.log(e);
+          });
         }
-        this.$emit("close");
+        // this.$emit("close");
       }
       this.submit = false;
     },
@@ -125,11 +135,12 @@ export default defineComponent({
     const showModal = ref(false);
     const submit = ref(false);
     const resource = ref();
+    const { create, update } = useResourceStore(resource.value)();
 
     function fetchData(params) {
       const configStore = useConfigStore();
       const resources = configStore.getResources;
-      
+    
       if (params.resource.name) {
         try {
           for (const [key, value] of Object.entries(resources)) {

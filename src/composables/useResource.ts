@@ -62,6 +62,10 @@ export default function useResource(
         stateList: stateList.value,
         stateUser: vStateUser ? vStateUser : stateUser.value,
         subId: subId,
+      }).then(() => {
+        return true;
+      }).catch((e) => {
+        return e;
       });
     }
   }
