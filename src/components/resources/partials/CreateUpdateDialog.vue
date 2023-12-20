@@ -23,13 +23,13 @@
           :submit="submit"
         />
       </div>
-      <div v-if="errors">
+      <div v-if="errors.length > 0">
         <div class="bg-red-100 border-red-600 p-4">
           <ul class="mb-0">
             <li v-for="(error, key) in errors" :key="key">
               <ul>
-                <li v-for="(message, index) in error" :key="index">
-                  {{ message }}
+                <li>
+                  {{ error }}
                 </li>
               </ul>
             </li>
@@ -56,7 +56,8 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, watch, ref } from "vue";
+import useResource from "../../../composables/useResource";
+import { computed, defineComponent, onMounted, watch, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useConfigStore from "../../../store/config";
 import useResourceStore from "../../../store/resource";
@@ -72,33 +73,6 @@ export default defineComponent({
     },
     updateData(data) {
       this.modalData = data;
-    },
-    validated(valid, data = null) {
-      this.modalData = data;
-
-      if (valid) {
-        if (this.dataValues) {
-          // add dataValues to modalData
-          this.modalData = { ...this.modalData, ...this.dataValues };
-        }
-        if (this.modalType == "create") {
-          // this.$emit("create", this.modalData, this.dataId, this.subId);
-          this.create(this.modalData, this.dataId, this.subId).then(() => {
-            this.$emit("close");
-          }).catch((e) => {
-            this.errors = e.response.data.errors;
-          });
-        } else if (this.modalType == "update") {
-          // this.$emit("update", this.modalData, this.dataId, this.subId);
-          this.update(this.modalData, this.dataId, this.subId).then(() => {
-            this.$emit("close");
-          }).catch((e) => {
-            this.errors = e.response.data.errors;
-          });
-        }
-        // this.$emit("close");
-      }
-      this.submit = false;
     },
   },
   props: {
@@ -141,7 +115,7 @@ export default defineComponent({
       default: null,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const dataId = ref();
     const dataValues = ref();
     const modalData = ref();
@@ -149,8 +123,42 @@ export default defineComponent({
     const showModal = ref(false);
     const submit = ref(false);
     const resource = ref();
-    const { create, update } = useResourceStore(props.resource)();
-    const errors = ref();
+    const errors = ref([]);
+    const { create, update } = useResource(props.resource);
+
+    const validated = async (valid, data = null) => {
+      modalData.value = data;
+      // clear errors
+      errors.value = [];
+
+      if (valid) {
+        if (dataValues.value) {
+          // add dataValues to modalData
+          modalData.value = { ...modalData.value, ...dataValues.value };
+        }
+ 
+        if (modalType.value == "create") {
+          // emit("create", modalData.value, dataId.value, props.subId).then(() => {
+          await create(modalData.value, dataId.value, props.subId).then(() => {
+            emit("close");
+          }).catch((e) => {
+            Object.keys(e.response.data.errors).forEach((key, index) => {
+              errors.value[index] = e.response.data.errors[key][0];
+            });
+          });
+        } else if (modalType.value == "update") {
+          await update(modalData.value, dataId.value, props.subId).then(() => {
+            emit("close");
+          }).catch((e) => {
+            Object.keys(e.response.data.errors).forEach((key, index) => {
+              errors.value[index] = e.response.data.errors[key][0];
+            });
+          });
+        }
+        // this.$emit("close");
+      }
+      submit.value = false;
+    };
 
     function fetchData(params) {
       const configStore = useConfigStore();
@@ -193,7 +201,6 @@ export default defineComponent({
     });
 
     return {
-      create,
       dataId,
       dataValues,
       errors,
@@ -202,7 +209,7 @@ export default defineComponent({
       modalType,
       showModal,
       submit,
-      update,
+      validated,
     };
   },
 });

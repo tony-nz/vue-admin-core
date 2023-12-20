@@ -55,17 +55,19 @@ export default function useResource(
 
   function create(params: unknown, subId?: number, vStateUser?: boolean) {
     if (params && resourceName) {
-      resourceStore.create({
-        params,
-        routeId: routeId.value,
-        apiUrl: apiUrl.value,
-        stateList: stateList.value,
-        stateUser: vStateUser ? vStateUser : stateUser.value,
-        subId: subId,
-      }).then(() => {
-        return Promise.resolve();
-      }).catch((e) => {
-        return Promise.reject(e);
+      return new Promise<void>((resolve, reject) => {
+        resourceStore.create({
+          params,
+          routeId: routeId.value,
+          apiUrl: apiUrl.value,
+          stateList: stateList.value,
+          stateUser: vStateUser ? vStateUser : stateUser.value,
+          subId: subId,
+        }).then(() => {
+          resolve();
+        }).catch((e) => {
+          reject(e);
+        });
       });
     }
   }
@@ -73,51 +75,57 @@ export default function useResource(
   function update(params, id, subId?: number, vStateUser?: boolean) {
     if (params && id && resourceName) {
       params.id = id;
-      resourceStore.update({
-        params,
-        routeId: routeId.value,
-        apiUrl: apiUrl.value,
-        stateList: stateList.value,
-        stateUser: vStateUser ? vStateUser : stateUser.value,
-        subId: subId,
-      }).then(() => {
-        return Promise.resolve();
-      }).catch((e) => {
-        return Promise.reject(e);
+      return new Promise<void>((resolve, reject) => {
+        resourceStore.update({
+          params,
+          routeId: routeId.value,
+          apiUrl: apiUrl.value,
+          stateList: stateList.value,
+          stateUser: vStateUser ? vStateUser : stateUser.value,
+          subId: subId,
+        }).then(() => {
+          resolve();
+        }).catch((e) => {
+          reject(e);
+        });
       });
     }
   }
 
   function remove(id, subId?: number, vStateUser?: boolean) {
     if (id && resourceName) {
-      resourceStore.delete({
-        params: { id },
-        routeId: routeId.value,
-        apiUrl: apiUrl.value,
-        stateList: stateList.value,
-        stateUser: vStateUser ? vStateUser : stateUser.value,
-        subId: subId,
-      }).then(() => {
-        return Promise.resolve();
-      }).catch((e) => {
-        return Promise.reject(e);
+      return new Promise<void>((resolve, reject) => {
+        resourceStore.delete({
+          params: { id },
+          routeId: routeId.value,
+          apiUrl: apiUrl.value,
+          stateList: stateList.value,
+          stateUser: vStateUser ? vStateUser : stateUser.value,
+          subId: subId,
+        }).then(() => {
+          resolve();
+        }).catch((e) => {
+          reject(e);
+        });
       });
     }
   }
 
   function bulkRemove(data, subId?: number, vStateUser?: boolean) {
     if (data && resourceName) {
-      resourceStore.deleteMany({
-        params: { data },
-        routeId: routeId.value,
-        apiUrl: apiUrl.value,
-        stateList: stateList.value,
-        stateUser: vStateUser ? vStateUser : stateUser.value,
-        subId: subId,
-      }).then(() => {
-        return Promise.resolve();
-      }).catch((e) => {
-        return Promise.reject(e);
+      return new Promise<void>((resolve, reject) => {
+        resourceStore.deleteMany({
+          params: { data },
+          routeId: routeId.value,
+          apiUrl: apiUrl.value,
+          stateList: stateList.value,
+          stateUser: vStateUser ? vStateUser : stateUser.value,
+          subId: subId,
+        }).then(() => {
+          resolve();
+        }).catch((e) => {
+          reject(e);
+        });
       });
     }
   }
