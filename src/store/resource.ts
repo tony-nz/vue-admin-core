@@ -153,10 +153,6 @@ function processStoreData(state, action, payload, data) {
       break;
     case GET_LIST:
     case GET_TREE:
-      // update lastSync time
-      // state.lastSync = currentDate.setMinutes(currentDate.getMinutes());
-      state.setLastSync(state, Date.now());
-
       // set list data
       state.setList(state, { data, stateList, stateUser });
       break;
@@ -257,6 +253,11 @@ const useResourceStore = function (resource) {
               action === "getList")
           ) {
             apiStore.setLoading(false);
+
+            /**
+             *  Set the lastSync time
+             */
+            resourceStore.setLastSync(resourceStore, Date.now());
 
             if (stateList && resourceStore.data.list[stateList].length > 0) {
               return Promise.resolve({
