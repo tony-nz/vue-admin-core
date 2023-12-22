@@ -227,6 +227,8 @@ const useResourceStore = function (resource) {
           const stateList = payload?.stateList ? payload.stateList : "";
           const stateUser = payload?.stateUser ? payload.stateUser : false;
           const currentDate = new Date();
+          const lastSync = resourceStore.getLastSync;
+          const syncCheck = currentDate.getTime() - 60000;
 
           /**
            * Set loading for certain methods
@@ -235,10 +237,17 @@ const useResourceStore = function (resource) {
             apiStore.setLoading(true);
           }
 
-          /**
-           * Set future date 1 minute(s) ago
-           */
-          currentDate.setMinutes(currentDate.getMinutes() - 1);
+          console.log("resource", resource);
+          console.log("lastSync", lastSync);
+          console.log("syncCheck", syncCheck);
+          console.log("currentDate.getTime()", currentDate.getTime());
+          console.log("currentDate.getTime() - lastSync", currentDate.getTime() - lastSync);
+          console.log("##########");
+          console.log("!params?.force", !params?.force);
+          console.log("!stateUser", !stateUser);
+          console.log("((currentDate.getTime() - lastSync) < 10000)", ((currentDate.getTime() - lastSync) < 10000));
+          console.log("action", action);
+          console.log("##########");
 
           /**
            * Check for cache
@@ -246,34 +255,42 @@ const useResourceStore = function (resource) {
           if (
             (!params?.force &&
               !stateUser &&
-              resourceStore.getLastSync >= currentDate &&
+              (lastSync > 0 && lastSync < syncCheck) &&
               action === "getList") ||
             (!params?.force &&
-              !resourceStore.getLastSync === null &&
+              !lastSync === null &&
+              action === "getList") ||
+            (!params?.force &&
+              !stateUser &&
+              ((currentDate.getTime() - lastSync) < 10000) &&
               action === "getList")
           ) {
             apiStore.setLoading(false);
 
-            /**
-             *  Set the lastSync time
-             */
-            resourceStore.setLastSync(resourceStore, Date.now());
+            console.log("Returning cache");
 
             if (stateList && resourceStore.data.list[stateList].length > 0) {
+              console.log("Returning first if");
               return Promise.resolve({
                 data: resourceStore.data.list[stateList],
               });
             } else if (stateUser && resourceStore.data.userList.length > 0) {
+              console.log("Returning first if else");
               return Promise.resolve({
                 data: resourceStore.data.userList,
               });
             }
             if (resourceStore.data.list.length > 0) {
+              console.log("Returning second if");
               return Promise.resolve({
                 data: resourceStore.data.list,
               });
             }
+            return Promise.resolve({
+              data: resourceStore.data.list,
+            });
           }
+          console.log("END");
 
           /**
            * Set params.id to state.item.id if action
