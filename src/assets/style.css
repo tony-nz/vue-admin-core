@@ -33,24 +33,6 @@ body {
   margin-left: 0 !important;
 }
 
-
-/* header toolbar icons */
-/* header .svg-icon svg [fill]:not(.permanent):not(g) { */
-header .svg-icon svg [fill]:not(g) {
-  transition: fill 0.3s ease;
-  fill: #ffffff;
-}
-
-header .top-menu-item:hover .svg-icon svg [fill]:not(g) {
-  transition: fill 0.3s ease;
-  fill: #868686;
-}
-
-header .menu-active .svg-icon svg [fill]:not(g) {
-  /* fill: #0097f1; */
-  fill: #019efe;
-}
-
 /* toggle buttons */
 .toggle-btn:checked {
   /* Apply class right-0*/

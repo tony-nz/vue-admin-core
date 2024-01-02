@@ -53,7 +53,7 @@
               >
                 <button
                   @click="navigate"
-                  class="cursor-pointer flex items-center text-sm font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg"
+                  class="cursor-pointer flex items-center text-sm font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg group"
                   :class="{
                     'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active' : isExactActive,
                     'bg-black bg-opacity-10 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white text-opacity-70' : !isExactActive,
@@ -61,9 +61,9 @@
                 >
                   <span
                     v-if="item.icon && item.icon['path']"
-                    class="svg-icon svg-icon-2x svg-icon-white mr-2"
+                    class="mr-2"
                   >
-                    <inline-svg :src="item.icon['path']" class="h-6 w-6" />
+                    <inline-svg :src="item.icon['path']" class="!fill-current h-6 w-6" />
                   </span>
                   {{ translate(item.label) }}
                 </button>
