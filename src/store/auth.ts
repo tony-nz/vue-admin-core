@@ -32,29 +32,21 @@ const useAuthStore = defineStore({
   }),
   actions: {
     async login(credentials) {
-      // await ApiService.get(this.AuthConfig("api.csrfCookie"));
+      await ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.AuthConfig("api.csrfCookie"))
-          .then(() => {
-            // ApiService.setHeader();
-            ApiService.post(this.AuthConfig("api.login"), credentials)
-              .then(({ data }) => {
-                this.verifyAuth()
-                  .then(() => {
-                    resolve();
-                  })
-                  .catch(() => {
-                    reject();
-                  });
+        ApiService.post(this.AuthConfig("api.login"), credentials)
+          .then(({ data }) => {
+            this.verifyAuth()
+              .then(() => {
+                resolve();
               })
-              .catch(({ response }) => {
-                this.setError(response.data.error);
-                reject(response);
+              .catch(() => {
+                reject();
               });
           })
-          .catch((e) => {
-            console.log(e);
-            reject(e);
+          .catch(({ response }) => {
+            this.setError(response.data.error);
+            reject(response);
           });
       });
     },
@@ -203,6 +195,7 @@ const useAuthStore = defineStore({
       this.config = config;
     },
     clearCsrfToken() {
+      document.cookie = "binbossapibackend_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       document.cookie = "XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     },
   },
