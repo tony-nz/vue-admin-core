@@ -132,7 +132,6 @@ export default function useResource(
 
   function showDeletePopup(params) {
     if (resource && params.$event) {
-      console.log("Inside showDeletePopup");
       confirmDelete.require({
         group:
           "DT_" +

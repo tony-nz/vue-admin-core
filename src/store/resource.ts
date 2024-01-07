@@ -237,18 +237,6 @@ const useResourceStore = function (resource) {
             apiStore.setLoading(true);
           }
 
-          console.log("resource", resource);
-          console.log("lastSync", lastSync);
-          console.log("syncCheck", syncCheck);
-          console.log("currentDate.getTime()", currentDate.getTime());
-          console.log("currentDate.getTime() - lastSync", currentDate.getTime() - lastSync);
-          console.log("##########");
-          console.log("!params?.force", !params?.force);
-          console.log("!stateUser", !stateUser);
-          console.log("((currentDate.getTime() - lastSync) < 10000)", ((currentDate.getTime() - lastSync) < 10000));
-          console.log("action", action);
-          console.log("##########");
-
           /**
            * Check for cache
            */
@@ -267,21 +255,16 @@ const useResourceStore = function (resource) {
           ) {
             apiStore.setLoading(false);
 
-            console.log("Returning cache");
-
             if (stateList && resourceStore.data.list[stateList].length > 0) {
-              console.log("Returning first if");
               return Promise.resolve({
                 data: resourceStore.data.list[stateList],
               });
             } else if (stateUser && resourceStore.data.userList.length > 0) {
-              console.log("Returning first if else");
               return Promise.resolve({
                 data: resourceStore.data.userList,
               });
             }
             if (resourceStore.data.list.length > 0) {
-              console.log("Returning second if");
               return Promise.resolve({
                 data: resourceStore.data.list,
               });
@@ -290,7 +273,6 @@ const useResourceStore = function (resource) {
               data: resourceStore.data.list,
             });
           }
-          console.log("END");
 
           /**
            * Set params.id to state.item.id if action
