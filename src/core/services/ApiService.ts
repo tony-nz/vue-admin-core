@@ -29,6 +29,19 @@ class ApiService {
       ? authStore.AuthConfig("api.baseURL")
       : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
+
+    // interceptors
+    ApiService.vueInstance.axios.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      function (error) {
+        if (error.response && [401, 419].includes(error.response.status) && authStore.authUser) {
+          authStore.purgeAuth();
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   /**

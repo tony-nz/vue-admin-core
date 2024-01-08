@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { AuthConfig } from "../core/types/AuthConfigTypes";
-import { useRoute, useRouter } from "vue-router";
 import ApiService from "../core/services/ApiService";
 import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";
@@ -78,11 +77,10 @@ const useAuthStore = defineStore({
       });
     },
     logout() {
-      // ApiService.setHeader();
       return new Promise<void>((resolve, reject) => {
-        this.purgeAuth();
         ApiService.post(this.AuthConfig("api.logout"), {})
           .then(() => {
+            this.purgeAuth();
             resolve();
           })
           .catch(() => {
@@ -210,6 +208,13 @@ const useAuthStore = defineStore({
       };
     },
     /**
+     * Auth user
+     * @returns object
+     */
+    authUser(): any {
+      return this.user;
+    },
+    /**
      * Get authentification errors
      * @returns array
      */
@@ -262,13 +267,6 @@ const useAuthStore = defineStore({
       return this.user;
     },
     /**
-     * Verify user authentication
-     * @returns boolean
-     */
-    isUserAuthenticated(): boolean {
-      return this.isAuthenticated;
-    },
-    /**
      * Site settings
      * @returns array
      */
@@ -288,6 +286,13 @@ const useAuthStore = defineStore({
       });
 
       return this.settings;
+    },
+    /**
+     * Verify user authentication
+     * @returns boolean
+     */
+    isUserAuthenticated(): boolean {
+      return this.isAuthenticated;
     },
   },
 });
