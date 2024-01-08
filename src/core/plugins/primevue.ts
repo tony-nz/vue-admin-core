@@ -103,12 +103,16 @@ import TreeTable from "primevue/treetable";
 import TriStateCheckbox from "primevue/tristatecheckbox";
 import VirtualScroller from "primevue/virtualscroller";
 
+// preset
+import Lara from "../../assets/presets/lara";
+import Wind from "../../assets/presets/wind";
+
 /**
  * Initialize PrimeVUE component
  * @param app vue instance
  */
 export function initPrimeVue(app: App<Element>) {
-  app.use(PrimeVue);
+  app.use(PrimeVue, { unstyled: true, pt: Wind });
 
   // register services
   app.use(ToastService);

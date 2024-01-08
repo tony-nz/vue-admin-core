@@ -38,7 +38,7 @@
             <div class="-mt-px flex divide-x divide-gray-200">
               <div class="w-0 flex-1 flex">
                 <button
-                  @click="showCreateEdit('dialog', 'update', slotProps.data)"
+                  @click="showCreateEdit('dialog', 'update', (slotProps as any)?.data)"
                   class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500"
                 >
                   <span class="ml-3">Edit</span>
@@ -65,7 +65,7 @@
           <div class="justify-end flex gap-2">
             <div class="self-center">
               <button
-                @click="showCreateEdit('dialog', 'update', slotProps.data)"
+                @click="showCreateEdit('dialog', 'update', (slotProps as any)?.data)"
                 class="transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 hover:bg-primary-400 dark:bg-slate-800 hover:fill-white p-2 shadow"
               >
                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
