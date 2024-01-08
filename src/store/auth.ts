@@ -163,7 +163,6 @@ const useAuthStore = defineStore({
       return this.settings;
     },
     setAuth(data) {
-      // const locale = data.user.locale ? data.user.locale : "en";
       this.isAuthenticated = true;
       this.user = data.user;
       this.roles = data.roles;
@@ -191,10 +190,6 @@ const useAuthStore = defineStore({
     },
     setAuthConfig(config) {
       this.config = config;
-    },
-    clearCsrfToken() {
-      document.cookie = "binbossapibackend_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      document.cookie = "XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     },
   },
   getters: {

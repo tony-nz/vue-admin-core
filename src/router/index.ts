@@ -34,20 +34,21 @@ export async function initRouter(router) {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       const authStore = useAuthStore();
 
+      await authStore
+        .verifyAuth()
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      
       if (!authStore.isUserAuthenticated) {
         next({
           path: "/login",
           query: { redirect: to.fullPath },
         });
       } else {
-        await authStore
-          .verifyAuth()
-          .then((res) => {
-            return res;
-          })
-          .catch((err) => {
-            console.log(err);
-          });
         const breadcrumbStore = useBreadcrumbStore();
         // TODO:: bug with this
         // const configStore = useConfigStore();
