@@ -30,8 +30,8 @@
       </button>
     </div>
     <div v-if="resource.edit.page && showDefaults">
-      <router-link :to="{ name: resource.singularName + 'Show', params: { id: data.id } }">
-        <button :class="btnClass" v-tooltip="'Open ' + resource.singularName.toLowerCase()">
+      <router-link :to="{ name: resource.singularName + 'Show', params: { id: data.id } }" v-tooltip="'Open ' + resource.singularName.toLowerCase()">
+        <button :class="btnClass">
           <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
             <path d="M572.6 270.3l-96 192C471.2 473.2 460.1 480 447.1 480H0l119.2-238.3C124.6 230.8 135.7 224 147.8 224h396.2C567.7 224 583.2 249 572.6 270.3z" />
             <path class="opacity-40" d="M480 144V224H147.8C135.7 224 124.6 230.8 119.2 241.7L0 480V80C0 53.49 21.49 32 48 32h160l64 64h160C458.5 96 480 117.5 480 144z" />
