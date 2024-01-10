@@ -98,17 +98,16 @@
           v-if="showToolbar"
           class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-4 dark:bg-transparent"
         >
-          <span
-            v-if="toolbar?.search != false"
-            class="p-input-icon-left w-full"
-          >
-            <i class="pi pi-search" />
-            <InputText
-              v-model="filters['global'].value"
-              class="w-full"
-              placeholder="Search..."
-            />
-          </span>
+          <div v-if="toolbar?.search != false" class="flex w-full justify-end">
+            <span class="w-full relative">
+              <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
+              <InputText
+                v-model="filters['global'].value"
+                class="pl-10 font-normal w-full"
+                placeholder="Search..."
+              />
+            </span>
+          </div>
           <slot name="toolbar"></slot>
           <button
             v-if="showSelect && toolbar?.bulkDeleteBtn != false"

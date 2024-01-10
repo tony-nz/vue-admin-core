@@ -111,8 +111,12 @@ import Wind from "../../assets/presets/wind";
  * Initialize PrimeVUE component
  * @param app vue instance
  */
-export function initPrimeVue(app: App<Element>) {
-  app.use(PrimeVue, { unstyled: true, pt: Wind });
+export function initPrimeVue(app: App<Element>, preset?) {
+  if (preset) {
+    app.use(PrimeVue, { unstyled: true, pt: preset });
+  } else {
+    app.use(PrimeVue);
+  }
 
   // register services
   app.use(ToastService);

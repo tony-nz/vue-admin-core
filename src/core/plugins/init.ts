@@ -16,15 +16,25 @@ import "vue-loading-overlay/dist/css/index.css";
 export const initPlugins = async function (app: App<Element>, router, options) {
   // Load CRUD Resources
   await initResources(app, router);
+
   // Load Api Service
   ApiService.init(app);
+
   // Load Error Log
   initErrorLog(app);
+
   // Apply locales
   app.use(i18n);
+
   // Load additional plugins
   initInlineSvg(app);
-  initPrimeVue(app);
+
+  // PrimeVue with preset
+  if (options.primevue.preset) {
+    initPrimeVue(app, options.primevue.preset);
+  } else {
+    initPrimeVue(app);
+  }
 
   // toast
   app.use(Vue3Toasity, {
