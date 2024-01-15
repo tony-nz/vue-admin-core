@@ -93,9 +93,8 @@
       responsiveLayout="scroll"
       showGridlines
     >
-      <template #header>
+      <template v-if="showToolbar" #header>
         <div
-          v-if="showToolbar"
           class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-4 dark:bg-transparent"
         >
           <div v-if="toolbar?.search != false" class="flex w-full justify-end">
