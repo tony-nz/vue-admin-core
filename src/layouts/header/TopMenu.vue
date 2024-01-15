@@ -89,13 +89,14 @@ import {
   layoutWidth,
 } from "../../core/helpers/config";
 import { translate } from "../../core/helpers/functions";
+import { useRouter } from "vue-router";
+import AppBar from "./AppBar.vue";
 import OffCanvas from "../offcanvas/OffCanvas.vue";
+import InlineSvg from "vue-inline-svg";
+import MainMenu from "../../core/types/MainMenuTypes";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
 import Tab from "../../components/ui/tabs/Tab.vue";
-import AppBar from "./AppBar.vue";
 import useConfigStore from "../../store/config";
-import MainMenu from "../../core/types/MainMenuTypes";
-import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "TopMenu",
@@ -106,10 +107,11 @@ export default defineComponent({
     },
   },
   components: {
+    AppBar,
+    InlineSvg,
     OffCanvas,
     Tabs,
     Tab,
-    AppBar,
   },
   watch: {
     activeTab(tab) {

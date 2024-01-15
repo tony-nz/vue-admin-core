@@ -71,18 +71,21 @@
 import { defineComponent, ref } from "vue";
 import { layoutWidth } from "../../core/helpers/config";
 import { translate } from "../../core/helpers/functions";
+import type { MainMenu } from "../../core/types/MainMenuTypes";
+
+import DropdownMenu from "./partials/DropdownMenu.vue";
+import InlineSvg from "vue-inline-svg";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanel from "../../components/ui/tabs/TabPanel.vue";
-import useConfigStore from "../../store/config";
-import type { MainMenu } from "../../core/types/MainMenuTypes";
 import useAuthStore from "../../store/auth";
-import DropdownMenu from "./partials/DropdownMenu.vue";
+import useConfigStore from "../../store/config";
 
 export default defineComponent({
   name: "SecondaryMenu",
   props: ["tab"],
   components: {
     DropdownMenu,
+    InlineSvg,
     TabPanels,
     TabPanel,
   },

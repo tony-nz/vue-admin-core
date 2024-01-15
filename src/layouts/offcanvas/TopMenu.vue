@@ -14,7 +14,7 @@
             :inActiveClass="'bg-black bg-opacity-10 hover:bg-white hover:bg-opacity-100 hover:fill-gray-800 fill-white fill-opacity-70'"
             @click="changeBackground(item)"
           >
-            <inline-svg :src="item.svgIcon" class="h-6 w-6" />
+            <inline-svg v-if="item.svgIcon" :src="item.svgIcon" class="h-6 w-6" />
           </VaTab>
         </template>
       </VaTabs>
@@ -63,11 +63,15 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import useConfigStore from "../../store/config";
+import InlineSvg from "vue-inline-svg";
 import MainMenu from "../../core/types/MainMenuTypes";
+import useConfigStore from "../../store/config";
 
 export default defineComponent({
   name: "TopMenu",
+  components: {
+    InlineSvg,
+  },
   props: ["tab"],
   methods: {
     changeTab(tab) {

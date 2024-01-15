@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="duotone svg-icon">
+    <span v-if="icon" class="duotone svg-icon">
       <inline-svg
         id="duotone"
         :src="icon"
@@ -15,8 +15,13 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
+import InlineSvg from "vue-inline-svg";
 
 export default defineComponent({
+  name: "Duotone",
+  components: {
+    InlineSvg,
+  },
   props: {
     ariaLabel: {
       type: String,

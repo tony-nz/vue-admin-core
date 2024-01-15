@@ -91,11 +91,13 @@ import { defineComponent, watch, computed, ref, reactive } from "vue";
 import { useTabsStore, ITabsItem } from "../store/tabs";
 import { useRoute, useRouter } from "vue-router";
 import Duotone from "../components/ui/icons/Duotone.vue";
+import InlineSvg from "vue-inline-svg";
 
 export default defineComponent({
   name: "RouterTabs",
   components: {
     Duotone,
+    InlineSvg,
   },
   setup() {
     const route = useRoute();

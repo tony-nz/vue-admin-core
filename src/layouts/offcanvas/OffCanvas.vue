@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { onBeforeRouteUpdate } from "vue-router";
+// import { onBeforeRouteUpdate } from "vue-router";
 import { translate } from "../../core/helpers/functions";
 import Content from "./Content.vue";
 import Header from "./Header.vue";
@@ -86,10 +86,10 @@ export default defineComponent({
       isVisible.value = true;
     };
 
-    onBeforeRouteUpdate((to, from, next) => {
-      close();
-      next();
-    });
+    // onBeforeRouteUpdate((to, from, next) => {
+    //   close();
+    //   next();
+    // });
 
     return {
       activeTab,

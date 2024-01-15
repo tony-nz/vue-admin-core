@@ -100,8 +100,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { translate } from "../../../core/helpers/functions";
+import InlineSvg from "vue-inline-svg";
+
 export default defineComponent({
   name: "DropdownMenu",
+  components: {
+    InlineSvg,
+  },
   props: {
     activeClass: {
       type: String,
