@@ -20,7 +20,7 @@
         <slot name="toolbar"></slot>
         <button
           v-if="
-            resource?.create?.modal && toolbar?.teleport?.createBtn != false
+            resource?.create?.modal || toolbar?.teleport?.createBtn != false
           "
           type="button"
           class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
