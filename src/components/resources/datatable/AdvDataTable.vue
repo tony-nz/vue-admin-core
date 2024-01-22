@@ -39,7 +39,7 @@
         </button>
         <router-link
           v-else-if="
-            resource?.create?.page && toolbar?.teleport?.createBtn != false
+            resource?.create?.page || toolbar?.teleport?.createBtn != false
           "
           :to="resource.url + '/create'"
           type="button"
