@@ -164,7 +164,8 @@ export default defineComponent({
       const configStore = useConfigStore();
       const resources = configStore.getResources;
     
-      if (!params.url && params.resource.name) {
+      if (params.resource) {
+        console.log("Inside resource", params.resource);
         try {
           for (const [key, value] of Object.entries(resources)) {
             if (value.name == params.resource.name) {
@@ -187,6 +188,7 @@ export default defineComponent({
           console.log(e);
         }
       }
+      console.log("Outside resource", params.url);
       return ApiService.get(params.url).then((res) => {
         // state.value.options[fieldId] = res.data.data;
         return res.data.data;
