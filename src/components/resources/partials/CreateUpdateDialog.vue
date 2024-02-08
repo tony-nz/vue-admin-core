@@ -164,7 +164,7 @@ export default defineComponent({
       const configStore = useConfigStore();
       const resources = configStore.getResources;
     
-      if (params.resource.name) {
+      if (!params.url && params.resource.name) {
         try {
           for (const [key, value] of Object.entries(resources)) {
             if (value.name == params.resource.name) {
