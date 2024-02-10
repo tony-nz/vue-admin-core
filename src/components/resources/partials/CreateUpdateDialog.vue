@@ -204,7 +204,13 @@ export default defineComponent({
     onMounted(() => {
       dataId.value = props.data[props.primaryKey];
       dataValues.value = props.fieldValues;
-      modalData.value = props.data;
+
+      // set modalData
+      if (props.type == "update") {
+        modalData.value = props.data;
+      }
+
+      // show modal
       showModal.value = true;
     });
 
