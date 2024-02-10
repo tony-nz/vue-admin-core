@@ -229,6 +229,8 @@
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
       :resource="resource"
       :subId="params?.id ? params.id : null"
+      :stateList="stateList"
+      :stateUser="stateUser"
     />
     <!-- End:CreateUpdate dialog -->
     <!-- Start:CreateUpdate dialog -->
@@ -245,6 +247,8 @@
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
       :resource="resource"
       :subId="params?.id ? params.id : null"
+      :stateList="stateList"
+      :stateUser="stateUser"
     />
     <!-- End:CreateUpdate dialog -->
   </div>

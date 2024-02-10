@@ -110,6 +110,14 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    stateList: {
+      type: String,
+      default: "",
+    },
+    stateUser: {
+      type: Boolean,
+      default: false,
+    },
     subId: {
       type: Number,
       default: null,
@@ -139,7 +147,7 @@ export default defineComponent({
  
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
-          await create(modalData.value, dataId.value, props.subId).then(() => {
+          await create(modalData.value, dataId.value, props.subId, props.stateUser).then(() => {
             emit("close");
           }).catch((e) => {
             Object.keys(e.response.data.errors).forEach((key, index) => {
@@ -147,7 +155,7 @@ export default defineComponent({
             });
           });
         } else if (modalType.value == "update") {
-          await update(modalData.value, dataId.value, props.subId).then(() => {
+          await update(modalData.value, dataId.value, props.subId, props.stateUser).then(() => {
             emit("close");
           }).catch((e) => {
             Object.keys(e.response.data.errors).forEach((key, index) => {
@@ -165,7 +173,6 @@ export default defineComponent({
       const resources = configStore.getResources;
     
       if (params.resource) {
-        console.log("Inside resource", params.resource);
         try {
           for (const [key, value] of Object.entries(resources)) {
             if (value.name == params.resource.name) {
@@ -188,7 +195,6 @@ export default defineComponent({
           console.log(e);
         }
       }
-      console.log("Outside resource", params.url);
       return ApiService.get(params.url).then((res) => {
         // state.value.options[fieldId] = res.data.data;
         return res.data.data;

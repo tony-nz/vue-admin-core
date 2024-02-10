@@ -165,6 +165,7 @@ function processStoreData(state, action, payload, data) {
        * Check for param Id
        */
       let stateListResource: string[] = [];
+
       if (stateUser) {
         stateListResource =
           params?.id && state.data.userList

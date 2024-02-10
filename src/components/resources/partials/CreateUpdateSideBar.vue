@@ -83,6 +83,14 @@ export default defineComponent({
       type: Object,
       required: true,
     },
+    stateList: {
+      type: String,
+      default: "",
+    },
+    stateUser: {
+      type: Boolean,
+      default: false,
+    },
     subId: {
       type: Number,
       default: null,
