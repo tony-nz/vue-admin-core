@@ -1,7 +1,7 @@
 <template>
   <div>
     <Dialog
-      :header="type == 'create' ? 'Create ' + resource.name : 'Update ' + resource.name"
+      :header="type == 'create' ? 'Create ' + getSingularizedLabel(resource.name) : 'Update ' + getSingularizedLabel(resource.name)"
       v-model:visible="showModal"
       :modal="true"
       :maximizable="true"
@@ -61,6 +61,7 @@ import { computed, defineComponent, onMounted, watch, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useConfigStore from "../../../store/config";
 import useResourceStore from "../../../store/resource";
+import { getSingularizedLabel } from "../../../core/helpers/functions";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
@@ -219,6 +220,7 @@ export default defineComponent({
       dataValues,
       errors,
       fetchData,
+      getSingularizedLabel,
       modalData,
       modalType,
       showModal,
