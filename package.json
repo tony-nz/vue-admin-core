@@ -2,7 +2,7 @@
   "name": "@tony-nz/vue-admin-core",
   "author": "Tony Myers",
   "private": false,
-  "version": "0.4.4",
+  "version": "0.4.5",
   "type": "module",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
