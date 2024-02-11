@@ -2,6 +2,7 @@ import { App } from "vue";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import axios from "axios";
 import useAuthStore from "../../store/auth";
+import useNotificationStore from "../../store/notification";
 import VueAxios from "vue-axios";
 
 const BASE_URL = "http://localhost:8000";
@@ -67,7 +68,7 @@ class ApiService {
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios.get(resource, params).catch((error) => {
-      throw new Error(`[VUEADMIN] ApiService ${error}`);
+      return Promise.reject(error);
     });
   }
 
@@ -87,7 +88,7 @@ class ApiService {
         // .get(`${resource}/${slug}`, params)
         .get(`${resource}`, params)
         .catch((error) => {
-          throw new Error(`[VUEADMIN] ApiService ${error}`);
+          return Promise.reject(error);
         })
     );
   }
@@ -102,7 +103,9 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params);
+    return ApiService.vueInstance.axios.post(`${resource}`, params).catch((error) => {
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -115,7 +118,9 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params);
+    return ApiService.vueInstance.axios.post(`${resource}`, params).catch((error) => {
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -130,7 +135,9 @@ class ApiService {
     slug: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}/${slug}`, params);
+    return ApiService.vueInstance.axios.put(`${resource}/${slug}`, params).catch((error) => {
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -143,7 +150,9 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}`, params);
+    return ApiService.vueInstance.axios.put(`${resource}`, params).catch((error) => {
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -155,7 +164,7 @@ class ApiService {
     return ApiService.vueInstance.axios
       .delete(`${resource}/${slug}`)
       .catch((error) => {
-        throw new Error(`[VUEADMIN] ApiService ${error}`);
+        return Promise.reject(error);
       });
   }
 
@@ -171,7 +180,7 @@ class ApiService {
     return ApiService.vueInstance.axios
       .delete(`${resource}`, params)
       .catch((error) => {
-        throw new Error(`[VUEADMIN] ApiService ${error}`);
+        return Promise.reject(error);
       });
   }
 
@@ -189,7 +198,9 @@ class ApiService {
       params.data.ids.map((id) =>
         ApiService.vueInstance.axios.put(`${resource}/${id}`, params.data)
       )
-    );
+    ).catch((error) => {
+      return Promise.reject(error);
+    });
   }
 
   /**
@@ -202,7 +213,9 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<any> {
-    return ApiService.vueInstance.axios.post(`${resource}/bulkDelete`, params);
+    return ApiService.vueInstance.axios.post(`${resource}/bulkDelete`, params).catch((error) => {
+      return Promise.reject(error);
+    });;
     // return Promise.all(
     //   params.data.forEach(item => {
     //     ApiService.vueInstance.axios.delete(`${resource}/${item['id']}`);

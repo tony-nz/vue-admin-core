@@ -334,8 +334,6 @@ const useResourceStore = function (resource) {
           const message = e.response?.data?.message || false;
           apiStore.setLoading(false);
           resourceStore.showError(resourceStore, e.message, message);
-
-          return Promise.reject(e);
         }
       })
   );
