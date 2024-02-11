@@ -203,12 +203,18 @@ export default function useResource(
       //   });
       // } else {}
       // }
+      isLoading.value = true;
       resourceData.value = await resourceStore.getList({
         params: options?.params ? options?.params : null,
         routeId: routeId.value,
         apiUrl: apiUrl.value,
         stateList: stateList.value,
         stateUser: stateUser.value,
+      }).then((data) => {
+        isLoading.value = false;
+        return data;
+      }).catch((e) => {
+        isLoading.value = false;
       });
     }
   }

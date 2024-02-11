@@ -161,6 +161,7 @@
           </router-link>
         </div>
       </template>
+      <template #loading>Loading...</template>
       <Column
         v-if="showSelect"
         v-model:selection="selectedResources"
@@ -523,7 +524,6 @@ export default defineComponent({
       } catch (e) {
         console.log("Error getting resource data", e);
       }
-      isLoading.value = false;
     });
 
     return {
