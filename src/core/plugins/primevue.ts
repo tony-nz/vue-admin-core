@@ -111,9 +111,17 @@ import Wind from "../../assets/presets/wind";
  * Initialize PrimeVUE component
  * @param app vue instance
  */
-export function initPrimeVue(app: App<Element>, preset?) {
+export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
+  if (!zIndex) {
+    zIndex = {
+        modal: 1100,        //dialog, sidebar
+        overlay: 1000,      //dropdown, overlaypanel
+        menu: 1000,         //overlay menus
+        tooltip: 1100       //tooltip
+    }
+  }
   if (preset) {
-    app.use(PrimeVue, { unstyled: true, pt: preset });
+    app.use(PrimeVue, { unstyled: true, pt: preset, zIndex: zIndex });
   } else {
     app.use(PrimeVue);
   }
