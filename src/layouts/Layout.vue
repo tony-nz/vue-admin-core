@@ -20,7 +20,7 @@
     </Toolbar>
     <!-- pb-12 for footer -->
     <!-- <main class="relative flex flex-col flex-1 pb-12 overflow-auto h-full z-0" :class="displayToolbar ? '-mt-16' : '-mt-[122px]'"> -->
-    <main class="relative flex flex-col flex-1 overflow-auto h-full z-0" :class="displayToolbar ? '-mt-16' : '-mt-[122px]'">
+    <main class="relative flex flex-col flex-1 overflow-auto h-full z-0" :class="displayToolbar ? '-mt-16' : '-mt-[120px]'">
       <div
         id="vueadmin-content"
         :class="{
