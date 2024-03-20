@@ -1,8 +1,7 @@
 <template>
   <div>
-    <Teleport v-if="!isLoading && resource" :to="'#' + teleportLocation">
+    <Teleport v-if="!isLoading && resource && showTeleportToolbar" :to="'#' + teleportLocation">
       <div
-        v-if="showTeleportToolbar"
         id="toolbar-datatable"
         class="flex justify-end gap-4"
       >
