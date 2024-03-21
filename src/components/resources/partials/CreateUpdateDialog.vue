@@ -207,9 +207,9 @@ export default defineComponent({
       dataValues.value = props.fieldValues;
 
       // set modalData
-      if (props.type == "update") {
-        modalData.value = props.data;
-      }
+      // if (props.type == "update") {
+      modalData.value = props.data;
+      // }
 
       // show modal
       showModal.value = true;
