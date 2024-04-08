@@ -139,7 +139,7 @@ const useAuthStore = defineStore({
     },
     updateSettings(payload) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.put(this.AuthConfig("api.settings"), payload)
+        ApiService.post(this.AuthConfig("api.settings"), payload)
           .then(({ data }) => {
             this.setSettings(data.data);
             resolve();
