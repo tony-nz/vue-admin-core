@@ -620,8 +620,8 @@ export default defineComponent({
      */
     const activeOptions = [
       { label: "All", value: null },
-      { label: "Active", value: 1 },
-      { label: "Inactive", value: 0 },
+      { label: "Active", value: true },
+      { label: "Inactive", value: false },
     ];
 
     onMounted(async () => {
