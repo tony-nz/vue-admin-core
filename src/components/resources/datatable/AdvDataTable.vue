@@ -1,10 +1,10 @@
 <template>
   <div>
-    <Teleport v-if="!isLoading && resource && showTeleportToolbar" :to="'#' + teleportLocation">
-      <div
-        id="toolbar-datatable"
-        class="flex justify-end gap-4"
-      >
+    <Teleport
+      v-if="!isLoading && resource && showTeleportToolbar"
+      :to="'#' + teleportLocation"
+    >
+      <div id="toolbar-datatable" class="flex justify-end gap-4">
         <span
           v-if="toolbar?.teleport?.search != false"
           class="p-input-icon-left w-full"
@@ -29,10 +29,21 @@
           }"
           @click="showCreateEdit('dialog', 'create', modalData)"
         >
-          <span v-if="!simpleCreate">{{ translate("va.actions.create")}} <span class="lowercase">{{ getSingularizedLabel(resource.label) }}</span></span>
+          <span v-if="!simpleCreate"
+            >{{ translate("va.actions.create") }}
+            <span class="lowercase">{{
+              getSingularizedLabel(resource.label)
+            }}</span></span
+          >
           <span v-else>
-            <svg class="h-4 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-              <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+            <svg
+              class="h-4 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+              />
             </svg>
           </span>
         </button>
@@ -48,10 +59,19 @@
             'text-white py-2 px-4': !simpleCreate,
           }"
         >
-          <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
+          <span v-if="!simpleCreate"
+            >{{ translate("va.actions.create") }}
+            {{ getSingularizedLabel(resource.label) }}</span
+          >
           <span v-else>
-            <svg class="h-4 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-              <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+            <svg
+              class="h-4 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+              />
             </svg>
           </span>
         </router-link>
@@ -97,14 +117,26 @@
           class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
         >
           <div v-if="toolbar?.search != false" class="flex w-full justify-end">
-            <span class="w-full relative">
-              <i class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600" />
+            <span class="flex w-full relative">
+              <i
+                class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"
+              />
               <InputText
                 v-model="filters['global'].value"
                 class="pl-10 font-normal w-full"
                 placeholder="Search..."
               />
             </span>
+          </div>
+          <div v-if="showActive" class="flex gap-2">
+            <Dropdown
+              v-model="filters['active'].value"
+              :options="activeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Filter by activity"
+              class="w-48"
+            />
           </div>
           <slot name="toolbar"></slot>
           <button
@@ -132,10 +164,19 @@
             }"
             @click="showCreateEdit('dialog', 'create', modalData)"
           >
-            <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
+            <span v-if="!simpleCreate"
+              >{{ translate("va.actions.create") }}
+              {{ getSingularizedLabel(resource.label) }}</span
+            >
             <span v-else>
-              <svg class="h-4 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+              <svg
+                class="h-4 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 448 512"
+              >
+                <path
+                  d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+                />
               </svg>
             </span>
           </button>
@@ -149,10 +190,19 @@
               'text-white py-2 px-4': !simpleCreate,
             }"
           >
-            <span v-if="!simpleCreate">{{ translate("va.actions.create")}} {{ getSingularizedLabel(resource.label) }}</span>
+            <span v-if="!simpleCreate"
+              >{{ translate("va.actions.create") }}
+              {{ getSingularizedLabel(resource.label) }}</span
+            >
             <span v-else>
-              <svg class="h-4 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                <path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z" />
+              <svg
+                class="h-4 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 448 512"
+              >
+                <path
+                  d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+                />
               </svg>
             </span>
           </router-link>
@@ -164,6 +214,20 @@
         selectionMode="multiple"
         headerStyle="width: 3em"
       />
+      <Column
+        v-if="showActive"
+        :exportable="false"
+        :sortable="true"
+        field="active"
+        headerStyle="width: 2rem"
+      >
+        <template #body="{ data }">
+          <InputSwitch
+            v-model="data.active"
+            @update:modelValue="changeActive(data)"
+          />
+        </template>
+      </Column>
       <slot name="columns">
         <!-- TODO:: rewrite this.. -->
         <div
@@ -199,17 +263,34 @@
         <slot name="expansion" v-bind:slotProps="slotProps" />
       </template>
       <template #empty>
-        <div v-if="isLoading" class="inline-flex items-center px-4 py-2 leading-6 text-sm text-slate-900 transition ease-in-out duration-150">
-          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="#000000" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <div
+          v-if="isLoading"
+          class="inline-flex items-center px-4 py-2 leading-6 text-sm text-slate-900 transition ease-in-out duration-150"
+        >
+          <svg
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="#000000"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
           </svg>
           Loading...
         </div>
-        <div v-else>
-          No records found
-        </div>
-    </template>
+        <div v-else>No records found</div>
+      </template>
     </DataTable>
     <span v-else>Missing resource prop</span>
     <!-- Start:Delete popup -->
@@ -275,6 +356,7 @@ import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import CreateUpdateSideBar from "../partials/CreateUpdateSideBar.vue";
 import useResource from "../../../composables/useResource";
 
+import useResourceStore from "../../../store/resource";
 interface TeleportToolbar {
   search?: boolean;
   bulkDeleteBtn?: boolean;
@@ -314,6 +396,9 @@ export default defineComponent({
     editMode: {
       type: String as PropType<DataTableEditModeType>,
       default: "cell",
+    },
+    filters: {
+      type: Object,
     },
     formData: {
       type: Object,
@@ -367,7 +452,11 @@ export default defineComponent({
     },
     showActive: {
       type: Boolean,
-      default: true,
+      default: false,
+    },
+    showActiveToolbar: {
+      type: Boolean,
+      default: false,
     },
     showActions: {
       type: Boolean,
@@ -429,7 +518,7 @@ export default defineComponent({
     },
     totalRecords: {
       type: Number,
-    }
+    },
   },
   setup(props, { emit }) {
     const globalFilterFields = ref();
@@ -442,6 +531,7 @@ export default defineComponent({
     });
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      ...props.filters,
     });
     const {
       apiUrl,
@@ -515,6 +605,25 @@ export default defineComponent({
       emit("rowReorder", event);
     };
 
+    /**
+     * Change active
+     * @param event
+     */
+    const changeActive = async (event: any) => {
+      if (event && event.id) {
+        await update(event, event.id);
+      }
+    };
+
+    /**
+     * Active filters
+     */
+    const activeOptions = [
+      { label: "All", value: null },
+      { label: "Active", value: 1 },
+      { label: "Inactive", value: 0 },
+    ];
+
     onMounted(async () => {
       apiUrl.value = props?.apiUrl;
       stateList.value = props?.stateList;
@@ -524,16 +633,25 @@ export default defineComponent({
         routeId.value = props.routeId;
       }
 
-      if(props.formData) {
+      if (props.formData) {
         // merge props.formData (object) with modalData.value (array)
-        modalData.value = {...props.formData, ...modalData.value};
+        modalData.value = { ...props.formData, ...modalData.value };
+      }
+
+      if (props.showActive) {
+        // add active filter
+        Object.assign(filters.value, {
+          active: { value: true, matchMode: FilterMatchMode.EQUALS },
+        });
       }
 
       getResourceData();
     });
 
     return {
+      activeOptions,
       bulkRemove,
+      changeActive,
       closeModal,
       closeSidebar,
       columnReorder,
@@ -636,9 +754,9 @@ export default defineComponent({
 
 /* fix for icon on search input */
 .p-input-icon-left > i:first-of-type {
-    position: absolute !important;
-    left: 1.5rem !important;
-    top: 1.5rem !important;
+  position: absolute !important;
+  left: 1.5rem !important;
+  top: 1.5rem !important;
 }
 .p-paginator {
   display: v-bind("displayPagination");
