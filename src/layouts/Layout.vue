@@ -69,7 +69,6 @@ import { useLoading } from "vue-loading-overlay";
 import { useRoute, useRouter } from "vue-router";
 import Header from "./header/Header.vue";
 import LayoutService from "../core/services/LayoutService";
-// import RouterTabs from "./RouterTabs.vue";
 import Toast from "primevue/toast";
 import Toolbar from "./toolbar/Toolbar.vue";
 import useBreadcrumbStore from "../store/breadcrumb";
@@ -78,7 +77,6 @@ export default defineComponent({
   name: "VueAdmin",
   components: {
     Header,
-    // RouterTabs,
     Toast,
     Toolbar,
   },
