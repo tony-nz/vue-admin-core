@@ -17,7 +17,7 @@
           <svg
             version="1.1"
             xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink" 
+            xmlns:xlink="http://www.w3.org/1999/xlink"
             class="h-5 w-5 rounded-sm"
             viewBox="0 0 35 35"
             xml:space="preserve"
@@ -87,7 +87,11 @@
               :key="index"
               :class="{ 'mt-4': index > 0 }"
             >
-              <router-link v-if="item.to" :to="item.to" class="flex lg:items-center group">
+              <router-link
+                v-if="item.to"
+                :to="item.to"
+                class="flex lg:items-center group"
+              >
                 <div
                   class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-md text-white"
                 >
@@ -123,7 +127,7 @@ import { computed, defineComponent, onMounted, ref } from "vue";
 import { translate } from "../../../core/helpers/functions";
 
 import Duotone from "../../../components/ui/icons/Duotone.vue";
-import useAuthStore from "../../../store/auth";
+import useAppStore from "../../../store/app";
 import useConfigStore from "../../../store/config";
 
 export default defineComponent({
@@ -139,12 +143,12 @@ export default defineComponent({
     const isFullscreen = ref(false);
     const isVisible = ref(false);
     const menuItems = ref([]);
-    const store = useAuthStore();
+    const store = useAppStore();
     const userAppsConfig = useConfigStore().getAppMenu;
 
     /**
      * Change the locale of the current user
-     * @param locale 
+     * @param locale
      */
     const changeLocale = (locale) => {
       if (locale) {

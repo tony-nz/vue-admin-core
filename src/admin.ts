@@ -1,12 +1,12 @@
 import { initPlugins } from "./core/plugins/init";
 import { initRouter } from "./router";
-import useAuthStore from "./store/auth";
+import useAppStore from "./store/app";
 import useConfigStore from "./store/config";
 
 export default class VueAdmin {
   constructor({ app, options }) {
     const router = options.router;
-    const authStore = useAuthStore();
+    const appStore = useAppStore();
     const configStore = useConfigStore();
 
     /**
@@ -19,7 +19,7 @@ export default class VueAdmin {
        * Initialize AuthConfig
        */
       if (options.config.auth) {
-        authStore.setAuthConfig(options.config.auth);
+        appStore.setAuthConfig(options.config.auth);
       }
     }
 

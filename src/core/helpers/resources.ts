@@ -10,7 +10,7 @@ const can = (permissions) => {
     return permissions;
   }
   return true;
-  // return authStore.getPermissions;
+  // return appStore.getPermissions;
 };
 
 /**
@@ -197,7 +197,7 @@ const buildResourceConfig = (resource) => {
       return permissions.length && can(permissions);
     },
   };
-  
+
   // update resource config
   useConfigStore().updateResource(resourceConfig);
 

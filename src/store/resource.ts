@@ -5,8 +5,7 @@ import { ResourceConfig } from "../core/types/ResourceConfigTypes";
 import * as methods from "./enums/ResourceEnums";
 
 import ApiService from "../core/services/ApiService";
-import useAuthStore from "./auth";
-import useNotificationStore from "./notification";
+import useAppStore from "./auth";
 
 const stores = {};
 let storeActions = {};
@@ -220,7 +219,7 @@ const useResourceStore = function (resource) {
   Object.values(methods).forEach(
     (action) =>
       (storeActions[action] = async (payload) => {
-        const authStore = useAuthStore();
+        const appStore = useAppStore();
         const resourceStore = useResourceStore(resource)();
 
         try {
@@ -235,7 +234,7 @@ const useResourceStore = function (resource) {
            * Set loading for certain methods
            */
           if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-            authStore.setApiLoading(true);
+            appStore.setApiLoading(true);
           }
 
           /**
@@ -253,7 +252,7 @@ const useResourceStore = function (resource) {
               currentDate.getTime() - lastSync < 10000 &&
               action === "getList")
           ) {
-            authStore.setApiLoading(false);
+            appStore.setApiLoading(false);
 
             if (stateList && resourceStore.data.list[stateList].length > 0) {
               return Promise.resolve({
@@ -318,7 +317,7 @@ const useResourceStore = function (resource) {
            * Set loading to false
            * and show success message
            */
-          authStore.setApiLoading(false);
+          appStore.setApiLoading(false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -331,7 +330,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           const message = e.response?.data?.message || false;
-          authStore.setApiLoading(false);
+          appStore.setApiLoading(false);
           resourceStore.showError(resourceStore, e.message, message);
         }
       })
@@ -370,7 +369,7 @@ const useResourceStore = function (resource) {
         state.data.lastSync = lastSync;
       },
       showSuccess(state, { action, params, data }): any {
-        const logStore = useNotificationStore();
+        const appStore = useAppStore();
         const messages = {
           [CREATE]: translate("va.messages.created", {
             resource: resource.getName(1),
@@ -411,19 +410,19 @@ const useResourceStore = function (resource) {
           this.resource.notifications["all"] ||
           this.resource.notifications[action]
         ) {
-          logStore.showToast({
+          appStore.showToast({
             severity: "success",
             summary: messages[action],
           });
         }
       },
       showError(state, summary, message): any {
-        const logStore = useNotificationStore();
+        const appStore = useAppStore();
         if (
           !this.resource.notifications ||
           this.resource.notifications["error"] === true
         ) {
-          logStore.showToast({
+          appStore.showToast({
             severity: "error",
             summary,
             message,

@@ -1,12 +1,12 @@
 import { App } from "vue";
-import useNotificationStore from "../../store/notification";
+import useAppStore from "../../store/app";
 
 /**
  * Initialize ErrorLog
  * @param app vue instance
  */
 export function initErrorLog(app: App<Element>) {
-  const store = useNotificationStore();
+  const store = useAppStore();
   app.config.errorHandler = function (err, vm, info) {
     store.addLog({
       log: "error",

@@ -15,9 +15,7 @@
         <TabPanels v-model="activeTab">
           <template v-for="(menu, i) in mainMenuConfig" :key="i">
             <TabPanel v-if="menu.items">
-              <nav
-                class="flex-row hidden md:pb-0 md:flex md:justify-end"
-              >
+              <nav class="flex-row hidden md:pb-0 md:flex md:justify-end">
                 <template v-for="item in menu.items" :key="item.to">
                   <router-link
                     v-if="item && !item.items && !item.external && item.to"
@@ -47,7 +45,10 @@
                     :class="defaultClass"
                   >
                     <div class="flex flex-row items-center justify-center">
-                      <div v-if="item.icon" :class="{ 'mr-2': item.label.length > 0 }">
+                      <div
+                        v-if="item.icon"
+                        :class="{ 'mr-2': item.label.length > 0 }"
+                      >
                         <inline-svg :src="item.icon" class="h-4 w-4" />
                       </div>
                       {{ translate(item.label) }}
@@ -77,7 +78,7 @@ import DropdownMenu from "./partials/DropdownMenu.vue";
 import InlineSvg from "vue-inline-svg";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanel from "../../components/ui/tabs/TabPanel.vue";
-import useAuthStore from "../../store/auth";
+import useAppStore from "../../store/app";
 import useConfigStore from "../../store/config";
 
 export default defineComponent({
@@ -118,9 +119,11 @@ export default defineComponent({
       return active;
     };
 
-    const store = useAuthStore();
+    const store = useAppStore();
     const activeClass = ref("text-gray-900 bg-gray-200");
-    const defaultClass = ref("px-4 py-2 text-sm rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:mr-2 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline");
+    const defaultClass = ref(
+      "px-4 py-2 text-sm rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:mr-2 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
+    );
 
     return {
       activeClass,

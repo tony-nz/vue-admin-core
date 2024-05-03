@@ -71,7 +71,7 @@ import Header from "./header/Header.vue";
 import LayoutService from "../core/services/LayoutService";
 import Toast from "primevue/toast";
 import Toolbar from "./toolbar/Toolbar.vue";
-import useBreadcrumbStore from "../store/breadcrumb";
+import useAppStore from "../store/app";
 
 export default defineComponent({
   name: "VueAdmin",
@@ -88,16 +88,16 @@ export default defineComponent({
     });
     let loader;
 
-    const breadcrumbStore = useBreadcrumbStore();
+    const appStore = useAppStore();
 
     const breadcrumbs = computed(() => {
-      return breadcrumbStore.pageBreadcrumbPath;
+      return appStore.pageBreadcrumbPath;
     });
     const currentPage = computed(() => {
-      return breadcrumbStore.currentPage;
+      return appStore.currentPage;
     });
     const pageTitle = computed(() => {
-      return breadcrumbStore.pageTitle;
+      return appStore.pageTitle;
     });
     const viewKey = computed(() => {
       return currentRoute.path || Date.now();

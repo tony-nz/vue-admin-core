@@ -1,4 +1,4 @@
-import useBreadcrumbStore from "../../store/breadcrumb";
+import useAppStore from "../../store/app";
 
 /**
  * Sets current page breadcrumbs
@@ -9,8 +9,8 @@ export const setCurrentPageBreadcrumbsOG = (
   pageTitle: string,
   breadcrumbs: Array<string>
 ): void => {
-  const breadcrumbStore = useBreadcrumbStore();
-  breadcrumbStore.setBreadcrumb({
+  const store = useAppStore();
+  store.setBreadcrumb({
     title: pageTitle,
     pageBreadcrumbPath: breadcrumbs,
   });
@@ -26,8 +26,8 @@ export const setCurrentPageBreadcrumbs = (
   breadcrumbs: Array<string>,
   getPage?: string
 ): void => {
-  const breadcrumbStore = useBreadcrumbStore();
-  breadcrumbStore.setBreadcrumb({
+  const store = useAppStore();
+  store.setBreadcrumb({
     title: pageTitle,
     pageBreadcrumbPath: breadcrumbs,
     page: getPage ? getPage : null,
@@ -39,8 +39,8 @@ export const setCurrentPageBreadcrumbs = (
  * @param {string} title Current page title name
  */
 export const setCurrentPageTitle = (title: string): void => {
-  const breadcrumbStore = useBreadcrumbStore();
-  breadcrumbStore.setBreadcrumb({
+  const store = useAppStore();
+  store.setBreadcrumb({
     title: title,
   });
 };

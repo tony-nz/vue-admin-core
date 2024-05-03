@@ -7,7 +7,7 @@ import { LoadingPlugin } from "vue-loading-overlay";
 import { ObjectDirective } from "vue";
 import ApiService from "../services/ApiService";
 import i18n from "./i18n";
-import useAuthStore from "../../store/auth";
+import useAppStore from "../../store/app";
 import Vue3Toasity, { type ToastContainerOptions } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import "vue-loading-overlay/dist/css/index.css";
@@ -21,7 +21,7 @@ export const initPlugins = async function (app: App<Element>, router, options) {
    */
   const permissionDirective: ObjectDirective = {
     mounted: (el, binding) => {
-      const store = useAuthStore();
+      const store = useAppStore();
       const permission = binding.value;
       const userPermissions = store.getPermissions;
       if (permission && userPermissions) {

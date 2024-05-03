@@ -1,8 +1,7 @@
 import { h, resolveComponent, getCurrentInstance, handleError } from "vue";
 import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
 import i18n from "../core/plugins/i18n";
-import useAuthStore from "../store/auth";
-import useNotificationStore from "../store/notification";
+import useAppStore from "../store/app";
 import useResourceStore from "../store/resource";
 import roles from "./middleware/roles";
 
@@ -57,7 +56,7 @@ export const useResourceRoutes = function (resource) {
     try {
       const routerPermissions = buildPermissions(resource);
       const store = useResourceStore(resource)();
-      const authStore = useAuthStore();
+      const appStore = useAppStore();
       return {
         path,
         name: resourceName(name, action),
@@ -74,7 +73,7 @@ export const useResourceRoutes = function (resource) {
               title: getTitle(action),
               resource,
               // store,
-              permissions: authStore.getPermissions,
+              permissions: appStore.getPermissions,
             };
             if (
               Array.prototype.includes.call(
@@ -121,8 +120,7 @@ export const useResourceRoutes = function (resource) {
                   return next();
                 }
               } catch ({ status, message }) {
-                const logStore = useNotificationStore();
-                logStore.showToast({
+                appStore.showToast({
                   severity: "error",
                   summary: message,
                   message:
@@ -147,7 +145,7 @@ export const useResourceRoutes = function (resource) {
         },
         meta: {
           isCache: true,
-          isLoading: authStore.getApiLoading,
+          isLoading: appStore.getApiLoading,
           requiresAuth: true,
           icon: resource.icon,
           layout: resource.layout,

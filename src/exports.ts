@@ -1,12 +1,9 @@
 /**
  * Stores
  */
-import useAuthStore from "./store/auth";
-import useBreadcrumbStore from "./store/breadcrumb";
+import useAppStore from "./store/app";
 import useConfigStore from "./store/config";
-import useNotificationStore from "./store/notification";
 import useResourceStore from "./store/resource";
-import { useTabsStore, ITabsItem } from "./store/tabs";
 /**
  * Helpers
  */
@@ -26,7 +23,6 @@ import {
 /**
  * Types
  */
-export type { ITabsItem };
 
 export {
   /**
@@ -46,10 +42,7 @@ export {
   /**
    * Stores
    */
-  useAuthStore,
-  useBreadcrumbStore,
+  useAppStore,
   useConfigStore,
-  useNotificationStore,
   useResourceStore,
-  useTabsStore,
 };

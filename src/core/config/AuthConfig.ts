@@ -1,6 +1,7 @@
-import { AuthConfig } from "../types/AuthConfigTypes";
+import { Config } from "../types/ConfigTypes";
+import defaultLayoutConfig from "./DefaultLayoutConfig";
 
-const config: AuthConfig = {
+const config: Config = {
   api: {
     baseURL: "http://localhost:8000",
     csrfCookie: "/sanctum/csrf-cookie",
@@ -12,11 +13,20 @@ const config: AuthConfig = {
     permissions: "/api/auth/ability",
     settings: "/api/settings",
   },
+  initial: defaultLayoutConfig,
+  layout: {},
+  locale: window.localStorage.getItem("locale") || "en",
+  menu: {
+    apps: {},
+    main: [],
+    user: {},
+  },
   oauth: {
     provider: "google",
     login: "/api/oauth/google",
     callback: "/api/oauth/google/callback",
   },
+  resources: {},
 };
 
 export default config;

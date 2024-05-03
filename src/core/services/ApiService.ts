@@ -1,8 +1,7 @@
 import { App } from "vue";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import axios from "axios";
-import useAuthStore from "../../store/auth";
-import useNotificationStore from "../../store/notification";
+import useAppStore from "../../store/app";
 import VueAxios from "vue-axios";
 
 const BASE_URL = "http://localhost:8000";
@@ -20,14 +19,14 @@ class ApiService {
    * @description initialize vue axios
    */
   public static init(app: App<Element>) {
-    const authStore = useAuthStore();
+    const appStore = useAppStore();
 
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    ApiService.vueInstance.axios.defaults.baseURL = authStore.AuthConfig(
+    ApiService.vueInstance.axios.defaults.baseURL = appStore.AuthConfig(
       "api.baseURL"
     )
-      ? authStore.AuthConfig("api.baseURL")
+      ? appStore.AuthConfig("api.baseURL")
       : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
 
@@ -37,8 +36,12 @@ class ApiService {
         return response;
       },
       function (error) {
-        if (error.response && [401, 419].includes(error.response.status) && authStore.authUser) {
-          authStore.purgeAuth();
+        if (
+          error.response &&
+          [401, 419].includes(error.response.status) &&
+          appStore.authUser
+        ) {
+          appStore.purgeAuth();
         }
         return Promise.reject(error);
       }
@@ -103,9 +106,11 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params).catch((error) => {
-      return Promise.reject(error);
-    });
+    return ApiService.vueInstance.axios
+      .post(`${resource}`, params)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -118,9 +123,11 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.post(`${resource}`, params).catch((error) => {
-      return Promise.reject(error);
-    });
+    return ApiService.vueInstance.axios
+      .post(`${resource}`, params)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -135,9 +142,11 @@ class ApiService {
     slug: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}/${slug}`, params).catch((error) => {
-      return Promise.reject(error);
-    });
+    return ApiService.vueInstance.axios
+      .put(`${resource}/${slug}`, params)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -150,9 +159,11 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.put(`${resource}`, params).catch((error) => {
-      return Promise.reject(error);
-    });
+    return ApiService.vueInstance.axios
+      .put(`${resource}`, params)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**
@@ -213,9 +224,11 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<any> {
-    return ApiService.vueInstance.axios.post(`${resource}/bulkDelete`, params).catch((error) => {
-      return Promise.reject(error);
-    });;
+    return ApiService.vueInstance.axios
+      .post(`${resource}/bulkDelete`, params)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
     // return Promise.all(
     //   params.data.forEach(item => {
     //     ApiService.vueInstance.axios.delete(`${resource}/${item['id']}`);

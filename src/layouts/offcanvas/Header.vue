@@ -1,6 +1,8 @@
 <template>
   <div class="bg-white shadow">
-    <div class="sm:hidden lg:block px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8">
+    <div
+      class="sm:hidden lg:block px-4 sm:px-6 lg:max-w-6xl lg:mx-auto lg:px-8"
+    >
       <div
         class="py-6 md:flex md:items-center md:justify-between lg:border-t lg:border-gray-200"
       >
@@ -44,12 +46,12 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import useAuthStore from "../../store/auth";
+import useAppStore from "../../store/app";
 
 export default defineComponent({
   name: "Header",
   setup() {
-    const store = useAuthStore();
+    const store = useAppStore();
 
     const getTimeOfDay = computed(() => {
       const hour = new Date().getHours();
@@ -69,7 +71,7 @@ export default defineComponent({
       return getUser.value["avatar"]
         ? getUser.value["avatar"]
         : "data:image/svg+xml;charset=UTF-8;base64," +
-          window.btoa(`
+            window.btoa(`
             <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
               <path d="M274.7 304H173.3C77.61 304 0 381.6 0 477.3c0 19.14 15.52 34.67 34.66 34.67h378.7C432.5 512 448 496.5 448 477.3C448 381.6 370.4 304 274.7 304z"></path>
               <path class="opacity-40" d="M352 128c0 70.69-57.3 128-128 128C153.3 256 96 198.7 96 128s57.31-128 128-128C294.7 0 352 57.31 352 128z"></path>
@@ -78,15 +80,11 @@ export default defineComponent({
     });
 
     const getUserEmail = computed(() => {
-      return getUser.value["email"]
-        ? getUser.value["email"]
-        : "Missing email";
+      return getUser.value["email"] ? getUser.value["email"] : "Missing email";
     });
 
     const getUserName = computed(() => {
-      return getUser.value["name"]
-        ? getUser.value["name"]
-        : "Missing name";
+      return getUser.value["name"] ? getUser.value["name"] : "Missing name";
     });
 
     return {

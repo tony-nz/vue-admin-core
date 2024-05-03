@@ -1,6 +1,5 @@
 import { nextFactory } from "./middleware/nextFactory";
-import useAuthStore from "../store/auth";
-import useBreadcrumbStore from "../store/breadcrumb";
+import useAppStore from "../store/app";
 
 export async function initRouter(router) {
   /**
@@ -11,10 +10,10 @@ export async function initRouter(router) {
    */
   router.beforeEach(async (to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresAuth)) {
-      const authStore = useAuthStore();
+      const appStore = useAppStore();
 
-      if (!authStore.isUserAuthenticated) {
-        await authStore
+      if (!appStore.isUserAuthenticated) {
+        await appStore
           .verifyAuth(router)
           .then((res) => {
             return res;
@@ -27,12 +26,11 @@ export async function initRouter(router) {
           });
       }
 
-      if (authStore.isUserAuthenticated) {
-        const breadcrumbStore = useBreadcrumbStore();
+      if (appStore.isUserAuthenticated) {
         const getPage = to.matched.find((record) => record.meta.page);
         const path = to.path.split("/").filter((item) => item !== "");
 
-        breadcrumbStore.setBreadcrumb({
+        appStore.setBreadcrumb({
           title: to.meta.title,
           pageBreadcrumbPath: path,
           page: getPage ? getPage : null,
@@ -40,7 +38,7 @@ export async function initRouter(router) {
 
         // params for middleware
         const params = {
-          userRoles: authStore.getRoles,
+          userRoles: appStore.getRoles,
         };
 
         // role middleware

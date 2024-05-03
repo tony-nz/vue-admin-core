@@ -28,13 +28,9 @@ import ApiService from "./core/services/ApiService";
 /**
  * Stores
  */
-import useAuthStore from "./store/auth";
-import useBreadcrumbStore from "./store/breadcrumb";
+import useAppStore from "./store/app";
 import useConfigStore from "./store/config";
-import useNotificationStore from "./store/notification";
 import useResourceStore from "./store/resource";
-import { useTabsStore } from "./store/tabs";
-// import { useTabsStore, ITabsItem } from "./store/tabs";
 
 /**
  * Types
@@ -59,7 +55,6 @@ import {
   Permissions,
   ResourceConfig,
 } from "./core/types/ResourceConfigTypes";
-import { IState, ITabsItem } from "./core/types/TabTypes";
 import {
   UserAppMenu,
   MenuItem,
@@ -142,8 +137,6 @@ export type {
   ModalPage,
   Permissions,
   ResourceConfig,
-  IState,
-  ITabsItem,
   UserAppMenu,
   MenuItem,
   MenuItemIcon,
@@ -178,12 +171,9 @@ export {
   /**
    * Stores
    */
-  useAuthStore,
-  useBreadcrumbStore,
+  useAppStore,
   useConfigStore,
-  useNotificationStore,
   useResourceStore,
-  useTabsStore,
 };
 
 export default VueAdminPlugin;
