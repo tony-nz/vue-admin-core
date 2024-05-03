@@ -1,24 +1,31 @@
-import { defineStore } from "pinia";
 import { AuthConfig } from "../core/types/AuthConfigTypes";
+import { API } from "../core/types/ApiTypes";
+import { defineStore } from "pinia";
+import { initResources } from "../core/plugins/resources";
 import ApiService from "../core/services/ApiService";
 import authConfig from "../core/config/AuthConfig";
 import i18n from "../core/plugins/i18n";
 import objectPath from "object-path";
 
 interface IState {
-  errors: string[];
+  api: API;
   config: AuthConfig;
-  locale: string;
+  errors: string[];
   isAuthenticated: boolean;
+  locale: string;
   permissions: any;
-  user: any;
   roles: any;
   settings: any;
+  user: any;
 }
 
 const useAuthStore = defineStore({
   id: "AuthStore",
   state: (): IState => ({
+    api: {
+      loading: false,
+      refresh: false,
+    },
     errors: [],
     config: authConfig,
     locale: window.localStorage.getItem("locale") || "en",
@@ -30,12 +37,12 @@ const useAuthStore = defineStore({
       JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
   }),
   actions: {
-    async login(credentials) {
+    async login(credentials, router) {
       await ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("api.login"), credentials)
           .then(({ data }) => {
-            this.verifyAuth()
+            this.verifyAuth(router)
               .then(() => {
                 resolve();
               })
@@ -62,12 +69,12 @@ const useAuthStore = defineStore({
           });
       });
     },
-    loginOauthCallback(payload) {
+    loginOauthCallback(payload, router) {
       ApiService.get(this.AuthConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("oauth.callback"), payload)
           .then(({ data }) => {
-            this.verifyAuth();
+            this.verifyAuth(router);
             resolve();
           })
           .catch(({ response }) => {
@@ -88,11 +95,11 @@ const useAuthStore = defineStore({
           });
       });
     },
-    register(credentials) {
+    register(credentials, router) {
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("api.register"), credentials)
           .then(({ data }) => {
-            this.setAuth(data);
+            this.setAuth(data, router);
             resolve();
           })
           .catch(({ response }) => {
@@ -101,11 +108,11 @@ const useAuthStore = defineStore({
           });
       });
     },
-    forgotPassword(payload) {
+    forgotPassword(payload, router) {
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.AuthConfig("api.forgotPassword"), payload)
           .then(({ data }) => {
-            this.setAuth(data);
+            this.setAuth(data, router);
             resolve();
           })
           .catch(({ response }) => {
@@ -114,12 +121,11 @@ const useAuthStore = defineStore({
           });
       });
     },
-    async verifyAuth() {
-      // ApiService.setHeader();
+    async verifyAuth(router) {
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.AuthConfig("api.verify"))
           .then(({ data }) => {
-            this.setAuth(data.data);
+            this.setAuth(data.data, router);
             this.getApiSettings();
             resolve();
           })
@@ -162,12 +168,14 @@ const useAuthStore = defineStore({
 
       return this.settings;
     },
-    setAuth(data) {
+    setAuth(data, router) {
       this.isAuthenticated = true;
       this.user = data.user;
       this.roles = data.roles;
       this.permissions = data.permissions;
       this.errors = [];
+      // Load CRUD Resources
+      initResources(router);
     },
     setError(error) {
       this.errors = error;
@@ -181,7 +189,6 @@ const useAuthStore = defineStore({
       // JwtService.saveLocale(locale);
     },
     purgeAuth() {
-      // delete axios.defaults.auth;
       this.isAuthenticated = false;
       this.user = [];
       this.errors = [];
@@ -190,6 +197,15 @@ const useAuthStore = defineStore({
     },
     setAuthConfig(config) {
       this.config = config;
+    },
+    setApiLoading(loading) {
+      this.api.loading = loading;
+      if (!loading) {
+        this.api.refresh = false;
+      }
+    },
+    setApiRefresh(refresh) {
+      this.api.refresh = refresh;
     },
   },
   getters: {
@@ -288,6 +304,20 @@ const useAuthStore = defineStore({
      */
     isUserAuthenticated(): boolean {
       return this.isAuthenticated;
+    },
+    /**
+     * Get api loading state
+     * @returns object
+     */
+    getApiLoading(): boolean {
+      return this.api.loading;
+    },
+    /**
+     * Get api refresh state
+     * @returns object
+     */
+    getApiRefresh(): boolean {
+      return this.api.refresh;
     },
   },
 });

@@ -1,28 +1,8 @@
 import { nextFactory } from "./middleware/nextFactory";
-
-// import NProgress from "nprogress";
-// import "nprogress/nprogress.css";
-
 import useAuthStore from "../store/auth";
 import useBreadcrumbStore from "../store/breadcrumb";
-import useConfigStore from "../store/config";
 
 export async function initRouter(router) {
-  /**
-   * NProgress Configuration
-   * @type {{showSpinner: boolean, easing: string, speed: number}}
-   */
-  // NProgress.configure({ showSpinner: false, easing: "ease", speed: 1000 });
-
-  /**
-   * Workaround for when DOM is not loaded
-   */
-  document.onreadystatechange = () => {
-    if (document.readyState == "complete") {
-      // NProgress.configure({ parent: ".bg-breadcrumb-hero" });
-    }
-  };
-
   /**
    * Router Guards
    * @param to
@@ -30,13 +10,12 @@ export async function initRouter(router) {
    * @param next
    */
   router.beforeEach(async (to, from, next) => {
-    // NProgress.start();
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       const authStore = useAuthStore();
-      
+
       if (!authStore.isUserAuthenticated) {
         await authStore
-          .verifyAuth()
+          .verifyAuth(router)
           .then((res) => {
             return res;
           })
@@ -50,10 +29,6 @@ export async function initRouter(router) {
 
       if (authStore.isUserAuthenticated) {
         const breadcrumbStore = useBreadcrumbStore();
-        // TODO:: bug with this
-        // const configStore = useConfigStore();
-        // configStore.resetLayoutConfig();
-
         const getPage = to.matched.find((record) => record.meta.page);
         const path = to.path.split("/").filter((item) => item !== "");
 
@@ -89,10 +64,5 @@ export async function initRouter(router) {
       }
     }
     next();
-  });
-
-  router.afterEach(() => {
-    // complete the progress bar
-    // NProgress.done();
   });
 }

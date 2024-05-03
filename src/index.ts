@@ -28,7 +28,6 @@ import ApiService from "./core/services/ApiService";
 /**
  * Stores
  */
-import useApiStore from "./store/api";
 import useAuthStore from "./store/auth";
 import useBreadcrumbStore from "./store/breadcrumb";
 import useConfigStore from "./store/config";
@@ -175,11 +174,10 @@ export {
    * Services
    */
   ApiService,
-  
+
   /**
    * Stores
    */
-  useApiStore,
   useAuthStore,
   useBreadcrumbStore,
   useConfigStore,

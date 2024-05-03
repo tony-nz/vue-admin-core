@@ -5,7 +5,7 @@ import { ResourceConfig } from "../core/types/ResourceConfigTypes";
 import * as methods from "./enums/ResourceEnums";
 
 import ApiService from "../core/services/ApiService";
-import useApiStore from "./api";
+import useAuthStore from "./auth";
 import useNotificationStore from "./notification";
 
 const stores = {};
@@ -220,7 +220,7 @@ const useResourceStore = function (resource) {
   Object.values(methods).forEach(
     (action) =>
       (storeActions[action] = async (payload) => {
-        const apiStore = useApiStore();
+        const authStore = useAuthStore();
         const resourceStore = useResourceStore(resource)();
 
         try {
@@ -235,7 +235,7 @@ const useResourceStore = function (resource) {
            * Set loading for certain methods
            */
           if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-            apiStore.setLoading(true);
+            authStore.setApiLoading(true);
           }
 
           /**
@@ -244,17 +244,16 @@ const useResourceStore = function (resource) {
           if (
             (!params?.force &&
               !stateUser &&
-              (lastSync > 0 && lastSync < syncCheck) &&
+              lastSync > 0 &&
+              lastSync < syncCheck &&
               action === "getList") ||
-            (!params?.force &&
-              !lastSync === null &&
-              action === "getList") ||
+            (!params?.force && !lastSync === null && action === "getList") ||
             (!params?.force &&
               !stateUser &&
-              ((currentDate.getTime() - lastSync) < 10000) &&
+              currentDate.getTime() - lastSync < 10000 &&
               action === "getList")
           ) {
-            apiStore.setLoading(false);
+            authStore.setApiLoading(false);
 
             if (stateList && resourceStore.data.list[stateList].length > 0) {
               return Promise.resolve({
@@ -319,7 +318,7 @@ const useResourceStore = function (resource) {
            * Set loading to false
            * and show success message
            */
-          apiStore.setLoading(false);
+          authStore.setApiLoading(false);
           resourceStore.showSuccess(resourceStore, { action, params, data });
 
           /**
@@ -332,7 +331,7 @@ const useResourceStore = function (resource) {
           return Promise.resolve(response);
         } catch (e: any) {
           const message = e.response?.data?.message || false;
-          apiStore.setLoading(false);
+          authStore.setApiLoading(false);
           resourceStore.showError(resourceStore, e.message, message);
         }
       })

@@ -1,12 +1,14 @@
 import { App } from "vue";
 import { initInlineSvg } from "./inline-svg";
 import { initPrimeVue } from "./primevue";
-import { initResources } from "./resources";
+// import { initResources } from "./resources";
 import { initErrorLog } from "./errorLog";
+import { LoadingPlugin } from "vue-loading-overlay";
+import { ObjectDirective } from "vue";
 import ApiService from "../services/ApiService";
 import i18n from "./i18n";
+import useAuthStore from "../../store/auth";
 import Vue3Toasity, { type ToastContainerOptions } from "vue3-toastify";
-import { LoadingPlugin } from "vue-loading-overlay";
 import "vue3-toastify/dist/index.css";
 import "vue-loading-overlay/dist/css/index.css";
 /**
@@ -14,8 +16,30 @@ import "vue-loading-overlay/dist/css/index.css";
  * @param app vue instance
  */
 export const initPlugins = async function (app: App<Element>, router, options) {
-  // Load CRUD Resources
-  await initResources(app, router);
+  /**
+   * Register permission directive
+   */
+  const permissionDirective: ObjectDirective = {
+    mounted: (el, binding) => {
+      const store = useAuthStore();
+      const permission = binding.value;
+      const userPermissions = store.getPermissions;
+      if (permission && userPermissions) {
+        const hasPermission = userPermissions.includes(permission);
+        if (!hasPermission) {
+          el.parentNode && el.parentNode.removeChild(el);
+        }
+      }
+    },
+  };
+
+  /**
+   * Apply permission directive
+   */
+  app.directive("permission", permissionDirective);
+
+  // // Load CRUD Resources
+  // await initResources(router);
 
   // Load Api Service
   ApiService.init(app);

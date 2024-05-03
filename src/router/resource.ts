@@ -2,7 +2,6 @@ import { h, resolveComponent, getCurrentInstance, handleError } from "vue";
 import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
 import i18n from "../core/plugins/i18n";
 import useAuthStore from "../store/auth";
-import useApiStore from "../store/api";
 import useNotificationStore from "../store/notification";
 import useResourceStore from "../store/resource";
 import roles from "./middleware/roles";
@@ -58,7 +57,7 @@ export const useResourceRoutes = function (resource) {
     try {
       const routerPermissions = buildPermissions(resource);
       const store = useResourceStore(resource)();
-      const apiStore = useApiStore();
+      const authStore = useAuthStore();
       return {
         path,
         name: resourceName(name, action),
@@ -67,7 +66,6 @@ export const useResourceRoutes = function (resource) {
           // TODO: Remove this after testing
           // props: ["id", "title", "resource", "store", "permissions"],
           render(c) {
-            const authStore = useAuthStore();
             const components = JSON.parse(
               JSON.stringify(getCurrentInstance()?.appContext.components)
             );
@@ -149,7 +147,7 @@ export const useResourceRoutes = function (resource) {
         },
         meta: {
           isCache: true,
-          isLoading: apiStore.getLoading,
+          isLoading: authStore.getApiLoading,
           requiresAuth: true,
           icon: resource.icon,
           layout: resource.layout,

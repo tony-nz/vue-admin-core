@@ -1,7 +1,6 @@
 /**
  * Stores
  */
-import useApiStore from "./store/api";
 import useAuthStore from "./store/auth";
 import useBreadcrumbStore from "./store/breadcrumb";
 import useConfigStore from "./store/config";
@@ -47,7 +46,6 @@ export {
   /**
    * Stores
    */
-  useApiStore,
   useAuthStore,
   useBreadcrumbStore,
   useConfigStore,
