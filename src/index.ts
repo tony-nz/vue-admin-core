@@ -29,13 +29,12 @@ import ApiService from "./core/services/ApiService";
  * Stores
  */
 import useAppStore from "./store/app";
-import useConfigStore from "./store/config";
 import useResourceStore from "./store/resource";
 
 /**
  * Types
  */
-import { AuthConfig } from "./core/types/AuthConfigTypes";
+import { App } from "./core/types/AppTypes";
 import { Item, ChildField, Field } from "./core/types/FieldTypes";
 import {
   Theme,
@@ -119,7 +118,7 @@ const VueAdminPlugin = {
  * Types
  */
 export type {
-  AuthConfig,
+  App,
   Item,
   ChildField,
   Field,
@@ -172,7 +171,6 @@ export {
    * Stores
    */
   useAppStore,
-  useConfigStore,
   useResourceStore,
 };
 

@@ -60,11 +60,11 @@
 <script lang="ts">
 import {
   contentWidth,
+  darkMode,
   displayLoader,
   displayToolbar,
-} from "../core/helpers/config";
+} from "../core/helpers/app";
 import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
-import { darkMode } from "../core/helpers/config";
 import { useLoading } from "vue-loading-overlay";
 import { useRoute, useRouter } from "vue-router";
 import Header from "./header/Header.vue";

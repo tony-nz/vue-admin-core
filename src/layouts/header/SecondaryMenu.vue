@@ -70,7 +70,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { layoutWidth } from "../../core/helpers/config";
+import { layoutWidth } from "../../core/helpers/app";
 import { translate } from "../../core/helpers/functions";
 import type { MainMenu } from "../../core/types/MainMenuTypes";
 
@@ -79,7 +79,6 @@ import InlineSvg from "vue-inline-svg";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanel from "../../components/ui/tabs/TabPanel.vue";
 import useAppStore from "../../store/app";
-import useConfigStore from "../../store/config";
 
 export default defineComponent({
   name: "SecondaryMenu",
@@ -97,7 +96,7 @@ export default defineComponent({
   },
   setup(props) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: MainMenu[] = useConfigStore().getMainMenu;
+    const mainMenuConfig: MainMenu[] = useAppStore().getMainMenu;
     const routeClass = ref(
       "hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2"
     );

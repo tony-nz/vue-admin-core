@@ -1,3 +1,4 @@
+import { API } from "./ApiTypes";
 import LayoutConfigTypes from "./LayoutConfigTypes";
 import UserMenu from "./UserMenuTypes";
 import UserAppMenu from "./UserAppsMenuTypes";
@@ -15,7 +16,7 @@ interface APIConfig {
   settings: string;
 }
 
-interface OAuthConfig {
+interface OAppConfig {
   provider: string;
   login: string;
   callback: string;
@@ -31,10 +32,38 @@ interface Config {
     user: UserMenu;
     main: MainMenu[];
   };
-  oauth: OAuthConfig;
+  oauth: OAppConfig;
   resources: any;
 }
 
-export default Config;
+interface Notification {
+  api: any;
+  error: any;
+  warning: any;
+  success: any;
+  echo: any;
+}
 
-export type { Config };
+interface Breadcrumb {
+  title: string;
+  pageBreadcrumbPath: Array<string>;
+  page: string;
+}
+
+interface App {
+  api: API;
+  breadcrumbs: Breadcrumb;
+  config: Config;
+  errors: string[];
+  isAuthenticated: boolean;
+  locale: string;
+  permissions: any;
+  notifications: Notification;
+  roles: any;
+  settings: any;
+  user: any;
+}
+
+export default App;
+
+export type { App, Breadcrumb, Config, Notification };

@@ -25,7 +25,7 @@ import { defineComponent, onActivated, onMounted, watch, ref } from "vue";
 import { translate } from "../../../core/helpers/functions";
 import { useRoute } from "vue-router";
 import ApiService from "../../../core/services/ApiService";
-import useConfigStore from "../../../store/config";
+import useAppStore from "../../../store/app";
 import useResourceStore from "../../../store/resource";
 
 export default defineComponent({
@@ -50,19 +50,21 @@ export default defineComponent({
      * @param {object} params
      */
     function fetchData(params) {
-      const configStore = useConfigStore();
-      const resources = configStore.getResources;
-      
+      const appStore = useAppStore();
+      const resources = appStore.getResources;
+
       if (params.resourceName) {
         try {
           for (const [key, value] of Object.entries(resources)) {
             if (value.name == params.resourceName) {
-              return useResourceStore(value)().getList({}).then(({ data }) => {
-                if (typeof data == "undefined") {
-                  return null;
-                }
-                return data;
-              });
+              return useResourceStore(value)()
+                .getList({})
+                .then(({ data }) => {
+                  if (typeof data == "undefined") {
+                    return null;
+                  }
+                  return data;
+                });
             }
           }
           return null;
@@ -97,10 +99,13 @@ export default defineComponent({
           // add dataValues to modalData
           modalData.value = { ...modalData.value, ...dataValues.value };
         }
-        store.update({}, {
-          params: modalData.value,
-          routeId: route.params.id,
-        });
+        store.update(
+          {},
+          {
+            params: modalData.value,
+            routeId: route.params.id,
+          }
+        );
       }
       submit.value = false;
     };

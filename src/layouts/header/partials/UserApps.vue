@@ -128,7 +128,6 @@ import { translate } from "../../../core/helpers/functions";
 
 import Duotone from "../../../components/ui/icons/Duotone.vue";
 import useAppStore from "../../../store/app";
-import useConfigStore from "../../../store/config";
 
 export default defineComponent({
   name: "UserApps",
@@ -144,7 +143,7 @@ export default defineComponent({
     const isVisible = ref(false);
     const menuItems = ref([]);
     const store = useAppStore();
-    const userAppsConfig = useConfigStore().getAppMenu;
+    const userAppsConfig = useAppStore().getAppMenu;
 
     /**
      * Change the locale of the current user

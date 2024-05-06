@@ -1,7 +1,11 @@
 <template>
   <div>
     <Dialog
-      :header="type == 'create' ? 'Create ' + getSingularizedLabel(resource.name) : 'Update ' + getSingularizedLabel(resource.name)"
+      :header="
+        type == 'create'
+          ? 'Create ' + getSingularizedLabel(resource.name)
+          : 'Update ' + getSingularizedLabel(resource.name)
+      "
       v-model:visible="showModal"
       :modal="true"
       :maximizable="true"
@@ -59,7 +63,7 @@
 import useResource from "../../../composables/useResource";
 import { computed, defineComponent, onMounted, watch, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
-import useConfigStore from "../../../store/config";
+import useAppStore from "../../../store/app";
 import useResourceStore from "../../../store/resource";
 import { getSingularizedLabel } from "../../../core/helpers/functions";
 
@@ -145,24 +149,38 @@ export default defineComponent({
           // add dataValues to modalData
           modalData.value = { ...modalData.value, ...dataValues.value };
         }
- 
+
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
-          await create(modalData.value, dataId.value, props.subId, props.stateUser).then(() => {
-            emit("close");
-          }).catch((e) => {
-            Object.keys(e.response.data.errors).forEach((key, index) => {
-              errors.value[index] = e.response.data.errors[key][0];
+          await create(
+            modalData.value,
+            dataId.value,
+            props.subId,
+            props.stateUser
+          )
+            .then(() => {
+              emit("close");
+            })
+            .catch((e) => {
+              Object.keys(e.response.data.errors).forEach((key, index) => {
+                errors.value[index] = e.response.data.errors[key][0];
+              });
             });
-          });
         } else if (modalType.value == "update") {
-          await update(modalData.value, dataId.value, props.subId, props.stateUser).then(() => {
-            emit("close");
-          }).catch((e) => {
-            Object.keys(e.response.data.errors).forEach((key, index) => {
-              errors.value[index] = e.response.data.errors[key][0];
+          await update(
+            modalData.value,
+            dataId.value,
+            props.subId,
+            props.stateUser
+          )
+            .then(() => {
+              emit("close");
+            })
+            .catch((e) => {
+              Object.keys(e.response.data.errors).forEach((key, index) => {
+                errors.value[index] = e.response.data.errors[key][0];
+              });
             });
-          });
         }
         // this.$emit("close");
       }
@@ -170,9 +188,9 @@ export default defineComponent({
     };
 
     function fetchData(params) {
-      const configStore = useConfigStore();
-      const resources = configStore.getResources;
-    
+      const appStore = useAppStore();
+      const resources = appStore.getResources;
+
       if (params.resource) {
         try {
           for (const [key, value] of Object.entries(resources)) {
@@ -181,16 +199,22 @@ export default defineComponent({
             }
           }
           const resourceStore = useResourceStore(resource.value)();
-          return resourceStore.getList({
-              stateList: params.resource.stateList ? params.resource.stateList : null,
-              stateUser: params.resource.stateUser ? params.resource.stateUser : null,
+          return resourceStore
+            .getList({
+              stateList: params.resource.stateList
+                ? params.resource.stateList
+                : null,
+              stateUser: params.resource.stateUser
+                ? params.resource.stateUser
+                : null,
               subId: props.subId,
-            }).then(({ data }) => {
-            if (typeof data == "undefined") {
-              return null;
-            }
-            return data;
-          });
+            })
+            .then(({ data }) => {
+              if (typeof data == "undefined") {
+                return null;
+              }
+              return data;
+            });
         } catch (e) {
           // TODO ERROR LOG
           console.log(e);

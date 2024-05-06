@@ -1,13 +1,13 @@
 import { computed } from "vue";
-import useConfigStore from "../../store/config";
+import useAppStore from "../../store/app";
 
 /**
  * Returns layout config
  * @returns {object}
  */
 export const config = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig;
+  const appStore = useAppStore();
+  return appStore.getAppConfig;
 });
 
 /**
@@ -15,8 +15,8 @@ export const config = computed(() => {
  * @returns {boolean}
  */
 export const displayBreadcrumbs = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("breadcrumbs.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("breadcrumbs.display");
 });
 
 /**
@@ -24,8 +24,8 @@ export const displayBreadcrumbs = computed(() => {
  * @returns {boolean}
  */
 export const displayLoader = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("loader.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("loader.display");
 });
 
 /**
@@ -33,8 +33,8 @@ export const displayLoader = computed(() => {
  * @returns {boolean}
  */
 export const displayLogo = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("logo.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("logo.display");
 });
 
 /**
@@ -42,8 +42,8 @@ export const displayLogo = computed(() => {
  * @returns {boolean}
  */
 export const displayToolbar = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("toolbar.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("toolbar.display");
 });
 
 /**
@@ -51,8 +51,8 @@ export const displayToolbar = computed(() => {
  * @returns {boolean}
  */
 export const displayScrollTop = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("scrollTop.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("scrollTop.display");
 });
 
 /**
@@ -60,8 +60,8 @@ export const displayScrollTop = computed(() => {
  * @returns {boolean}
  */
 export const layoutWidth = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("theme.display");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("theme.display");
 });
 
 /**
@@ -69,8 +69,8 @@ export const layoutWidth = computed(() => {
  * @returns {boolean}
  */
 export const contentWidth = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("content.width");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("content.width");
 });
 
 /**
@@ -78,8 +78,8 @@ export const contentWidth = computed(() => {
  * @returns {string}
  */
 export const loaderLogo = computed(() => {
-  const configStore = useConfigStore();
-  return process.env.BASE_URL + configStore.getLayoutConfig("loader.logo");
+  const appStore = useAppStore();
+  return process.env.BASE_URL + appStore.getAppConfig("loader.logo");
 });
 
 /**
@@ -87,8 +87,8 @@ export const loaderLogo = computed(() => {
  * @returns {string}
  */
 export const logoDark = computed(() => {
-  const configStore = useConfigStore();
-  return process.env.BASE_URL + configStore.getLayoutConfig("logo.dark");
+  const appStore = useAppStore();
+  return process.env.BASE_URL + appStore.getAppConfig("logo.dark");
 });
 
 /**
@@ -96,8 +96,8 @@ export const logoDark = computed(() => {
  * @returns {string}
  */
 export const logoLight = computed(() => {
-  const configStore = useConfigStore();
-  return process.env.BASE_URL + configStore.getLayoutConfig("logo.light");
+  const appStore = useAppStore();
+  return process.env.BASE_URL + appStore.getAppConfig("logo.light");
 });
 
 /**
@@ -105,8 +105,8 @@ export const logoLight = computed(() => {
  * @returns {string}
  */
 export const logoAlt = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("logo.alt");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("logo.alt");
 });
 
 /**
@@ -114,8 +114,8 @@ export const logoAlt = computed(() => {
  * @returns {string}
  */
 export const logoClass = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("logo.class");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("logo.class");
 });
 
 /**
@@ -123,8 +123,8 @@ export const logoClass = computed(() => {
  * @returns {boolean}
  */
 export const darkMode = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.getLayoutConfig("theme.darkMode");
+  const appStore = useAppStore();
+  return appStore.getAppConfig("theme.darkMode");
 });
 
 /**
@@ -132,14 +132,14 @@ export const darkMode = computed(() => {
  * @returns {boolean}
  */
 export const toggleDarkMode = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.toggleDarkMode;
+  const appStore = useAppStore();
+  return appStore.toggleDarkMode;
 });
 /**
  * Toggle toolbar
  * @returns {boolean}
  */
 export const toggleToolbar = computed(() => {
-  const configStore = useConfigStore();
-  return configStore.toggleToolbar;
+  const appStore = useAppStore();
+  return appStore.toggleToolbar;
 });

@@ -1,54 +1,27 @@
-import { AuthConfig } from "../core/types/AuthConfigTypes";
-import { API } from "../core/types/ApiTypes";
-import { Config } from "../core/types/ConfigTypes";
+import { App, Breadcrumb } from "../core/types/AppTypes";
 import { defineStore } from "pinia";
 import { initResources } from "../core/plugins/resources";
 import ApiService from "../core/services/ApiService";
-import authConfig from "../core/config/AuthConfig";
+import getAppConfig from "../core/config/AppConfig";
 import i18n from "../core/plugins/i18n";
 import objectPath from "object-path";
 import { toast, type ToastOptions } from "vue3-toastify";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
-
-interface Notification {
-  api: any;
-  error: any;
-  warning: any;
-  success: any;
-  echo: any;
-}
-
-interface Breadcrumb {
-  title: string;
-  pageBreadcrumbPath: Array<string>;
-  page: string;
-}
-
-interface IState {
-  api: API;
-  breadcrumbs: Breadcrumb;
-  config: Config;
-  errors: string[];
-  isAuthenticated: boolean;
-  locale: string;
-  permissions: any;
-  notifications: Notification;
-  roles: any;
-  settings: any;
-  user: any;
-}
+import UserMenu from "../core/types/UserMenuTypes";
+import UserAppMenu from "../core/types/UserAppsMenuTypes";
+import type MainMenu from "../core/types/MainMenuTypes";
 
 const useAppStore = defineStore({
   id: "AppStore",
-  state: (): IState => ({
+  state: (): App => ({
     api: {
       loading: false,
       refresh: false,
     },
     breadcrumbs: {} as Breadcrumb,
     errors: [],
-    config: authConfig,
+    config: getAppConfig,
     locale: window.localStorage.getItem("locale") || "en",
     isAuthenticated: false,
     permissions: [],
@@ -72,9 +45,9 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     async login(credentials, router) {
-      await ApiService.get(this.AuthConfig("api.csrfCookie"));
+      await ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.login"), credentials)
+        ApiService.post(this.getAppConfig("api.login"), credentials)
           .then(({ data }) => {
             this.verifyAuth(router)
               .then(() => {
@@ -95,9 +68,9 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     loginOauth() {
-      ApiService.get(this.AuthConfig("api.csrfCookie"));
+      ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.AuthConfig("oauth.login"))
+        ApiService.get(this.getAppConfig("oauth.login"))
           .then(({ data }) => {
             window.location.href = data.url;
           })
@@ -114,9 +87,9 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     loginOauthCallback(payload, router) {
-      ApiService.get(this.AuthConfig("api.csrfCookie"));
+      ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("oauth.callback"), payload)
+        ApiService.post(this.getAppConfig("oauth.callback"), payload)
           .then(({ data }) => {
             this.verifyAuth(router);
             resolve();
@@ -133,7 +106,7 @@ const useAppStore = defineStore({
      */
     logout() {
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.logout"), {})
+        ApiService.post(this.getAppConfig("api.logout"), {})
           .then(() => {
             this.purgeAuth();
             resolve();
@@ -151,7 +124,7 @@ const useAppStore = defineStore({
      */
     register(credentials, router) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.register"), credentials)
+        ApiService.post(this.getAppConfig("api.register"), credentials)
           .then(({ data }) => {
             this.setAuth(data, router);
             resolve();
@@ -170,7 +143,7 @@ const useAppStore = defineStore({
      */
     forgotPassword(payload, router) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.AuthConfig("api.forgotPassword"), payload)
+        ApiService.post(this.getAppConfig("api.forgotPassword"), payload)
           .then(({ data }) => {
             this.setAuth(data, router);
             resolve();
@@ -188,7 +161,7 @@ const useAppStore = defineStore({
      */
     async verifyAuth(router) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.AuthConfig("api.verify"))
+        ApiService.get(this.getAppConfig("api.verify"))
           .then(({ data }) => {
             this.setAuth(data.data, router);
             this.getApiSettings();
@@ -241,22 +214,13 @@ const useAppStore = defineStore({
          */
         if (payload.menu) {
           if (payload.menu.apps) {
-            this.config.menu.apps = {
-              ...this.config.menu.apps,
-              ...payload.menu.apps,
-            };
+            this.config.menu.apps = payload.menu.apps;
           }
           if (payload.menu.main) {
-            this.config.menu.main = [
-              ...this.config.menu.main,
-              ...payload.menu.main,
-            ];
+            this.config.menu.main = payload.menu.main;
           }
           if (payload.menu.user) {
-            this.config.menu.user = {
-              ...this.config.menu.user,
-              ...payload.menu.user,
-            };
+            this.config.menu.user = payload.menu.user;
           }
         }
 
@@ -312,7 +276,7 @@ const useAppStore = defineStore({
      */
     updateSettings(payload) {
       return new Promise<void>((resolve, reject) => {
-        ApiService.put(this.AuthConfig("api.settings"), payload)
+        ApiService.put(this.getAppConfig("api.settings"), payload)
           .then(({ data }) => {
             this.setSettings(data.data);
             resolve();
@@ -329,7 +293,9 @@ const useAppStore = defineStore({
      */
     async getApiSettings() {
       try {
-        const response = await ApiService.get(this.AuthConfig("api.settings"));
+        const response = await ApiService.get(
+          this.getAppConfig("api.settings")
+        );
         this.setSettings(
           response.data.data ? response.data.data : response.data
         );
@@ -450,13 +416,76 @@ const useAppStore = defineStore({
         toast(message, options);
       }
     },
+    toggleDarkMode(): void {
+      const element = document.getElementById("vueadmin-app");
+
+      if (this.config.layout.theme) {
+        this.config.layout.theme.darkMode = !this.config.layout.theme?.darkMode;
+      }
+
+      const localStorageConfig = Object.assign(
+        {},
+        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
+      );
+      if (element) {
+        if (this.config.layout.theme?.darkMode) {
+          localStorageConfig["darkMode"] = true;
+          element.classList.add("dark");
+        } else {
+          localStorageConfig["darkMode"] = false;
+          element.classList.remove("dark");
+        }
+      }
+      if (localStorageConfig) {
+        localStorage.setItem(
+          "layoutConfig",
+          JSON.stringify(localStorageConfig)
+        );
+      }
+    },
+    toggleToolbar(): void {
+      const localStorageConfig = Object.assign(
+        {},
+        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
+      );
+      if (this.config.layout.toolbar?.display) {
+        localStorageConfig["toolbar.display"] = false;
+        this.config.layout.toolbar.display = false;
+      } else if (this.config.layout.toolbar?.display == false) {
+        localStorageConfig["toolbar.display"] = true;
+        this.config.layout.toolbar.display = true;
+      }
+      if (localStorageConfig) {
+        localStorage.setItem(
+          "layoutConfig",
+          JSON.stringify(localStorageConfig)
+        );
+      }
+    },
+    updateResource(resource): void {
+      this.config.resources[resource.name] = resource;
+    },
+    findResource(payload: any): any[] {
+      try {
+        for (const [key, value] of Object.entries(this.config.resources)) {
+          const foundResource = value as { name: string } | any;
+          if (foundResource?.name === payload) {
+            return foundResource;
+          }
+        }
+      } catch (e) {
+        // TODO ERROR LOG
+        console.log(e);
+      }
+      return [];
+    },
   },
   getters: {
     /**
-     * Get config from auth config
+     * Get config from app config
      * @returns {function(path, defaultValue): *}
      */
-    AuthConfig() {
+    getAppConfig() {
       return (path, defaultValue?) => {
         return objectPath.get(this.config, path, defaultValue);
       };
@@ -589,6 +618,41 @@ const useAppStore = defineStore({
      */
     currentPage(): string {
       return this.breadcrumbs.page;
+    },
+    resetLayoutConfig() {
+      this.config.layout = Object.assign({}, this.config.initial);
+    },
+    overrideLayoutConfig(): void {
+      this.config.layout = this.config.initial = Object.assign(
+        {},
+        this.config.initial,
+        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
+      );
+    },
+    getDarkMode(): boolean {
+      return this.config.layout.theme?.darkMode
+        ? this.config.layout.theme?.darkMode
+        : false;
+    },
+    getLayoutConfig(): any {
+      return (path, defaultValue?) => {
+        return objectPath.get(this.config.layout, path, defaultValue);
+      };
+    },
+    getLayout(): any {
+      return this.config.layout;
+    },
+    getAppMenu(): UserAppMenu {
+      return this.config.menu.apps;
+    },
+    getMainMenu(): MainMenu[] {
+      return this.config.menu.main;
+    },
+    getUserMenu(): UserMenu {
+      return this.config.menu.user;
+    },
+    getResources(): any[] {
+      return this.config.resources;
     },
   },
 });

@@ -2,7 +2,6 @@
  * Stores
  */
 import useAppStore from "./store/app";
-import useConfigStore from "./store/config";
 import useResourceStore from "./store/resource";
 /**
  * Helpers
@@ -43,6 +42,5 @@ export {
    * Stores
    */
   useAppStore,
-  useConfigStore,
   useResourceStore,
 };

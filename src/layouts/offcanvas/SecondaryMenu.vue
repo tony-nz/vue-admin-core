@@ -15,12 +15,7 @@
                   v-else
                   :to="item.to ? item.to : ''"
                   custom
-                  v-slot="{
-                    href,
-                    navigate,
-                    isActive,
-                    isExactActive,
-                  }"
+                  v-slot="{ href, navigate, isActive, isExactActive }"
                 >
                   <button
                     v-if="item.to && item.items"
@@ -67,10 +62,7 @@
                         <router-link
                           :to="childMenu.to"
                           custom
-                          v-slot="{
-                            href,
-                            navigate,
-                          }"
+                          v-slot="{ href, navigate }"
                         >
                           <button
                             @click="navigate"
@@ -148,7 +140,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { translate } from "../../core/helpers/functions";
-import useConfigStore from "../../store/config";
+import useAppStore from "../../store/app";
 import MainMenu from "../../core/types/MainMenuTypes";
 
 export default defineComponent({
@@ -162,7 +154,7 @@ export default defineComponent({
   emits: ["closeOffCanvas"],
   setup(props, { emit }) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useConfigStore().getMainMenu;
+    const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
     const routeActiveClass = ref("text-blue-600");
     const routeClass = ref(
       "hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2"

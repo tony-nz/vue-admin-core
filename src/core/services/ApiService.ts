@@ -23,10 +23,10 @@ class ApiService {
 
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    ApiService.vueInstance.axios.defaults.baseURL = appStore.AuthConfig(
+    ApiService.vueInstance.axios.defaults.baseURL = appStore.getAppConfig(
       "api.baseURL"
     )
-      ? appStore.AuthConfig("api.baseURL")
+      ? appStore.getAppConfig("api.baseURL")
       : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
 

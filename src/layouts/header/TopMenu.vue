@@ -36,11 +36,11 @@
                 :isRoute="item.items ? false : true"
                 @click="tabClick(item)"
               >
-                <span
-                  v-if="item.icon && item.icon['path']"
-                  class="mr-2"
-                >
-                  <inline-svg :src="item.icon['path']" class="!fill-current h-6 w-6" />
+                <span v-if="item.icon && item.icon['path']" class="mr-2">
+                  <inline-svg
+                    :src="item.icon['path']"
+                    class="!fill-current h-6 w-6"
+                  />
                 </span>
                 {{ translate(item.label) }}
               </Tab>
@@ -55,15 +55,17 @@
                   @click="navigate"
                   class="cursor-pointer flex items-center text-sm font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg group"
                   :class="{
-                    'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active' : isExactActive,
-                    'bg-black bg-opacity-10 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white text-opacity-70' : !isExactActive,
+                    'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active':
+                      isExactActive,
+                    'bg-black bg-opacity-10 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white text-opacity-70':
+                      !isExactActive,
                   }"
                 >
-                  <span
-                    v-if="item.icon && item.icon['path']"
-                    class="mr-2"
-                  >
-                    <inline-svg :src="item.icon['path']" class="!fill-current h-6 w-6" />
+                  <span v-if="item.icon && item.icon['path']" class="mr-2">
+                    <inline-svg
+                      :src="item.icon['path']"
+                      class="!fill-current h-6 w-6"
+                    />
                   </span>
                   {{ translate(item.label) }}
                 </button>
@@ -87,7 +89,7 @@ import {
   logoDark,
   logoLight,
   layoutWidth,
-} from "../../core/helpers/config";
+} from "../../core/helpers/app";
 import { translate } from "../../core/helpers/functions";
 import { useRouter } from "vue-router";
 import AppBar from "./AppBar.vue";
@@ -96,7 +98,7 @@ import InlineSvg from "vue-inline-svg";
 import MainMenu from "../../core/types/MainMenuTypes";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
 import Tab from "../../components/ui/tabs/Tab.vue";
-import useConfigStore from "../../store/config";
+import useAppStore from "../../store/app";
 
 export default defineComponent({
   name: "TopMenu",
@@ -120,7 +122,7 @@ export default defineComponent({
   },
   setup(props) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useConfigStore().getMainMenu;
+    const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
     const router = useRouter();
     const slugBackground = ref();
 

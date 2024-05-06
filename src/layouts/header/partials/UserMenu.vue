@@ -178,10 +178,9 @@ import {
   toggleDarkMode,
   displayToolbar,
   toggleToolbar,
-} from "../../../core/helpers/config";
+} from "../../../core/helpers/app";
 import { translate } from "../../../core/helpers/functions";
 import useAppStore from "../../../store/app";
-import useConfigStore from "../../../store/config";
 
 export default defineComponent({
   name: "UserMenu",
@@ -204,7 +203,7 @@ export default defineComponent({
     const isVisible = ref(false);
     const focusedIndex = ref(0);
     const store = useAppStore();
-    const userMenuConfig = useConfigStore().getUserMenu;
+    const userMenuConfig = useAppStore().getUserMenu;
 
     /**
      * Toggle app to full screen

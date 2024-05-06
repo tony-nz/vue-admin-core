@@ -5,7 +5,7 @@ import { ResourceConfig } from "../core/types/ResourceConfigTypes";
 import * as methods from "./enums/ResourceEnums";
 
 import ApiService from "../core/services/ApiService";
-import useAppStore from "./auth";
+import useAppStore from "./app";
 
 const stores = {};
 let storeActions = {};

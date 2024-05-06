@@ -1,6 +1,6 @@
 import { formatKebabCase, upperCaseFirst } from "./functions";
 import i18n from "../plugins/i18n";
-import useConfigStore from "../../store/config";
+import useAppStore from "../../store/app";
 
 /**
  * Permissions helper & directive
@@ -199,7 +199,7 @@ const buildResourceConfig = (resource) => {
   };
 
   // update resource config
-  useConfigStore().updateResource(resourceConfig);
+  useAppStore().updateResource(resourceConfig);
 
   return resourceConfig;
 };
