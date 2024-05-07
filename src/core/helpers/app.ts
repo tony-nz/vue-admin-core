@@ -16,7 +16,7 @@ export const config = computed(() => {
  */
 export const displayBreadcrumbs = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("breadcrumbs.display");
+  return appStore.getAppConfig("layout.breadcrumbs.display");
 });
 
 /**
@@ -25,7 +25,7 @@ export const displayBreadcrumbs = computed(() => {
  */
 export const displayLoader = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("loader.display");
+  return appStore.getAppConfig("layout.loader.display");
 });
 
 /**
@@ -34,7 +34,7 @@ export const displayLoader = computed(() => {
  */
 export const displayLogo = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("logo.display");
+  return appStore.getAppConfig("layout.logo.display");
 });
 
 /**
@@ -43,7 +43,7 @@ export const displayLogo = computed(() => {
  */
 export const displayToolbar = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("toolbar.display");
+  return appStore.getAppConfig("layout.toolbar.display");
 });
 
 /**
@@ -52,7 +52,7 @@ export const displayToolbar = computed(() => {
  */
 export const displayScrollTop = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("scrollTop.display");
+  return appStore.getAppConfig("layout.scrollTop.display");
 });
 
 /**
@@ -61,7 +61,7 @@ export const displayScrollTop = computed(() => {
  */
 export const layoutWidth = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("theme.display");
+  return appStore.getAppConfig("layout.theme.display");
 });
 
 /**
@@ -70,7 +70,7 @@ export const layoutWidth = computed(() => {
  */
 export const contentWidth = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("content.width");
+  return appStore.getAppConfig("layout.content.width");
 });
 
 /**
@@ -79,7 +79,7 @@ export const contentWidth = computed(() => {
  */
 export const loaderLogo = computed(() => {
   const appStore = useAppStore();
-  return process.env.BASE_URL + appStore.getAppConfig("loader.logo");
+  return process.env.BASE_URL + appStore.getAppConfig("layout.loader.logo");
 });
 
 /**
@@ -88,7 +88,7 @@ export const loaderLogo = computed(() => {
  */
 export const logoDark = computed(() => {
   const appStore = useAppStore();
-  return process.env.BASE_URL + appStore.getAppConfig("logo.dark");
+  return process.env.BASE_URL + appStore.getAppConfig("layout.logo.dark");
 });
 
 /**
@@ -97,7 +97,7 @@ export const logoDark = computed(() => {
  */
 export const logoLight = computed(() => {
   const appStore = useAppStore();
-  return process.env.BASE_URL + appStore.getAppConfig("logo.light");
+  return process.env.BASE_URL + appStore.getAppConfig("layout.logo.light");
 });
 
 /**
@@ -106,7 +106,7 @@ export const logoLight = computed(() => {
  */
 export const logoAlt = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("logo.alt");
+  return appStore.getAppConfig("layout.logo.alt");
 });
 
 /**
@@ -115,7 +115,7 @@ export const logoAlt = computed(() => {
  */
 export const logoClass = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("logo.class");
+  return appStore.getAppConfig("layout.logo.class");
 });
 
 /**
@@ -124,7 +124,7 @@ export const logoClass = computed(() => {
  */
 export const darkMode = computed(() => {
   const appStore = useAppStore();
-  return appStore.getAppConfig("theme.darkMode");
+  return appStore.getAppConfig("layout.theme.darkMode");
 });
 
 /**

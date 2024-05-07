@@ -199,14 +199,14 @@ const useAppStore = defineStore({
          * Initialize API Config
          */
         if (payload.api) {
-          this.config.api = { ...this.config.api, ...payload.api };
+          this.config.api = payload.api;
         }
 
         /**
          * Initialize Layout Config
          */
         if (payload.layout) {
-          this.config.layout = { ...this.config.layout, ...payload.layout };
+          this.config.layout = payload.layout;
         }
 
         /**
@@ -317,7 +317,7 @@ const useAppStore = defineStore({
       this.setRoles(data.roles);
       this.setUser(data.user);
       // Load CRUD Resources
-      initResources(router);
+      // initResources(router);
     },
     /**
      * Purge user authentication
@@ -449,10 +449,16 @@ const useAppStore = defineStore({
         JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
       );
       if (this.config.layout.toolbar?.display) {
-        localStorageConfig["toolbar.display"] = false;
+        localStorageConfig["toolbar"] = {
+          ...localStorageConfig["toolbar"],
+          display: false,
+        };
         this.config.layout.toolbar.display = false;
-      } else if (this.config.layout.toolbar?.display == false) {
-        localStorageConfig["toolbar.display"] = true;
+      } else if (this.config.layout.toolbar?.display === false) {
+        localStorageConfig["toolbar"] = {
+          ...localStorageConfig["toolbar"],
+          display: true,
+        };
         this.config.layout.toolbar.display = true;
       }
       if (localStorageConfig) {

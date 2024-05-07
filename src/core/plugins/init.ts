@@ -1,7 +1,7 @@
 import { App } from "vue";
 import { initInlineSvg } from "./inline-svg";
 import { initPrimeVue } from "./primevue";
-// import { initResources } from "./resources";
+import { initResources } from "./resources";
 import { initErrorLog } from "./errorLog";
 import { LoadingPlugin } from "vue-loading-overlay";
 import { ObjectDirective } from "vue";
@@ -39,7 +39,7 @@ export const initPlugins = async function (app: App<Element>, router, options) {
   app.directive("permission", permissionDirective);
 
   // // Load CRUD Resources
-  // await initResources(router);
+  await initResources(router);
 
   // Load Api Service
   ApiService.init(app);
