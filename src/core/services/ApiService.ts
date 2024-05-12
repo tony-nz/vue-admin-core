@@ -89,7 +89,7 @@ class ApiService {
     return (
       ApiService.vueInstance.axios
         // .get(`${resource}/${slug}`, params)
-        .get(`${resource}`, params)
+        .get(`${resource}`, { params })
         .catch((error) => {
           return Promise.reject(error);
         })

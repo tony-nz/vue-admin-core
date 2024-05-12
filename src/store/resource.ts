@@ -293,6 +293,7 @@ const useResourceStore = function (resource) {
               ? payload?.apiUrl
               : resourceStore.resource.apiUrl
             : resourceStore.resource.apiUrl;
+          console.log("params", params);
           let response = await ApiService[
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
               ? "get"

@@ -4,7 +4,7 @@ import useResourceStore from "../store/resource";
 import { useRoute } from "vue-router";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
-import { computed, ref, onMounted } from "vue";
+import { computed, Ref, ref, toRef, onMounted } from "vue";
 
 interface Options {
   dataFilters?: object;
@@ -13,10 +13,14 @@ interface Options {
 
 export default function useResource(
   resource: ResourceType | undefined,
+  dtFilters: Ref<any>,
+  dtProps: any,
   options?: Options | undefined
 ) {
   const confirmDelete = useConfirm();
   const apiUrl = ref();
+  const filters = ref(dtFilters);
+  const props = ref(dtProps);
   const modalData = ref([]);
   const modalType = ref();
   const resourceData = ref();
@@ -31,43 +35,70 @@ export default function useResource(
   const stateUser = ref(false);
   const isLoading = ref(true);
   const resourceStore = useResourceStore(resource)();
-  /*
-   * Check for prop filters to filter the resource results
-   * e.g. filters = { name: "Reading", id: 1 }
-   */
-  const resourceDataFiltered = computed(() => {
-    const filters = ref(options?.dataFilters);
 
-    if (filters.value && Object.keys(filters.value).length !== 0) {
-      return resourceData.value?.data.filter((item) => {
-        for (const key in filters.value) {
-          if (filters.value[key] === true && item[key] !== null) {
-            return true;
-          }
-          if (item[key] === undefined || item[key] != filters.value[key])
-            return false;
-        }
-        return true;
+  const searchableColumns = ref(
+    props.searchableColumns || extractIds(resource?.fields)
+  );
+  const lazyParams: Ref<any> = ref({});
+  const totalRecords = ref(0);
+
+  function extractIds(obj: any): string[] {
+    let ids: string[] = [];
+
+    // Base case: if obj is a field with an id property
+    if (obj && obj.id) {
+      ids.push(obj.id);
+    }
+
+    // Recursive case: if obj has children or fields
+    if (obj.children) {
+      obj.children.forEach((child: any) => {
+        ids = ids.concat(extractIds(child));
+      });
+    } else if (obj.fields) {
+      obj.fields.forEach((field: any) => {
+        ids.push(field.id);
       });
     }
-    return resourceData.value?.data;
-  });
+
+    return ids;
+  }
+
+  const onPage = (event) => {
+    lazyParams.value = event;
+    // lazyParams.value.filters = filters.value;
+    getResourceData();
+  };
+  const onSort = (event) => {
+    lazyParams.value = event;
+    getResourceData();
+  };
+  const onFilter = () => {
+    lazyParams.value.filters = filters.value;
+    //Reset pagination first
+    lazyParams.value.originalEvent = { first: 0, page: 0 };
+    onPage(lazyParams.value);
+    getResourceData();
+  };
 
   function create(params: unknown, subId?: number, vStateUser?: boolean) {
     if (params && resourceName) {
       return new Promise<void>((resolve, reject) => {
-        resourceStore.create({
-          params,
-          routeId: routeId.value,
-          apiUrl: apiUrl.value,
-          stateList: stateList.value,
-          stateUser: vStateUser ? vStateUser : stateUser.value,
-          subId: subId,
-        }).then(() => {
-          resolve();
-        }).catch((e) => {
-          reject(e);
-        });
+        resourceStore
+          .create({
+            params,
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            stateList: stateList.value,
+            stateUser: vStateUser ? vStateUser : stateUser.value,
+            subId: subId,
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
       });
     }
   }
@@ -76,18 +107,21 @@ export default function useResource(
     if (params && id && resourceName) {
       params.id = id;
       return new Promise<void>((resolve, reject) => {
-        resourceStore.update({
-          params,
-          routeId: routeId.value,
-          apiUrl: apiUrl.value,
-          stateList: stateList.value,
-          stateUser: vStateUser ? vStateUser : stateUser.value,
-          subId: subId,
-        }).then(() => {
-          resolve();
-        }).catch((e) => {
-          reject(e);
-        });
+        resourceStore
+          .update({
+            params,
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            stateList: stateList.value,
+            stateUser: vStateUser ? vStateUser : stateUser.value,
+            subId: subId,
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
       });
     }
   }
@@ -95,18 +129,21 @@ export default function useResource(
   function remove(id, subId?: number, vStateUser?: boolean) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
-        resourceStore.delete({
-          params: { id },
-          routeId: routeId.value,
-          apiUrl: apiUrl.value,
-          stateList: stateList.value,
-          stateUser: vStateUser ? vStateUser : stateUser.value,
-          subId: subId,
-        }).then(() => {
-          resolve();
-        }).catch((e) => {
-          reject(e);
-        });
+        resourceStore
+          .delete({
+            params: { id },
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            stateList: stateList.value,
+            stateUser: vStateUser ? vStateUser : stateUser.value,
+            subId: subId,
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
       });
     }
   }
@@ -114,18 +151,21 @@ export default function useResource(
   function bulkRemove(data, subId?: number, vStateUser?: boolean) {
     if (data && resourceName) {
       return new Promise<void>((resolve, reject) => {
-        resourceStore.deleteMany({
-          params: { data },
-          routeId: routeId.value,
-          apiUrl: apiUrl.value,
-          stateList: stateList.value,
-          stateUser: vStateUser ? vStateUser : stateUser.value,
-          subId: subId,
-        }).then(() => {
-          resolve();
-        }).catch((e) => {
-          reject(e);
-        });
+        resourceStore
+          .deleteMany({
+            params: { data },
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            stateList: stateList.value,
+            stateUser: vStateUser ? vStateUser : stateUser.value,
+            subId: subId,
+          })
+          .then(() => {
+            resolve();
+          })
+          .catch((e) => {
+            reject(e);
+          });
       });
     }
   }
@@ -197,6 +237,22 @@ export default function useResource(
 
   async function getResourceData() {
     if (resource?.name) {
+      lazyParams.value.filters = filters.value;
+      if (!lazyParams.value.sortField) {
+        lazyParams.value.sortField = props.defaultSortField || "id";
+        // lazyParams.value.sortField = toRef(props, "defaultSortField").value;
+      }
+      if (![-1, 1].includes(lazyParams.value.sortOrder)) {
+        lazyParams.value.sortOrder = props.defaultSortDesc ? -1 : 1;
+      }
+      const params = {
+        // ...lazyParams.value,
+        //   ...options?.params,
+        force: true, // bypass cache
+        dt_params: JSON.stringify(lazyParams.value),
+        searchable_columns: JSON.stringify(searchableColumns.value),
+      };
+
       // if (apiUrl) {
       //   resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
       //     return data.data;
@@ -204,18 +260,25 @@ export default function useResource(
       // } else {}
       // }
       isLoading.value = true;
-      resourceData.value = await resourceStore.getList({
-        params: options?.params ? options?.params : null,
-        routeId: routeId.value,
-        apiUrl: apiUrl.value,
-        stateList: stateList.value,
-        stateUser: stateUser.value,
-      }).then((data) => {
-        isLoading.value = false;
-        return data;
-      }).catch((e) => {
-        isLoading.value = false;
-      });
+      await resourceStore
+        .getList({
+          params: params,
+          routeId: routeId.value,
+          apiUrl: apiUrl.value,
+          stateList: stateList.value,
+          stateUser: stateUser.value,
+        })
+        .then((data) => {
+          totalRecords.value = data.data.total;
+          isLoading.value = false;
+          resourceData.value = data.data.data;
+          console.log("data", data);
+          return data.data;
+        })
+        .catch((e) => {
+          totalRecords.value = 0;
+          isLoading.value = false;
+        });
     }
   }
 
@@ -227,6 +290,7 @@ export default function useResource(
     apiUrl,
     bulkRemove,
     create,
+    lazyParams,
     modalData,
     modalType,
     isLoading,
@@ -246,6 +310,10 @@ export default function useResource(
     closeModal,
     closeSidebar,
     resourceData,
-    resourceDataFiltered,
+    searchableColumns,
+    onPage,
+    onSort,
+    onFilter,
+    totalRecords,
   };
 }

@@ -1,118 +1,22 @@
 <template>
   <div>
-    <Teleport
-      v-if="!isLoading && resource && showTeleportToolbar"
-      :to="'#' + teleportLocation"
-    >
-      <div id="toolbar-datatable" class="flex justify-end gap-4">
-        <span
-          v-if="toolbar?.teleport?.search != false"
-          class="p-input-icon-left w-full"
-        >
-          <i class="pi pi-search" />
-          <InputText
-            v-model="filters['global'].value"
-            class="w-full"
-            placeholder="Search..."
-          />
-        </span>
-        <slot name="toolbar"></slot>
-        <button
-          v-if="
-            resource?.create?.modal || toolbar?.teleport?.createBtn != false
-          "
-          type="button"
-          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
-          :class="{
-            'fill-white p-2': simpleCreate,
-            'text-white py-2 px-4': !simpleCreate,
-          }"
-          @click="showCreateEdit('dialog', 'create', modalData)"
-        >
-          <span v-if="!simpleCreate"
-            >{{ translate("va.actions.create") }}
-            <span class="lowercase">{{
-              getSingularizedLabel(resource.label)
-            }}</span></span
-          >
-          <span v-else>
-            <svg
-              class="h-4 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-            >
-              <path
-                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
-              />
-            </svg>
-          </span>
-        </button>
-        <router-link
-          v-else-if="
-            resource?.create?.page || toolbar?.teleport?.createBtn != false
-          "
-          :to="resource.url + '/create'"
-          type="button"
-          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
-          :class="{
-            'fill-white p-2': simpleCreate,
-            'text-white py-2 px-4': !simpleCreate,
-          }"
-        >
-          <span v-if="!simpleCreate"
-            >{{ translate("va.actions.create") }}
-            {{ getSingularizedLabel(resource.label) }}</span
-          >
-          <span v-else>
-            <svg
-              class="h-4 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-            >
-              <path
-                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
-              />
-            </svg>
-          </span>
-        </router-link>
-      </div>
-    </Teleport>
     <DataTable
       v-if="resource"
-      :dataKey="idKey"
-      :editMode="editMode"
-      :globalFilterFields="globalFilterFields"
-      :loading="showLoading ? isLoading : false"
-      :paginator="showPaginator"
-      :paginatorTemplate="paginatorTemplate"
-      :reorderableColumns="reorderableColumns"
-      :rowHover="true"
-      :rows="rows"
-      :rowsPerPageOptions="[10, 20]"
-      :selectionMode="selectionMode"
-      :sortField="sortField"
-      :sortOrder="sortOrder"
+      :loading="show.loading ? isLoading : false"
+      :state-key="stateKey"
       :totalRecords="totalRecords"
-      :value="resourceDataFiltered"
-      @cell-edit-complete="onCellEditComplete"
-      @columnReorder="columnReorder"
-      @row-collapse="onLocalRowCollapse"
-      @row-expand="onLocalRowExpand"
-      @rowCollapse="onRowCollapse"
-      @rowExpand="onRowExpand"
-      @rowReorder="rowReorder"
-      @rowSelect="onRowSelect"
-      @rowUnselect="onRowUnselect"
-      v-bind="options"
+      :value="resourceData"
+      @onRowExpand="onLocalRowExpand"
+      @filter="onFilter"
+      @page="onPage"
+      @sort="onSort"
+      v-bind="dtOptions"
       v-model:expandedRows="expandedRows"
       v-model:filters="filters"
       v-model:selection="selectedResources"
-      currentPageReportTemplate="{totalRecords} Total"
-      filterDisplay="menu"
-      responsiveLayout="scroll"
-      showGridlines
+      state-storage="session"
     >
-      <template v-if="showToolbar" #header>
+      <template v-if="show.toolbar" #header>
         <div
           class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
         >
@@ -123,12 +27,13 @@
               />
               <InputText
                 v-model="filters['global'].value"
+                @input="debounce(onFilter, 500)"
                 class="pl-10 font-normal w-full"
-                placeholder="Search..."
+                placeholder="Keyword search"
               />
             </span>
           </div>
-          <div v-if="showActive" class="flex gap-2">
+          <div v-if="show.active" class="flex gap-2">
             <Dropdown
               v-model="filters['active'].value"
               :options="activeOptions"
@@ -139,8 +44,15 @@
             />
           </div>
           <slot name="toolbar"></slot>
+          <div v-if="show.refresh" class="flex gap-2">
+            <Button
+              @click="getResourceData"
+              class="p-button-text p-button-plain h-full"
+              icon="pi pi-refresh"
+            />
+          </div>
           <button
-            v-if="showSelect && toolbar?.bulkDeleteBtn != false"
+            v-if="show.select && toolbar?.bulkDeleteBtn != false"
             @click="showDeletePopup({ $event, selectedResources })"
             :class="{
               'bg-primary-500 hover:bg-primary-400 border-gray-400':
@@ -209,13 +121,13 @@
         </div>
       </template>
       <Column
-        v-if="showSelect"
+        v-if="show.select"
         v-model:selection="selectedResources"
         selectionMode="multiple"
         headerStyle="width: 3em"
       />
       <Column
-        v-if="showActive"
+        v-if="show.active"
         :exportable="false"
         :sortable="true"
         field="active"
@@ -242,14 +154,13 @@
           />
         </div>
       </slot>
-      <Column v-if="showActions" :exportable="false">
+      <Column v-if="show.actions" :exportable="false">
         <template #body="{ data }">
           <ActionColumn
             :data="data"
             :resource="resource"
             :fields="resource.fields"
-            :showDefaults="showActionDefaults"
-            :flex="actionColFlex"
+            :showDefaults="show.actionDefaults"
             @deletePopup="showDeletePopup"
             @showCreateEdit="showCreateEdit"
           >
@@ -304,8 +215,6 @@
         </template>
       </ConfirmPopup>
     </div>
-    <!-- End:Delete popup -->
-    <!-- Start:CreateUpdate dialog -->
     <CreateUpdateDialog
       v-if="showModal && resource"
       @close="closeModal"
@@ -321,81 +230,50 @@
       :stateList="stateList"
       :stateUser="stateUser"
     />
-    <!-- End:CreateUpdate dialog -->
-    <!-- Start:CreateUpdate dialog -->
-    <CreateUpdateSideBar
-      v-if="resource"
-      v-model="showSidebar"
-      :value="showSidebar"
-      @close="closeSidebar"
-      @create="create"
-      @update="update"
-      :data="modalData"
-      :fields="getResourceFields(stateList, true)"
-      :type="modalType"
-      :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
-      :resource="resource"
-      :subId="params?.id ? params.id : null"
-      :stateList="stateList"
-      :stateUser="stateUser"
-    />
-    <!-- End:CreateUpdate dialog -->
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, PropType, ref } from "vue";
+import { defineComponent, onMounted, PropType, ref, toRef, watch } from "vue";
 import { translate } from "../../../core/helpers/functions";
-import { FilterMatchMode, FilterOperator } from "primevue/api";
+import { FilterMatchMode } from "primevue/api";
+import { useDebounce } from "../../../composables/useDebounce";
 import {
   upperCaseFirst,
   getSingularizedLabel,
 } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
-import CreateUpdateSideBar from "../partials/CreateUpdateSideBar.vue";
 import useResource from "../../../composables/useResource";
-
-import useResourceStore from "../../../store/resource";
-interface TeleportToolbar {
-  search?: boolean;
-  bulkDeleteBtn?: boolean;
-  createBtn?: boolean;
-}
 
 interface DataTableToolbar {
   createBtn: boolean;
   bulkDeleteBtn: boolean;
   search: boolean;
-  teleport: TeleportToolbar;
 }
 
-type DataTableEditModeType = "cell" | "row";
-type DataTableSelectModeType = "single" | "multiple";
+interface Show {
+  actions: Boolean;
+  actionDefaults: Boolean;
+  active: Boolean;
+  header: Boolean;
+  loading: Boolean;
+  toolbar: Boolean;
+  refresh: Boolean;
+  select: Boolean;
+}
 
 export default defineComponent({
   name: "AdvDataTable",
   components: {
     ActionColumn,
     CreateUpdateDialog,
-    CreateUpdateSideBar,
   },
   props: {
-    actionColFlex: {
-      type: String,
-    },
-    apiUrl: {
-      type: String,
-    },
-    params: {
-      type: Object,
-    },
-    dataFilters: {
-      type: Object,
-    },
-    editMode: {
-      type: String as PropType<DataTableEditModeType>,
-      default: "cell",
+    defaultSortField: String,
+    defaultSortDesc: {
+      type: Boolean,
+      default: true,
     },
     filters: {
       type: Object,
@@ -406,89 +284,32 @@ export default defineComponent({
     formHidden: {
       type: Array,
     },
-    hidePagination: {
-      type: Boolean,
-      default: false,
-    },
-    idKey: {
-      type: String,
-    },
-    options: {
+    params: {
       type: Object,
-      required: false,
     },
-    onRowExpand: {
-      type: Function,
-      default: () => 1,
-    },
-    onRowCollapse: {
-      type: Function,
-      default: () => 1,
-    },
-    paginatorTemplate: {
+    refresh: {
       type: String,
-      default:
-        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
-      // "FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown",
-    },
-    reorderableColumns: {
-      type: Boolean,
-      default: false,
     },
     resource: {
       type: Object,
       required: true,
     },
-    rows: {
-      type: Number,
-      default: 10,
-    },
     routeId: {
       type: String,
     },
-    selectionMode: {
-      type: String as PropType<DataTableSelectModeType>,
-      default: "",
-    },
-    showActive: {
-      type: Boolean,
-      default: false,
-    },
-    showActiveToolbar: {
-      type: Boolean,
-      default: false,
-    },
-    showActions: {
-      type: Boolean,
-      default: true,
-    },
-    showActionDefaults: {
-      type: Boolean,
-      default: true,
-    },
-    showHeader: {
-      type: Boolean,
-      default: true,
-    },
-    showLoading: {
-      type: Boolean,
-      default: false,
-    },
-    showPaginator: {
-      type: Boolean,
-      default: true,
-    },
-    showSelect: {
-      type: Boolean,
-      default: false,
-    },
-    showToolbar: {
-      type: Boolean,
-      default: true,
-    },
-    showTeleportToolbar: {
-      type: Boolean,
-      default: false,
+    show: {
+      type: Object as PropType<Show>,
+      required: false,
+      default: () => ({
+        actions: true,
+        actionDefaults: true,
+        active: false,
+        header: true,
+        loading: false,
+        refresh: true,
+        select: false,
+        toolbar: true,
+      }),
     },
     simpleCreate: {
       type: Boolean,
@@ -509,44 +330,51 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    teleportLocation: {
-      type: String,
-      default: "toolbar-actions",
-    },
     toolbar: {
       type: Object as PropType<DataTableToolbar>,
     },
-    totalRecords: {
-      type: Number,
-    },
   },
-  setup(props, { emit }) {
-    const globalFilterFields = ref();
+  inheritAttrs: false,
+  setup(props, { emit, attrs }) {
     const expandedRows = ref([] as unknown[]);
     const selectedResources = ref();
-    const displayHeader = ref(props.showHeader ? "table-header-group" : "none");
-    const displayPagination = ref(props.hidePagination ? "none" : "flex");
-    const dataFilters = computed(() => {
-      return props.dataFilters;
-    });
+    const displayHeader = ref(
+      props.show.header ? "table-header-group" : "none"
+    );
+    const refresh = toRef(props, "refresh");
+    const stateKey = ref("dt-" + props.resource.name + "-state:");
+    const debounce = useDebounce();
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       ...props.filters,
     });
+
+    // default datatable options
+    const dtOptions = {
+      paginator: true,
+      rows: 10,
+      rowsPerPageOptions: [10, 25, 50, 100],
+      paginatorTemplate:
+        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
+      currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
+      first: 0,
+      lazy: true,
+      ...attrs,
+    };
+
     const {
-      apiUrl,
       bulkRemove,
       closeModal,
       closeSidebar,
       create,
       isLoading,
+      lazyParams,
       getResourceData,
       getResourceFields,
       modalData,
       modalType,
       remove,
       resourceData,
-      resourceDataFiltered,
       routeId,
       showCreateEdit,
       showDeletePopup,
@@ -555,8 +383,11 @@ export default defineComponent({
       stateList,
       stateUser,
       update,
-    } = useResource(props.resource, {
-      dataFilters,
+      onPage,
+      onSort,
+      onFilter,
+      totalRecords,
+    } = useResource(props.resource, filters, props, {
       params: props.params,
     });
 
@@ -565,44 +396,6 @@ export default defineComponent({
         (item) => item.id == event.data.id
       );
       expandedRows.value = [resource];
-    };
-
-    const onLocalRowCollapse = (event) => {
-      //
-    };
-    // possibly redundant
-    function setupFilters() {
-      if (resourceData.value[0]) {
-        globalFilterFields.value = Object.keys(resourceData.value[0]);
-        globalFilterFields.value.forEach((valueName) => {
-          Object.assign(filters.value, {
-            [valueName]: {
-              operator: FilterOperator.AND,
-              constraints: [
-                { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-              ],
-            },
-          });
-        });
-      }
-    }
-    const onCellEditComplete = (event) => {
-      emit("cellEditComplete", event);
-    };
-
-    const columnReorder = (event) => {
-      emit("columnReorder", event);
-    };
-
-    const onRowSelect = (event) => {
-      emit("onRowSelect", event);
-    };
-
-    const onRowUnselect = (event) => {
-      emit("onRowUnselect", event);
-    };
-    const rowReorder = (event) => {
-      emit("rowReorder", event);
     };
 
     /**
@@ -625,7 +418,21 @@ export default defineComponent({
     ];
 
     onMounted(async () => {
-      apiUrl.value = props?.apiUrl;
+      // lazy load / pagination
+      lazyParams.value = JSON.parse(
+        sessionStorage.getItem(stateKey.value as string) as string
+      );
+      if (!lazyParams.value) {
+        lazyParams.value = {
+          first: 0,
+          filters: filters.value,
+          rows: 10,
+        };
+      }
+      lazyParams.value.page = Math.fround(
+        parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows || 10)
+      );
+
       stateList.value = props?.stateList;
       stateUser.value = props?.stateUser;
 
@@ -638,7 +445,7 @@ export default defineComponent({
         modalData.value = { ...props.formData, ...modalData.value };
       }
 
-      if (props.showActive) {
+      if (props.show.active) {
         // add active filter
         Object.assign(filters.value, {
           active: { value: true, matchMode: FilterMatchMode.EQUALS },
@@ -648,33 +455,50 @@ export default defineComponent({
       getResourceData();
     });
 
+    // todo: work filters into this to allow for column filtering
+    // also remove redundant props, as it can all be passed through options
+
+    // function setupFilters() {
+    //   if (resourceData.value[0]) {
+    //     globalFilterFields.value = Object.keys(resourceData.value[0]);
+    //     globalFilterFields.value.forEach((valueName) => {
+    //       Object.assign(filters.value, {
+    //         [valueName]: {
+    //           operator: FilterOperator.AND,
+    //           constraints: [
+    //             { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    //           ],
+    //         },
+    //       });
+    //     });
+    //   }
+    // }
+
+    watch(refresh, (val) => {
+      getResourceData();
+    });
+
     return {
       activeOptions,
       bulkRemove,
       changeActive,
       closeModal,
       closeSidebar,
-      columnReorder,
       create,
+      debounce,
       displayHeader,
-      displayPagination,
       expandedRows,
       filters,
       getResourceFields,
       getSingularizedLabel,
-      globalFilterFields,
       isLoading,
       modalData,
       modalType,
-      onCellEditComplete,
-      onLocalRowCollapse,
-      onLocalRowExpand,
-      onRowSelect,
-      onRowUnselect,
+      onFilter,
+      onPage,
+      onSort,
       remove,
       resourceData,
-      resourceDataFiltered,
-      rowReorder,
       selectedResources,
       showCreateEdit,
       showDeletePopup,
@@ -682,9 +506,15 @@ export default defineComponent({
       showSidebar,
       stateList,
       stateUser,
+      totalRecords,
       translate,
       update,
       upperCaseFirst,
+      useDebounce,
+      getResourceData,
+      onLocalRowExpand,
+      dtOptions,
+      stateKey,
     };
   },
 });
@@ -757,8 +587,5 @@ export default defineComponent({
   position: absolute !important;
   left: 1.5rem !important;
   top: 1.5rem !important;
-}
-.p-paginator {
-  display: v-bind("displayPagination");
 }
 </style>
