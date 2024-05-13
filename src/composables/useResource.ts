@@ -1,10 +1,9 @@
-import ApiService from "../core/services/ApiService";
 import ResourceType from "../core/types/ResourceConfigTypes";
 import useResourceStore from "../store/resource";
 import { useRoute } from "vue-router";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
-import { computed, Ref, ref, toRef, onMounted } from "vue";
+import { Ref, ref } from "vue";
 
 interface Options {
   dataFilters?: object;
@@ -62,20 +61,29 @@ export default function useResource(
   }
 
   const onPage = (event) => {
-    lazyParams.value = event;
-    // lazyParams.value.filters = filters.value;
-    getResourceData();
+    if (resource?.lazy) {
+      lazyParams.value = event;
+      // lazyParams.value.filters = filters.value;
+      console.log("onPage");
+      getResourceData();
+    }
   };
   const onSort = (event) => {
-    lazyParams.value = event;
-    getResourceData();
+    if (resource?.lazy) {
+      lazyParams.value = event;
+      console.log("onSort");
+      getResourceData();
+    }
   };
   const onFilter = () => {
-    lazyParams.value.filters = filters.value;
-    //Reset pagination first
-    lazyParams.value.originalEvent = { first: 0, page: 0 };
-    onPage(lazyParams.value);
-    getResourceData();
+    if (resource?.lazy) {
+      lazyParams.value.filters = filters.value;
+      //Reset pagination first
+      lazyParams.value.originalEvent = { first: 0, page: 0 };
+      onPage(lazyParams.value);
+      console.log("onFilter");
+      getResourceData();
+    }
   };
 
   function create(params: unknown, subId?: number) {
@@ -215,45 +223,53 @@ export default function useResource(
 
   async function getResourceData() {
     if (resource?.name) {
-      lazyParams.value.filters = filters.value;
-      if (!lazyParams.value.sortField) {
-        lazyParams.value.sortField = props.sortField || "id";
-      }
-      if (![-1, 1].includes(lazyParams.value.sortOrder)) {
-        lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
-      }
-      const params = {
-        // ...lazyParams.value,
-        //   ...options?.params,
-        force: true, // bypass cache
-        dt_params: JSON.stringify(lazyParams.value),
-        searchable_columns: JSON.stringify(searchableColumns.value),
-      };
-
-      // if (apiUrl) {
-      //   resourceData.value = await ApiService.get(apiUrl).then(({ data }) => {
-      //     return data.data;
-      //   });
-      // } else {}
-      // }
       isLoading.value = true;
-      await resourceStore
-        .getList({
-          params: params,
-          routeId: routeId.value,
-          apiUrl: apiUrl.value,
-        })
-        .then((data) => {
-          totalRecords.value = data.data.total;
-          isLoading.value = false;
-          resourceData.value = data.data.data;
-          console.log("data", data);
-          return data.data;
-        })
-        .catch((e) => {
-          totalRecords.value = 0;
-          isLoading.value = false;
-        });
+
+      /**
+       * Check for resource.lazy
+       */
+      if (resource.lazy) {
+        lazyParams.value.filters = filters.value;
+        if (!lazyParams.value.sortField) {
+          lazyParams.value.sortField = props.sortField || "id";
+        }
+        if (![-1, 1].includes(lazyParams.value.sortOrder)) {
+          lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
+        }
+        const params = {
+          dt_params: JSON.stringify(lazyParams.value),
+          searchable_columns: JSON.stringify(searchableColumns.value),
+        };
+
+        await resourceStore
+          .getList({
+            params: params,
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+          })
+          .then((response) => {
+            totalRecords.value = response.data.total;
+            resourceData.value = response.data.data;
+            return response.data;
+          })
+          .catch((e) => {
+            totalRecords.value = 0;
+          });
+      } else {
+        await resourceStore
+          .getList({
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+          })
+          .then((response) => {
+            resourceData.value = response.data;
+            return response.data;
+          })
+          .catch((e) => {
+            totalRecords.value = 0;
+          });
+      }
+      isLoading.value = false;
     }
   }
 

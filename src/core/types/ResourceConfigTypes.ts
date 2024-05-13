@@ -50,6 +50,7 @@ interface ResourceConfig {
   routes?: Array<string>;
   lists?: Array<List>;
   notifications?: Array<Notifications>;
+  lazy?: boolean;
 }
 
 export default ResourceConfig;
