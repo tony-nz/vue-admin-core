@@ -103,10 +103,6 @@ import TreeTable from "primevue/treetable";
 import TriStateCheckbox from "primevue/tristatecheckbox";
 import VirtualScroller from "primevue/virtualscroller";
 
-// preset
-import Lara from "../../assets/presets/lara";
-import Wind from "../../assets/presets/wind";
-
 /**
  * Initialize PrimeVUE component
  * @param app vue instance
@@ -114,11 +110,11 @@ import Wind from "../../assets/presets/wind";
 export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
   if (!zIndex) {
     zIndex = {
-        modal: 1100,        //dialog, sidebar
-        overlay: 1000,      //dropdown, overlaypanel
-        menu: 1000,         //overlay menus
-        tooltip: 1100       //tooltip
-    }
+      modal: 1100, //dialog, sidebar
+      overlay: 1000, //dropdown, overlaypanel
+      menu: 1000, //overlay menus
+      tooltip: 1100, //tooltip
+    };
   }
   if (preset) {
     app.use(PrimeVue, { unstyled: true, pt: preset, zIndex: zIndex });

@@ -119,7 +119,7 @@ export const useResourceRoutes = function (resource) {
                   setTitle(to, action, data);
                   return next();
                 }
-              } catch ({ status, message }) {
+              } catch ({ status, message }: any) {
                 appStore.showToast({
                   severity: "error",
                   summary: message,
