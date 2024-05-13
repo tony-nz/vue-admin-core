@@ -237,6 +237,7 @@ export default function useResource(
           lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
         }
         const params = {
+          lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
           searchable_columns: JSON.stringify(searchableColumns.value),
         };
@@ -250,7 +251,7 @@ export default function useResource(
           .then((response) => {
             totalRecords.value = response.data.total;
             resourceData.value = response.data.data;
-            return response.data;
+            return response.data.data;
           })
           .catch((e) => {
             totalRecords.value = 0;

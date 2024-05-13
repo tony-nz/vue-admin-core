@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
 import { translate, upperCaseFirst } from "../core/helpers/functions";
 import { ResourceConfig } from "../core/types/ResourceConfigTypes";
-
 import * as methods from "./enums/ResourceEnums";
-
 import ApiService from "../core/services/ApiService";
 import useAppStore from "./app";
 
@@ -87,8 +85,7 @@ function processStoreData(state, action, payload, data) {
       break;
     case GET_LIST:
     case GET_TREE:
-      // set list data
-      state.setList(state, { data });
+      state.setList(state, data);
       break;
     case GET_ONE:
       break;
@@ -182,7 +179,9 @@ const useResourceStore = function (resource) {
 
           // if the response contains a data object, use that,
           // otherwise use the response itself
-          const data = response.data?.data ? response.data.data : response.data;
+          const data = response.data?.data?.data
+            ? response.data.data.data
+            : response.data;
 
           /**
            * Process data into store for caching
@@ -227,7 +226,7 @@ const useResourceStore = function (resource) {
       setItem(state, item) {
         state.data.item = item;
       },
-      setList(state, { data }) {
+      setList(state, data) {
         state.data.list = data;
       },
       showSuccess(state, { action, params, data }): any {
