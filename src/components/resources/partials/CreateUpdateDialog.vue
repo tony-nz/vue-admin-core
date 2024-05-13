@@ -115,14 +115,6 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    stateList: {
-      type: String,
-      default: "",
-    },
-    stateUser: {
-      type: Boolean,
-      default: false,
-    },
     subId: {
       type: Number,
       default: null,
@@ -152,12 +144,7 @@ export default defineComponent({
 
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
-          await create(
-            modalData.value,
-            dataId.value,
-            props.subId,
-            props.stateUser
-          )
+          await create(modalData.value, dataId.value, props.subId)
             .then(() => {
               emit("close");
             })
@@ -167,12 +154,7 @@ export default defineComponent({
               });
             });
         } else if (modalType.value == "update") {
-          await update(
-            modalData.value,
-            dataId.value,
-            props.subId,
-            props.stateUser
-          )
+          await update(modalData.value, dataId.value, props.subId)
             .then(() => {
               emit("close");
             })
@@ -201,12 +183,6 @@ export default defineComponent({
           const resourceStore = useResourceStore(resource.value)();
           return resourceStore
             .getList({
-              stateList: params.resource.stateList
-                ? params.resource.stateList
-                : null,
-              stateUser: params.resource.stateUser
-                ? params.resource.stateUser
-                : null,
               subId: props.subId,
             })
             .then(({ data }) => {

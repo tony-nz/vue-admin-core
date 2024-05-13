@@ -1,19 +1,18 @@
 <template>
-  <div>
+  <div v-if="resource">
     <DataTable
-      v-if="resource"
-      :loading="show.loading ? isLoading : false"
-      :state-key="stateKey"
-      :totalRecords="totalRecords"
-      :value="resourceData"
-      @onRowExpand="onLocalRowExpand"
-      @filter="onFilter"
-      @page="onPage"
-      @sort="onSort"
       v-bind="dtOptions"
       v-model:expandedRows="expandedRows"
       v-model:filters="filters"
       v-model:selection="selectedResources"
+      @filter="onFilter"
+      @page="onPage"
+      @onRowExpand="onLocalRowExpand"
+      @sort="onSort"
+      :loading="show.loading ? isLoading : false"
+      :state-key="stateKey"
+      :totalRecords="totalRecords"
+      :value="resourceData"
       state-storage="session"
     >
       <template v-if="show.toolbar" #header>
@@ -71,12 +70,12 @@
             type="button"
             class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
             :class="{
-              'fill-white p-2': simpleCreate,
-              'text-white py-2 px-4': !simpleCreate,
+              'fill-white p-2': toolbar?.simpleCreate,
+              'text-white py-2 px-4': !toolbar?.simpleCreate,
             }"
             @click="showCreateEdit('dialog', 'create', modalData)"
           >
-            <span v-if="!simpleCreate"
+            <span v-if="!toolbar?.simpleCreate"
               >{{ translate("va.actions.create") }}
               {{ getSingularizedLabel(resource.label) }}</span
             >
@@ -98,11 +97,11 @@
             type="button"
             class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
             :class="{
-              'fill-white p-2': simpleCreate,
-              'text-white py-2 px-4': !simpleCreate,
+              'fill-white p-2': toolbar?.simpleCreate,
+              'text-white py-2 px-4': !toolbar?.simpleCreate,
             }"
           >
-            <span v-if="!simpleCreate"
+            <span v-if="!toolbar?.simpleCreate"
               >{{ translate("va.actions.create") }}
               {{ getSingularizedLabel(resource.label) }}</span
             >
@@ -143,7 +142,7 @@
       <slot name="columns">
         <!-- TODO:: rewrite this.. -->
         <div
-          v-for="field in getResourceFields(stateList)"
+          v-for="field in getResourceFields(resource.fields)"
           v-bind:key="field.id"
         >
           <Column
@@ -158,8 +157,8 @@
         <template #body="{ data }">
           <ActionColumn
             :data="data"
-            :resource="resource"
             :fields="resource.fields"
+            :resource="resource"
             :showDefaults="show.actionDefaults"
             @deletePopup="showDeletePopup"
             @showCreateEdit="showCreateEdit"
@@ -203,7 +202,6 @@
         <div v-else>No records found</div>
       </template>
     </DataTable>
-    <span v-else>Missing resource prop</span>
     <!-- Start:Delete popup -->
     <div v-if="resource">
       <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
@@ -217,19 +215,18 @@
     </div>
     <CreateUpdateDialog
       v-if="showModal && resource"
-      @close="closeModal"
-      @create="create"
-      @update="update"
+      @close="showModal = false"
       :data="modalData"
-      :hidden="formHidden"
-      :fields="getResourceFields(stateList, true)"
+      :hidden="form.hidden"
+      :fields="getResourceFields(resource.fields)"
       :type="modalType"
       :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
       :resource="resource"
       :subId="params?.id ? params.id : null"
-      :stateList="stateList"
-      :stateUser="stateUser"
     />
+  </div>
+  <div v-else>
+    <span>Missing resource prop</span>
   </div>
 </template>
 
@@ -247,9 +244,10 @@ import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
 
 interface DataTableToolbar {
-  createBtn: boolean;
-  bulkDeleteBtn: boolean;
-  search: boolean;
+  bulkDeleteBtn: Boolean;
+  createBtn: Boolean;
+  search: Boolean;
+  simpleCreate: Boolean;
 }
 
 interface Show {
@@ -263,6 +261,16 @@ interface Show {
   select: Boolean;
 }
 
+interface Options {
+  sortDesc: Boolean;
+  sortField: String;
+}
+
+interface Form {
+  data: Object;
+  hidden: Array<string>;
+}
+
 export default defineComponent({
   name: "AdvDataTable",
   components: {
@@ -270,19 +278,23 @@ export default defineComponent({
     CreateUpdateDialog,
   },
   props: {
-    defaultSortField: String,
-    defaultSortDesc: {
-      type: Boolean,
-      default: true,
-    },
     filters: {
       type: Object,
     },
-    formData: {
-      type: Object,
+    form: {
+      type: Object as PropType<Form>,
+      default: () => ({
+        data: {},
+        hidden: [],
+      }),
     },
-    formHidden: {
-      type: Array,
+    options: {
+      type: Object as PropType<Options>,
+      required: false,
+      default: () => ({
+        sortField: "id",
+        sortDesc: true,
+      }),
     },
     params: {
       type: Object,
@@ -311,45 +323,39 @@ export default defineComponent({
         toolbar: true,
       }),
     },
-    simpleCreate: {
-      type: Boolean,
-      default: false,
-    },
-    sortField: {
-      type: String,
-    },
-    sortOrder: {
-      type: Number,
-      default: 1,
-    },
-    stateList: {
-      type: String,
-      default: "",
-    },
-    stateUser: {
-      type: Boolean,
-      default: false,
-    },
     toolbar: {
       type: Object as PropType<DataTableToolbar>,
     },
   },
   inheritAttrs: false,
   setup(props, { emit, attrs }) {
+    const debounce = useDebounce();
     const expandedRows = ref([] as unknown[]);
+    const refresh = toRef(props, "refresh");
     const selectedResources = ref();
+    const stateKey = ref("dt-" + props.resource.name + "-state:");
+
+    /**
+     * Display table header
+     * @type {Ref<string>}
+     */
     const displayHeader = ref(
       props.show.header ? "table-header-group" : "none"
     );
-    const refresh = toRef(props, "refresh");
-    const stateKey = ref("dt-" + props.resource.name + "-state:");
-    const debounce = useDebounce();
+
+    /**
+     * Filters
+     * @type {Ref<Record<string, { value: any; matchMode: FilterMatchMode }>>}
+     */
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       ...props.filters,
     });
 
-    // default datatable options
+    /**
+     * Datatable options
+     * @type {Ref<Options>}
+     */
     const dtOptions = {
       paginator: true,
       rows: 10,
@@ -362,31 +368,26 @@ export default defineComponent({
       ...attrs,
     };
 
+    /**
+     * Resource data
+     */
     const {
-      bulkRemove,
-      closeModal,
-      closeSidebar,
-      create,
-      isLoading,
-      lazyParams,
       getResourceData,
       getResourceFields,
+      isLoading,
+      lazyParams,
       modalData,
       modalType,
-      remove,
+      onFilter,
+      onPage,
+      onSort,
       resourceData,
       routeId,
       showCreateEdit,
       showDeletePopup,
       showModal,
-      showSidebar,
-      stateList,
-      stateUser,
-      update,
-      onPage,
-      onSort,
-      onFilter,
       totalRecords,
+      update,
     } = useResource(props.resource, filters, props, {
       params: props.params,
     });
@@ -433,16 +434,18 @@ export default defineComponent({
         parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows || 10)
       );
 
-      stateList.value = props?.stateList;
-      stateUser.value = props?.stateUser;
-
+      /**
+       * Set route id of current route
+       */
       if (props.routeId) {
         routeId.value = props.routeId;
       }
 
-      if (props.formData) {
-        // merge props.formData (object) with modalData.value (array)
-        modalData.value = { ...props.formData, ...modalData.value };
+      /**
+       * Merge prop form data with modal data
+       */
+      if (props.form?.data) {
+        modalData.value = { ...props.form.data, ...modalData.value };
       }
 
       if (props.show.active) {
@@ -480,41 +483,32 @@ export default defineComponent({
 
     return {
       activeOptions,
-      bulkRemove,
       changeActive,
-      closeModal,
-      closeSidebar,
-      create,
       debounce,
       displayHeader,
+      dtOptions,
       expandedRows,
       filters,
+      getResourceData,
       getResourceFields,
       getSingularizedLabel,
       isLoading,
       modalData,
       modalType,
       onFilter,
+      onLocalRowExpand,
       onPage,
       onSort,
-      remove,
       resourceData,
       selectedResources,
       showCreateEdit,
       showDeletePopup,
       showModal,
-      showSidebar,
-      stateList,
-      stateUser,
+      stateKey,
       totalRecords,
       translate,
-      update,
       upperCaseFirst,
       useDebounce,
-      getResourceData,
-      onLocalRowExpand,
-      dtOptions,
-      stateKey,
     };
   },
 });

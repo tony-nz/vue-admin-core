@@ -30,9 +30,6 @@ export default function useResource(
   const route = useRoute();
   const routeId = ref(route?.params?.id);
   const showModal = ref(false);
-  const showSidebar = ref(false);
-  const stateList = ref();
-  const stateUser = ref(false);
   const isLoading = ref(true);
   const resourceStore = useResourceStore(resource)();
 
@@ -81,7 +78,7 @@ export default function useResource(
     getResourceData();
   };
 
-  function create(params: unknown, subId?: number, vStateUser?: boolean) {
+  function create(params: unknown, subId?: number) {
     if (params && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
@@ -89,8 +86,6 @@ export default function useResource(
             params,
             routeId: routeId.value,
             apiUrl: apiUrl.value,
-            stateList: stateList.value,
-            stateUser: vStateUser ? vStateUser : stateUser.value,
             subId: subId,
           })
           .then(() => {
@@ -103,7 +98,7 @@ export default function useResource(
     }
   }
 
-  function update(params, id, subId?: number, vStateUser?: boolean) {
+  function update(params, id, subId?: number) {
     if (params && id && resourceName) {
       params.id = id;
       return new Promise<void>((resolve, reject) => {
@@ -112,8 +107,6 @@ export default function useResource(
             params,
             routeId: routeId.value,
             apiUrl: apiUrl.value,
-            stateList: stateList.value,
-            stateUser: vStateUser ? vStateUser : stateUser.value,
             subId: subId,
           })
           .then(() => {
@@ -126,7 +119,7 @@ export default function useResource(
     }
   }
 
-  function remove(id, subId?: number, vStateUser?: boolean) {
+  function remove(id, subId?: number) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
@@ -134,8 +127,6 @@ export default function useResource(
             params: { id },
             routeId: routeId.value,
             apiUrl: apiUrl.value,
-            stateList: stateList.value,
-            stateUser: vStateUser ? vStateUser : stateUser.value,
             subId: subId,
           })
           .then(() => {
@@ -148,7 +139,7 @@ export default function useResource(
     }
   }
 
-  function bulkRemove(data, subId?: number, vStateUser?: boolean) {
+  function bulkRemove(data, subId?: number) {
     if (data && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
@@ -156,8 +147,6 @@ export default function useResource(
             params: { data },
             routeId: routeId.value,
             apiUrl: apiUrl.value,
-            stateList: stateList.value,
-            stateUser: vStateUser ? vStateUser : stateUser.value,
             subId: subId,
           })
           .then(() => {
@@ -201,49 +190,37 @@ export default function useResource(
   function showCreateEdit(display, type, data = []) {
     modalType.value = type;
     modalData.value = data;
+
     if (display === "dialog") {
       showModal.value = true;
-    } else if (display === "sidebar") {
-      showSidebar.value = true;
     }
   }
 
-  function closeModal() {
-    showModal.value = false;
-  }
+  function getResourceFields(fields: any) {
+    let allFields: any = [];
 
-  function closeSidebar() {
-    // store.dispatch("appResource/closeSidebar");
-    showSidebar.value = false;
-  }
-
-  function getResourceFields(stateList, fullObject = false) {
-    if (resource) {
-      if (resource.lists && stateList) {
-        const index = resource.lists.findIndex((i) => {
-          return i.name === stateList;
-        });
-        if (fullObject) {
-          return resource.lists[index].fields;
+    function traverse(fields) {
+      fields.forEach((field: any) => {
+        if (field.fields) {
+          traverse(field.fields);
+        } else {
+          allFields.push(field);
         }
-        return resource.lists[index]?.fields?.[0]?.children?.[0].fields;
-      }
-      if (fullObject) {
-        return resource.fields;
-      }
-      return resource.fields?.[0]?.children?.[0].fields;
+      });
     }
+
+    traverse(fields);
+    return allFields;
   }
 
   async function getResourceData() {
     if (resource?.name) {
       lazyParams.value.filters = filters.value;
       if (!lazyParams.value.sortField) {
-        lazyParams.value.sortField = props.defaultSortField || "id";
-        // lazyParams.value.sortField = toRef(props, "defaultSortField").value;
+        lazyParams.value.sortField = props.sortField || "id";
       }
       if (![-1, 1].includes(lazyParams.value.sortOrder)) {
-        lazyParams.value.sortOrder = props.defaultSortDesc ? -1 : 1;
+        lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
       }
       const params = {
         // ...lazyParams.value,
@@ -265,8 +242,6 @@ export default function useResource(
           params: params,
           routeId: routeId.value,
           apiUrl: apiUrl.value,
-          stateList: stateList.value,
-          stateUser: stateUser.value,
         })
         .then((data) => {
           totalRecords.value = data.data.total;
@@ -282,10 +257,6 @@ export default function useResource(
     }
   }
 
-  onMounted(() => {
-    //
-  });
-
   return {
     apiUrl,
     bulkRemove,
@@ -299,16 +270,11 @@ export default function useResource(
     route,
     routeId,
     showModal,
-    showSidebar,
-    stateList,
-    stateUser,
     update,
     getResourceData,
     getResourceFields,
     showCreateEdit,
     showDeletePopup,
-    closeModal,
-    closeSidebar,
     resourceData,
     searchableColumns,
     onPage,

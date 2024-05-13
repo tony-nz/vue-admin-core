@@ -10,12 +10,6 @@ import ColorPicker from "./colorpicker/Index.vue";
 // icons
 import Duotone from "./icons/Duotone.vue";
 
-// stats
-import StatBox1 from "./stats/StatBox1.vue";
-
-// stats
-import UserDisplay from "./table/UserDisplay.vue";
-
 // tabs
 import Tab from "./tabs/Tab.vue";
 import Tabs from "./tabs/Tabs.vue";
@@ -27,8 +21,6 @@ export {
   Card,
   ColorPicker,
   Duotone,
-  StatBox1,
-  UserDisplay,
   Tab,
   Tabs,
   TabPanel,

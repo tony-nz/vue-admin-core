@@ -112,11 +112,11 @@ export default defineComponent({
 
     onActivated(() => {
       viewKey.value += 1;
-      modalData.value = store.getDataItem;
+      modalData.value = store.getItem;
     });
 
     onMounted(() => {
-      modalData.value = store.getDataItem;
+      modalData.value = store.getItem;
       isMounted.value = true;
     });
 
