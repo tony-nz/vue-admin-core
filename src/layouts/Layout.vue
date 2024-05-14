@@ -31,7 +31,7 @@
         class="mx-auto py-6 px-6 flex flex-col flex-1 overflow-y-auto"
       >
         <router-view v-slot="{ Component, route }">
-          <component v-if="route" :is="Component" :key="viewKey" />
+          <component v-if="route" :is="Component" />
         </router-view>
       </div>
     </main>

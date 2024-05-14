@@ -335,20 +335,12 @@ export default defineComponent({
     const stateKey = ref("dt-" + props.resource.name + "-state:");
 
     /**
-     * Display table header
-     * @type {Ref<string>}
-     */
-    const displayHeader = ref(
-      props.show.header ? "table-header-group" : "none"
-    );
-
-    /**
      * Filters
      * @type {Ref<Record<string, { value: any; matchMode: FilterMatchMode }>>}
      */
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      ...props.filters,
+      ...props.resource.datatable?.filters,
     });
 
     /**
@@ -467,25 +459,6 @@ export default defineComponent({
       getResourceData();
     });
 
-    // todo: work filters into this to allow for column filtering
-    // also remove redundant props, as it can all be passed through options
-
-    // function setupFilters() {
-    //   if (resourceData.value[0]) {
-    //     globalFilterFields.value = Object.keys(resourceData.value[0]);
-    //     globalFilterFields.value.forEach((valueName) => {
-    //       Object.assign(filters.value, {
-    //         [valueName]: {
-    //           operator: FilterOperator.AND,
-    //           constraints: [
-    //             { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    //           ],
-    //         },
-    //       });
-    //     });
-    //   }
-    // }
-
     watch(refresh, (val) => {
       getResourceData();
     });
@@ -494,7 +467,6 @@ export default defineComponent({
       activeOptions,
       changeActive,
       debounce,
-      displayHeader,
       dtOptions,
       expandedRows,
       filters,
@@ -522,73 +494,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<!-- <style>
-.p-datatable-header {
-  padding: 0px !important;
-}
-.p-datatable-header:empty {
-  display: none;
-}
-.p-datatable-thead {
-  display: v-bind("displayHeader");
-}
-#toolbar-datatable .p-inputtext {
-  padding: 8.21px;
-  width: 410px;
-  padding-left: 2.5rem;
-}
-
-/* Paginator styling */
-.p-paginator .p-paginator-first,
-.p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-next,
-.p-paginator .p-paginator-last {
-  border: none !important;
-  min-width: 1rem;
-}
-.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-  background: #009ffe;
-  color: #ffffff;
-}
-.p-link:focus {
-  box-shadow: none !important;
-}
-.p-paginator .p-paginator-first,
-.p-paginator .p-paginator-prev,
-.p-paginator .p-paginator-next,
-.p-paginator .p-paginator-last,
-.p-paginator .p-paginator-pages .p-paginator-page {
-  border-radius: 0.5rem;
-  border: none !important;
-  height: 32px !important;
-  width: 32px !important;
-  min-height: 32px !important;
-  min-width: 32px !important;
-  padding: 0px !important;
-  margin-left: 4px;
-  margin-right: 4px;
-}
-/* Dropdown option styling */
-.p-paginator .p-dropdown {
-  margin-right: 0 !important;
-  margin-left: 0 !important;
-}
-/* 
- * Align list options on the left
- * and paginator to the right
- */
-.p-paginator-current {
-  margin-left: auto !important;
-}
-/* .p-paginator-first {
-  margin-left: auto !important;
-} */
-
-/* fix for icon on search input */
-.p-input-icon-left > i:first-of-type {
-  position: absolute !important;
-  left: 1.5rem !important;
-  top: 1.5rem !important;
-}
-</style> -->

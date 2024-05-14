@@ -51,6 +51,7 @@ interface ResourceConfig {
   lists?: Array<List>;
   notifications?: Array<Notifications>;
   lazy?: boolean;
+  datatable?: Array<any>;
 }
 
 export default ResourceConfig;
