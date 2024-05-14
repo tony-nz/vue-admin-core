@@ -86,14 +86,14 @@ class ApiService {
     // slug = "" as string,
     params = [] as AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return (
-      ApiService.vueInstance.axios
-        // .get(`${resource}/${slug}`, params)
-        .get(`${resource}`, { params })
-        .catch((error) => {
-          return Promise.reject(error);
-        })
-    );
+    console.log("get");
+    console.log("resource", resource);
+    console.log("params", params);
+    return ApiService.vueInstance.axios
+      .get(`${resource}`, { params })
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 
   /**

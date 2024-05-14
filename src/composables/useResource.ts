@@ -1,9 +1,9 @@
-import ResourceType from "../core/types/ResourceConfigTypes";
-import useResourceStore from "../store/resource";
 import { useRoute } from "vue-router";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
 import { Ref, ref } from "vue";
+import ResourceType from "../core/types/ResourceConfigTypes";
+import useResourceStore from "../store/resource";
 
 interface Options {
   dataFilters?: object;
@@ -16,28 +16,40 @@ export default function useResource(
   dtProps: any,
   options?: Options | undefined
 ) {
-  const confirmDelete = useConfirm();
   const apiUrl = ref();
+  const confirmDelete = useConfirm();
   const filters = ref(dtFilters);
-  const props = ref(dtProps);
+  const isLoading = ref(true);
+  const lazyParams: Ref<any> = ref({});
   const modalData = ref([]);
   const modalType = ref();
+  const props = ref(dtProps);
   const resourceData = ref();
-  const resourceName = resource?.name
-    ? upperCaseFirst(resource.name)
-    : undefined;
+  const resourceStore = useResourceStore(resource)();
   const route = useRoute();
   const routeId = ref(route?.params?.id);
   const showModal = ref(false);
-  const isLoading = ref(true);
-  const resourceStore = useResourceStore(resource)();
+  const totalRecords = ref(0);
 
+  /**
+   * Set the resource name
+   */
+  const resourceName = resource?.name
+    ? upperCaseFirst(resource.name)
+    : undefined;
+
+  /**
+   * Set the searchable columns
+   */
   const searchableColumns = ref(
     props.searchableColumns || extractIds(resource?.fields)
   );
-  const lazyParams: Ref<any> = ref({});
-  const totalRecords = ref(0);
 
+  /**
+   * Extract ids from fields
+   * @param obj
+   * @returns string[]
+   */
   function extractIds(obj: any): string[] {
     let ids: string[] = [];
 
@@ -60,32 +72,49 @@ export default function useResource(
     return ids;
   }
 
+  /**
+   * Get data on page change
+   * @param event
+   */
   const onPage = (event) => {
     if (resource?.lazy) {
       lazyParams.value = event;
-      // lazyParams.value.filters = filters.value;
-      console.log("onPage");
-      getResourceData();
-    }
-  };
-  const onSort = (event) => {
-    if (resource?.lazy) {
-      lazyParams.value = event;
-      console.log("onSort");
-      getResourceData();
-    }
-  };
-  const onFilter = () => {
-    if (resource?.lazy) {
-      lazyParams.value.filters = filters.value;
-      //Reset pagination first
-      lazyParams.value.originalEvent = { first: 0, page: 0 };
-      onPage(lazyParams.value);
-      console.log("onFilter");
       getResourceData();
     }
   };
 
+  /**
+   * Sort data
+   * @param event
+   */
+  const onSort = (event) => {
+    if (resource?.lazy) {
+      lazyParams.value = event;
+      getResourceData();
+    }
+  };
+
+  /**
+   * Filter data
+   * @returns void
+   */
+  const onFilter = () => {
+    if (resource?.lazy) {
+      // set filters
+      lazyParams.value.filters = filters.value;
+      // reset pagination first
+      lazyParams.value.originalEvent = { first: 0, page: 0 };
+      // call onPage to get data
+      onPage(lazyParams.value);
+    }
+  };
+
+  /**
+   * Create a new resource
+   * @param params
+   * @param subId
+   * @returns Promise<void>
+   */
   function create(params: unknown, subId?: number) {
     if (params && resourceName) {
       return new Promise<void>((resolve, reject) => {
@@ -106,6 +135,13 @@ export default function useResource(
     }
   }
 
+  /**
+   * Update a resource
+   * @param params
+   * @param id
+   * @param subId
+   * @returns Promise<void>
+   */
   function update(params, id, subId?: number) {
     if (params && id && resourceName) {
       params.id = id;
@@ -127,6 +163,12 @@ export default function useResource(
     }
   }
 
+  /**
+   * Remove a resource
+   * @param id
+   * @param subId
+   * @returns Promise<void>
+   */
   function remove(id, subId?: number) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
@@ -147,6 +189,12 @@ export default function useResource(
     }
   }
 
+  /**
+   * Bulk remove resources
+   * @param data
+   * @param subId
+   * @returns Promise<void>
+   */
   function bulkRemove(data, subId?: number) {
     if (data && resourceName) {
       return new Promise<void>((resolve, reject) => {
@@ -167,6 +215,11 @@ export default function useResource(
     }
   }
 
+  /**
+   * Show delete popup
+   * @param params
+   * @returns void
+   */
   function showDeletePopup(params) {
     if (resource && params.$event) {
       confirmDelete.require({
@@ -195,6 +248,13 @@ export default function useResource(
     }
   }
 
+  /**
+   * Show create/edit modal
+   * @param display
+   * @param type
+   * @param data
+   * @returns void
+   */
   function showCreateEdit(display, type, data = []) {
     modalType.value = type;
     modalData.value = data;
@@ -204,6 +264,11 @@ export default function useResource(
     }
   }
 
+  /**
+   * Get resource fields
+   * @param fields
+   * @returns any
+   */
   function getResourceFields(fields: any) {
     let allFields: any = [];
 
@@ -221,6 +286,10 @@ export default function useResource(
     return allFields;
   }
 
+  /**
+   * Get resource data
+   * @returns Promise<void>
+   */
   async function getResourceData() {
     if (resource?.name) {
       isLoading.value = true;
@@ -278,25 +347,25 @@ export default function useResource(
     apiUrl,
     bulkRemove,
     create,
+    getResourceData,
+    getResourceFields,
+    isLoading,
     lazyParams,
     modalData,
     modalType,
-    isLoading,
-    remove,
-    resource,
-    route,
-    routeId,
-    showModal,
-    update,
-    getResourceData,
-    getResourceFields,
-    showCreateEdit,
-    showDeletePopup,
-    resourceData,
-    searchableColumns,
+    onFilter,
     onPage,
     onSort,
-    onFilter,
+    remove,
+    resource,
+    resourceData,
+    route,
+    routeId,
+    searchableColumns,
+    showCreateEdit,
+    showDeletePopup,
+    showModal,
     totalRecords,
+    update,
   };
 }

@@ -34,13 +34,12 @@ interface IState {
 /**
  * Function to figure out the correct apiUrl
  */
-function getApiUrl(apiUrl, action, payload) {
+function getApiUrl(apiUrl, action, params) {
   const replaceUrlId = (url, id) => {
     return url.replace(":id", id);
   };
-  const params = payload?.params ? payload?.params : {};
-  const routeId = payload?.routeId ? payload?.routeId : null;
-  const subId = payload?.subId ? payload?.subId : null;
+  const routeId = params?.routeId ? params?.routeId : null;
+  const subId = params?.subId ? params?.subId : null;
 
   apiUrl = replaceUrlId(apiUrl, routeId ? routeId : subId);
 
@@ -167,6 +166,7 @@ const useResourceStore = function (resource) {
           const newApiUrl = payload?.apiUrl
             ? payload?.apiUrl
             : resourceStore.resource.apiUrl;
+
           let response = await ApiService[
             [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
               ? "get"
@@ -181,7 +181,7 @@ const useResourceStore = function (resource) {
           // otherwise use the response itself
           const data = response.data?.data?.data
             ? response.data.data.data
-            : response.data;
+            : response.data.data;
 
           /**
            * Process data into store for caching

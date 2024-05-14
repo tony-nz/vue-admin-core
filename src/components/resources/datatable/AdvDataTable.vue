@@ -463,7 +463,6 @@ export default defineComponent({
         });
       }
 
-      console.log("onMount");
       getResourceData();
     });
 
@@ -487,7 +486,6 @@ export default defineComponent({
     // }
 
     watch(refresh, (val) => {
-      console.log("refresh");
       getResourceData();
     });
 

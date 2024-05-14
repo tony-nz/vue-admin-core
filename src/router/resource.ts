@@ -107,13 +107,13 @@ export const useResourceRoutes = function (resource) {
                */
               try {
                 const { data } = await store.getOne({
-                  params: { id },
+                  id,
                 });
 
                 /**
                  * Insert model into route & resource store
                  */
-                store.setItem({}, data);
+                store.setItem(store, data);
 
                 if (to.params.id) {
                   setTitle(to, action, data);
