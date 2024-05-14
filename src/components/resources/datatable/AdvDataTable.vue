@@ -277,6 +277,10 @@ export default defineComponent({
     CreateUpdateDialog,
   },
   props: {
+    apiUrl: {
+      type: String,
+      required: false,
+    },
     filters: {
       type: Object,
     },
@@ -362,6 +366,7 @@ export default defineComponent({
      * Resource data
      */
     const {
+      apiUrl,
       getResourceData,
       getResourceFields,
       isLoading,
@@ -429,10 +434,10 @@ export default defineComponent({
 
     onMounted(async () => {
       /**
-       * Check resource.lazy and lazy load data
+       * Check for props apiUrl
        */
-      if (props.resource.lazy) {
-        lazyLoad();
+      if (props.apiUrl) {
+        apiUrl.value = props.apiUrl;
       }
 
       /**
@@ -454,6 +459,13 @@ export default defineComponent({
         Object.assign(filters.value, {
           active: { value: true, matchMode: FilterMatchMode.EQUALS },
         });
+      }
+
+      /**
+       * Check resource.lazy and lazy load data
+       */
+      if (props.resource.lazy) {
+        lazyLoad();
       }
 
       getResourceData();
