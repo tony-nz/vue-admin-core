@@ -86,9 +86,6 @@ class ApiService {
     // slug = "" as string,
     params = [] as AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    console.log("get");
-    console.log("resource", resource);
-    console.log("params", params);
     return ApiService.vueInstance.axios
       .get(`${resource}`, { params })
       .catch((error) => {
