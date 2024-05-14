@@ -42,13 +42,14 @@
           />
         </div>
         <slot name="toolbar"></slot>
-        <div v-if="show.refresh" class="flex gap-2">
-          <Button
-            @click="getResourceData"
-            class="p-button-text p-button-plain h-full"
-            icon="pi pi-refresh"
-          />
-        </div>
+        <button
+          v-if="show.refresh"
+          type="button"
+          class="fill-white p-2 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          @click="getResourceData"
+        >
+          <span class="text-white pi pi-refresh mx-0" data-pc-section="icon" />
+        </button>
         <button
           v-if="show.select && toolbar?.bulkDeleteBtn != false"
           @click="showDeletePopup({ $event, selectedResources })"
@@ -315,7 +316,7 @@ export default defineComponent({
         actionDefaults: true,
         active: false,
         header: true,
-        loading: false,
+        loading: true,
         refresh: true,
         select: false,
         toolbar: true,
