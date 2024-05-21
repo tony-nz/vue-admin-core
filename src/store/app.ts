@@ -1,12 +1,12 @@
 import { App, Breadcrumb } from "../core/types/AppTypes";
 import { defineStore } from "pinia";
-import { initResources } from "../core/plugins/resources";
+import { toast, type ToastOptions } from "vue3-toastify";
+import { version } from "../../package.json";
 import ApiService from "../core/services/ApiService";
+import Echo from "laravel-echo";
 import getAppConfig from "../core/config/AppConfig";
 import i18n from "../core/plugins/i18n";
 import objectPath from "object-path";
-import { toast, type ToastOptions } from "vue3-toastify";
-import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import UserMenu from "../core/types/UserMenuTypes";
 import UserAppMenu from "../core/types/UserAppsMenuTypes";
@@ -19,6 +19,7 @@ const useAppStore = defineStore({
       loading: false,
       refresh: false,
     },
+    appVersion: version || "0",
     breadcrumbs: {} as Breadcrumb,
     errors: [],
     config: getAppConfig,
@@ -45,21 +46,36 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     async login(credentials, router) {
-      await ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.getAppConfig("api.login"), credentials)
-          .then(({ data }) => {
-            this.verifyAuth(router)
-              .then(() => {
-                resolve();
+        ApiService.get(this.getAppConfig("api.csrfCookie"))
+          .then(() => {
+            ApiService.post(this.getAppConfig("api.login"), credentials)
+              .then(({ data }) => {
+                this.verifyAuth(router)
+                  .then(() => {
+                    resolve(data);
+                  })
+                  .catch(({ response }) => {
+                    reject(response);
+                  });
               })
-              .catch(() => {
-                reject();
+              .catch(({ response }) => {
+                this.setErrors(response.data.error);
+                this.showToast({
+                  summary: "Error",
+                  message: "Failed to login user",
+                  severity: "error",
+                });
+                reject(response);
               });
           })
-          .catch(({ response }) => {
-            this.setErrors(response.data.error);
-            reject(response);
+          .catch(({ error }) => {
+            this.showToast({
+              summary: "Error",
+              message: "Failed to obtain CSRF token",
+              severity: "error",
+            });
+            reject(error);
           });
       });
     },
@@ -68,15 +84,30 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     loginOauth() {
-      ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.getAppConfig("oauth.login"))
-          .then(({ data }) => {
-            window.location.href = data.url;
+        ApiService.get(this.getAppConfig("api.csrfCookie"))
+          .then(() => {
+            ApiService.get(this.getAppConfig("oauth.login"))
+              .then(({ data }) => {
+                window.location.href = data.url;
+              })
+              .catch(({ response }) => {
+                this.setErrors(response.data.errors);
+                this.showToast({
+                  summary: "Error",
+                  message: "Failed to login with OAuth",
+                  severity: "error",
+                });
+                reject();
+              });
           })
-          .catch(({ response }) => {
-            this.setErrors(response.data.errors);
-            reject();
+          .catch(({ error }) => {
+            this.showToast({
+              summary: "Error",
+              message: "Failed to obtain CSRF token",
+              severity: "error",
+            });
+            reject(error);
           });
       });
     },
@@ -87,16 +118,31 @@ const useAppStore = defineStore({
      * @returns Promise<void>
      */
     loginOauthCallback(payload, router) {
-      ApiService.get(this.getAppConfig("api.csrfCookie"));
       return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.getAppConfig("oauth.callback"), payload)
-          .then(({ data }) => {
-            this.verifyAuth(router);
-            resolve();
+        ApiService.get(this.getAppConfig("api.csrfCookie"))
+          .then(() => {
+            ApiService.post(this.getAppConfig("oauth.callback"), payload)
+              .then(({ data }) => {
+                this.verifyAuth(router);
+                resolve(data);
+              })
+              .catch(({ response }) => {
+                this.setErrors(response.data.errors);
+                this.showToast({
+                  summary: "Error",
+                  message: "Failed to login with OAuth",
+                  severity: "error",
+                });
+                reject();
+              });
           })
-          .catch(({ response }) => {
-            this.setErrors(response.data.errors);
-            reject();
+          .catch(({ error }) => {
+            this.showToast({
+              summary: "Error",
+              message: "Failed to obtain CSRF token",
+              severity: "error",
+            });
+            reject(error);
           });
       });
     },
@@ -107,12 +153,18 @@ const useAppStore = defineStore({
     logout() {
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.getAppConfig("api.logout"), {})
-          .then(() => {
+          .then(({ data }) => {
             this.purgeAuth();
-            resolve();
+            resolve(data);
           })
-          .catch(() => {
-            reject();
+          .catch(({ response }) => {
+            this.setErrors(response.data.errors);
+            this.showToast({
+              summary: "Error",
+              message: "Failed to logout user",
+              severity: "error",
+            });
+            reject(response);
           });
       });
     },
@@ -127,11 +179,16 @@ const useAppStore = defineStore({
         ApiService.post(this.getAppConfig("api.register"), credentials)
           .then(({ data }) => {
             this.setAuth(data, router);
-            resolve();
+            resolve(data);
           })
           .catch(({ response }) => {
             this.setErrors(response.data.errors);
-            reject();
+            this.showToast({
+              summary: "Error",
+              message: "Failed to register user",
+              severity: "error",
+            });
+            reject(response);
           });
       });
     },
@@ -150,7 +207,12 @@ const useAppStore = defineStore({
           })
           .catch(({ response }) => {
             this.setErrors(response.data.errors);
-            reject();
+            this.showToast({
+              summary: "Error",
+              message: "Failed to send password reset email",
+              severity: "error",
+            });
+            reject(response);
           });
       });
     },
@@ -173,7 +235,12 @@ const useAppStore = defineStore({
               this.setErrors(response.message);
             }
             this.purgeAuth();
-            reject();
+            this.showToast({
+              summary: "Error",
+              message: "Failed to verify authentication",
+              severity: "error",
+            });
+            reject(response);
           });
       });
     },
@@ -282,6 +349,11 @@ const useAppStore = defineStore({
             resolve();
           })
           .catch(({ response }) => {
+            this.showToast({
+              summary: "Error",
+              message: "Failed to update settings",
+              severity: "error",
+            });
             this.setErrors(response.data.errors);
             reject();
           });
@@ -300,6 +372,11 @@ const useAppStore = defineStore({
           response.data.data ? response.data.data : response.data
         );
       } catch (e) {
+        this.showToast({
+          summary: "Error",
+          message: "Failed to retrieve settings",
+          severity: "error",
+        });
         console.log(e);
       }
 
@@ -480,13 +557,23 @@ const useAppStore = defineStore({
           }
         }
       } catch (e) {
-        // TODO ERROR LOG
+        this.showToast({
+          summary: "Error",
+          message: "Failed to find resource",
+          severity: "error",
+        });
         console.log(e);
       }
       return [];
     },
   },
   getters: {
+    /**
+     * Get app version
+     */
+    getAppVersion(): string {
+      return this.appVersion;
+    },
     /**
      * Get config from app config
      * @returns {function(path, defaultValue): *}

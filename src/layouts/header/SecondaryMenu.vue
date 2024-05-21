@@ -30,7 +30,9 @@
                         (isActive || isExactActive) && activeClass,
                       ]"
                     >
-                      <div class="flex flex-row items-center justify-center">
+                      <div
+                        class="flex flex-row items-center justify-center dark:text-slate-800"
+                      >
                         <div v-if="item.icon" class="mr-2">
                           <inline-svg :src="item.icon" class="h-4 w-4" />
                         </div>
@@ -44,7 +46,9 @@
                     target="_blank"
                     :class="defaultClass"
                   >
-                    <div class="flex flex-row items-center justify-center">
+                    <div
+                      class="flex flex-row items-center justify-center dark:text-white"
+                    >
                       <div
                         v-if="item.icon"
                         :class="{ 'mr-2': item.label.length > 0 }"

@@ -5,7 +5,7 @@
     class="flex flex-col w-full max-h-full overflow-hidden"
     :class="{
       'bg-gray-200': !darkMode,
-      'bg-slate-800 dark': darkMode,
+      'bg-slate-700 dark': darkMode,
     }"
   >
     <Header>

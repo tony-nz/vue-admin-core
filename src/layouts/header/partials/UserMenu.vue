@@ -58,7 +58,7 @@
       >
         <div
           v-if="userMenuConfig.header"
-          class="px-4 py-3 rounded-t-lg bg-blue-500"
+          class="px-4 py-3 rounded-t-lg bg-primary-500 dark:bg-slate-800 shadow"
         >
           <p class="text-sm text-gray-100">Signed in as</p>
           <p class="text-sm font-medium text-white truncate">
@@ -66,12 +66,16 @@
           </p>
         </div>
         <div v-for="(item, index) in userMenuConfig.menu" :key="index">
-          <div v-for="(menu, idx) in item.items" :key="idx" class="bg-white">
+          <div
+            v-for="(menu, idx) in item.items"
+            :key="idx"
+            class="bg-white dark:bg-slate-700"
+          >
             <router-link
               v-if="menu.to"
               :to="menu.to"
               custom
-              v-slot="{ navigate, isActive, isExactActive }"
+              v-slot="{ navigate }"
             >
               <button @click="processMenuCommand(navigate)" :class="mnuClass">
                 {{ translate(menu.label) }}
@@ -89,7 +93,7 @@
         </div>
         <div
           v-if="userMenuConfig.footer"
-          class="flex justify-end p-2 bg-white rounded-b-lg"
+          class="flex justify-end p-2 bg-white dark:bg-slate-600 rounded-b-lg"
         >
           <button @click="toggleToolbar()" :class="btnClass">
             <span class="hover:fill-gray-400 fill-primary-400">
@@ -188,12 +192,12 @@ export default defineComponent({
     btnClass: {
       type: String,
       default:
-        "w-8 ml-2 p-2 rounded-lg bg-opacity-40 bg-gray-200 hover:bg-gray-200 hover:bg-opacity-60",
+        "w-8 ml-2 p-2 rounded-lg bg-opacity-40 bg-gray-200 dark:bg-slate-900 hover:bg-gray-200 hover:bg-opacity-60",
     },
     mnuClass: {
       type: String,
       default:
-        "w-full text-left hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm",
+        "w-full text-left hover:bg-gray-50 text-gray-700 dark:text-white block px-4 py-2 text-sm",
     },
   },
   setup() {

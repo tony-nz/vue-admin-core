@@ -9,6 +9,12 @@ export async function initRouter(router) {
    * @param next
    */
   router.beforeEach(async (to, from, next) => {
+    const whitelist = ["/login", "/register", "/forgot-password"];
+
+    if (whitelist.includes(to.path)) {
+      return next();
+    }
+
     if (to.matched.some((record) => record.meta.requiresAuth)) {
       const appStore = useAppStore();
 

@@ -52,6 +52,7 @@ interface Breadcrumb {
 
 interface App {
   api: API;
+  appVersion: string;
   breadcrumbs: Breadcrumb;
   config: Config;
   errors: string[];

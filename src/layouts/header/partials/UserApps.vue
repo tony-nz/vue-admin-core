@@ -38,9 +38,9 @@
       <transition name="mega-menu-fade">
         <div
           v-show="isVisible"
-          class="mega-menu absolute normal-case font-normal bg-white shadow-md rounded-lg overflow-hidden border w-160 z-30 right-0"
+          class="mega-menu absolute normal-case font-normal bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden w-160 z-30 right-0"
         >
-          <div class="flex flex-col lg:flex-row px-8 py-6 border-b -mx-4 pb-0">
+          <div class="flex flex-col lg:flex-row px-8 py-6 -mx-4 pb-0">
             <ul class="w-full grid grid-cols-2 gap-4 px-4">
               <template
                 v-for="(item, index) in userAppsConfig.grid"
@@ -81,7 +81,7 @@
               </template>
             </ul>
           </div>
-          <ul class="bg-gray-100 px-8 py-8">
+          <ul class="bg-gray-100 dark:bg-slate-700 p-8 rounded-b-md">
             <li
               v-for="(item, index) in userAppsConfig.list"
               :key="index"
