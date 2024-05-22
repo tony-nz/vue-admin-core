@@ -3,8 +3,8 @@
     <Dialog
       :header="
         type == 'create'
-          ? 'Create ' + getSingularizedLabel(resource.name)
-          : 'Update ' + getSingularizedLabel(resource.name)
+          ? 'Create ' + resource.label
+          : 'Update ' + resource.label
       "
       v-model:visible="showModal"
       :modal="true"
