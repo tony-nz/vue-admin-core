@@ -23,7 +23,7 @@ export default function useResource(
   const lazyParams: Ref<any> = ref({});
   const modalData = ref([]);
   const modalType = ref();
-  const props = ref(dtProps);
+  const props: any = ref(dtProps);
   const resourceData = ref();
   const resourceStore = useResourceStore(resource)();
   const route = useRoute();

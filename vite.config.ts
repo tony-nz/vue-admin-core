@@ -27,7 +27,7 @@ export default defineConfig({
     rollupOptions: {
       external: ["vue", "pinia", "vue-router", "vue-inline-svg"],
       output: {
-        // exports: "named",
+        exports: "named",
         globals: {
           vue: "Vue",
           "vue-inline-svg": "InlineSvg",
@@ -40,7 +40,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@tony-nz/vue-admin-core": "./node_modules/@tony-nz/vue-admin-core",
-      'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+      "vue-i18n": "vue-i18n/dist/vue-i18n.cjs.js",
     },
     dedupe: ["vue"],
   },
