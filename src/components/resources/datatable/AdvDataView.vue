@@ -17,9 +17,115 @@
     :pt="dataViewStyle"
     :dataKey="'id'"
   >
-    <template #header>
-      <div class="flex justify-end">
-        <SelectButton v-model="layout" :options="options" :allowEmpty="false">
+    <template v-if="show.toolbar" #header>
+      <div
+        class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
+      >
+        <div v-if="toolbar?.search != false" class="flex w-full justify-end">
+          <span class="flex w-full relative">
+            <i
+              class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"
+            />
+            <InputText
+              v-model="filters['global'].value"
+              @input="debounce(onFilter, 500)"
+              class="pl-10 font-normal w-full"
+              placeholder="Keyword search"
+            />
+          </span>
+        </div>
+        <div v-if="show.active" class="flex gap-2">
+          <Dropdown
+            v-model="filters['active'].value"
+            :options="activeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Filter by activity"
+            class="w-48"
+          />
+        </div>
+        <slot name="toolbar"></slot>
+        <button
+          v-if="show.refresh"
+          type="button"
+          class="fill-white p-2 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          @click="getResourceData"
+        >
+          <span class="text-white pi pi-refresh mx-0" data-pc-section="icon" />
+        </button>
+        <button
+          v-if="show.select && toolbar?.bulkDeleteBtn != false"
+          @click="showDeletePopup({ $event, selectedResources })"
+          :class="{
+            'bg-primary-500 hover:bg-primary-400 border-gray-400':
+              selectedResources?.length > 0,
+            'bg-gray-300 border-gray-300':
+              selectedResources?.length === 0 || !selectedResources,
+          }"
+          :disabled="selectedResources?.length === 0 || !selectedResources"
+          class="py-2 px-4 border rounded shadow whitespace-nowrap text-white"
+          type="button"
+        >
+          Bulk Delete {{ getSingularizedLabel(resource.label) }}s
+        </button>
+        <button
+          v-if="resource?.create?.modal && toolbar?.createBtn != false"
+          type="button"
+          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          :class="{
+            'fill-white p-2': toolbar?.simpleCreate,
+            'text-white py-2 px-4': !toolbar?.simpleCreate,
+          }"
+          @click="showCreateEdit('dialog', 'create', modalData)"
+        >
+          <span v-if="!toolbar?.simpleCreate"
+            >{{ translate("va.actions.create") }}
+            {{ getSingularizedLabel(resource.label) }}</span
+          >
+          <span v-else>
+            <svg
+              class="h-4 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+              />
+            </svg>
+          </span>
+        </button>
+        <router-link
+          v-else-if="resource?.create?.page && toolbar?.createBtn != false"
+          :to="resource.url + '/create'"
+          type="button"
+          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          :class="{
+            'fill-white p-2': toolbar?.simpleCreate,
+            'text-white py-2 px-4': !toolbar?.simpleCreate,
+          }"
+        >
+          <span v-if="!toolbar?.simpleCreate"
+            >{{ translate("va.actions.create") }}
+            {{ getSingularizedLabel(resource.label) }}</span
+          >
+          <span v-else>
+            <svg
+              class="h-4 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"
+            >
+              <path
+                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+              />
+            </svg>
+          </span>
+        </router-link>
+        <SelectButton
+          v-model="layout"
+          :options="options"
+          :allowEmpty="false"
+          class="flex flex-row"
+        >
           <template #option="{ option }">
             <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-th-large']" />
           </template>
@@ -85,6 +191,40 @@
                   </template>
                 </ActionColumn>
               </div>
+            </div>
+          </div>
+          <div
+            v-if="show.create"
+            class="w-full sm:w-1/2 md:w-4/12 xl:w-1/2 p-2 group"
+          >
+            <div :class="gridClass" class="h-full">
+              <button
+                v-if="resource?.create?.modal && show?.create"
+                class="flex flex-col w-full h-full space-y-4 justify-evenly items-center"
+                type="button"
+                @click="showCreateEdit('dialog', 'create', modalData)"
+              >
+                <slot name="gridCreate">
+                  <!-- Default content if no slot is provided -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 448 512"
+                    class="h-32"
+                  >
+                    <path
+                      class="fill-primary-500 group-hover:fill-primary-400"
+                      d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
+                    />
+                  </svg>
+                  <button
+                    type="button"
+                    class="bg-primary-500 group-hover:bg-primary-400 rounded shadow whitespace-nowrap text-white py-2 px-4"
+                  >
+                    {{ translate("va.actions.create") }}
+                    {{ getSingularizedLabel(resource.label) }}
+                  </button>
+                </slot>
+              </button>
             </div>
           </div>
         </div>
@@ -171,6 +311,7 @@ interface Show {
   actions: boolean;
   actionDefaults: boolean;
   active: boolean;
+  create: boolean;
   header: boolean;
   loading: boolean;
   toolbar: boolean;
@@ -246,6 +387,7 @@ export default defineComponent({
         actions: true,
         actionDefaults: true,
         active: false,
+        create: true,
         header: true,
         loading: true,
         refresh: true,
@@ -394,12 +536,13 @@ export default defineComponent({
           "font-semibold",
 
           // Spacing
-          "p-6",
+          "p-1",
 
           // Color
-          "text-surface-800 dark:text-white/80",
-          "bg-surface-0 dark:bg-surface-800",
-          "border-surface-200 dark:border-surface-700 border-b",
+          // "text-surface-800 dark:text-white/80",
+          // "bg-slate-100 dark:bg-surface-800",
+          // "border-surface-200 dark:border-surface-700 border-b",
+          "border-b border-x-0 bg-slate-100 dark:bg-slate-800 border-surface-300 dark:border-surface-600 text-surface-700 dark:text-white/80",
         ],
       },
     });
