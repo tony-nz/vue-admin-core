@@ -1,7 +1,7 @@
 <template>
   <div :class="flex" class="flex gap-2">
     <slot name="actionCol" :data="data" />
-    <div v-if="resource.edit.modal && showDefaults">
+    <div v-if="resource.edit.modal && showDefaults && canAction('update')">
       <button
         @click="$emit('showCreateEdit', 'dialog', 'update', data)"
         v-tooltip="'Edit ' + resource.singularName.toLowerCase()"
@@ -22,7 +22,7 @@
         </svg>
       </button>
     </div>
-    <div v-if="resource.edit.page && showDefaults">
+    <div v-if="resource.show.page && showDefaults && canAction('update')">
       <router-link
         :to="{ name: resource.singularName + 'Show', params: { id: data.id } }"
         v-tooltip="'Open ' + resource.singularName.toLowerCase()"
@@ -44,7 +44,7 @@
         </button>
       </router-link>
     </div>
-    <div v-if="resource.delete && showDefaults">
+    <div v-if="resource.delete && showDefaults && canAction('delete')">
       <button
         @click="$emit('deletePopup', { $event, data })"
         v-tooltip="'Delete ' + resource.singularName.toLowerCase()"
@@ -109,6 +109,8 @@ export default defineComponent({
     ActionBtn,
   },
   setup(props) {
+    const { canAction } = props.resource;
+
     const btnClass = computed(() => {
       return "transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 hover:bg-primary-400 dark:bg-slate-800 hover:fill-white p-2 shadow";
     });
@@ -124,6 +126,7 @@ export default defineComponent({
     return {
       btnClass,
       btnDelClass,
+      canAction,
       getData,
       getGridColLength,
     };

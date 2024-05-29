@@ -31,7 +31,7 @@
             />
           </span>
         </div>
-        <div v-if="show.active" class="flex gap-2">
+        <div v-if="toolbar?.active" class="flex gap-2">
           <Dropdown
             v-model="filters['active'].value"
             :options="activeOptions"
@@ -43,7 +43,7 @@
         </div>
         <slot name="toolbar"></slot>
         <button
-          v-if="show.refresh"
+          v-if="toolbar?.refresh"
           type="button"
           class="fill-white p-2 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
           @click="getResourceData"
@@ -51,7 +51,7 @@
           <span class="text-white pi pi-refresh mx-0" data-pc-section="icon" />
         </button>
         <button
-          v-if="show.select && toolbar?.bulkDeleteBtn != false"
+          v-if="toolbar?.select"
           @click="showDeletePopup({ $event, selectedResources })"
           :class="{
             'bg-primary-500 hover:bg-primary-400 border-gray-400':
@@ -66,7 +66,9 @@
           Bulk Delete {{ getSingularizedLabel(resource.label) }}s
         </button>
         <button
-          v-if="resource?.create?.modal && toolbar?.createBtn != false"
+          v-if="
+            resource?.create?.modal && toolbar?.create && canAction('create')
+          "
           type="button"
           class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
           :class="{
@@ -92,7 +94,9 @@
           </span>
         </button>
         <router-link
-          v-else-if="resource?.create?.page && toolbar?.createBtn != false"
+          v-else-if="
+            resource?.create?.page && toolbar?.create && canAction('create')
+          "
           :to="resource.url + '/create'"
           type="button"
           class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
@@ -243,9 +247,12 @@ import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
 
 interface DataTableToolbar {
+  active: Boolean;
   bulkDeleteBtn: Boolean;
-  createBtn: Boolean;
+  create: Boolean;
+  refresh: Boolean;
   search: Boolean;
+  select: Boolean;
   simpleCreate: Boolean;
 }
 
@@ -386,6 +393,7 @@ export default defineComponent({
     } = useResource(props.resource, filters, props, {
       params: props.params,
     });
+    const { canAction } = props.resource;
 
     const onLocalRowExpand = (event) => {
       const resource = resourceData.value.find(
@@ -477,6 +485,7 @@ export default defineComponent({
 
     return {
       activeOptions,
+      canAction,
       changeActive,
       debounce,
       dtOptions,

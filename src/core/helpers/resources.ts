@@ -3,14 +3,31 @@ import i18n from "../plugins/i18n";
 import useAppStore from "../../store/app";
 
 /**
+ * Check if value is empty
+ * @param value
+ * @returns {boolean}
+ */
+const isEmpty = (value) => {
+  if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+  if (value && typeof value === "object") {
+    return Object.keys(value).length === 0;
+  }
+  return !value;
+};
+
+/**
  * Permissions helper & directive
  */
-const can = (permissions) => {
-  if (Array.isArray(permissions)) {
-    return permissions;
+const can = (permission) => {
+  const appStore = useAppStore();
+
+  if (!permission) {
+    return false;
   }
-  return true;
-  // return appStore.getPermissions;
+
+  return appStore.getPermissions.includes(permission);
 };
 
 /**
@@ -114,19 +131,25 @@ const buildResourceConfig = (resource) => {
   /**
    * Get valid actions
    */
-  const actions = ["list", "show", "create", "edit", "delete"].filter(
-    (name) => {
-      if ((resource.actions || []).length) {
-        return resource.actions.includes(name);
-      }
-
-      if ((resource.except || []).length) {
-        return !resource.except.includes(name);
-      }
-
-      return true;
+  const actions = [
+    "list",
+    "show",
+    "create",
+    "edit",
+    "update",
+    "read",
+    "delete",
+  ].filter((name) => {
+    if ((resource.actions || []).length) {
+      return resource.actions.includes(name);
     }
-  );
+
+    if ((resource.except || []).length) {
+      return !resource.except.includes(name);
+    }
+
+    return true;
+  });
   const nameKey = `resources.${resource.name}.name`;
 
   const getName = (count) => {
@@ -184,17 +207,19 @@ const buildResourceConfig = (resource) => {
 
       /**
        * Get permissions for asked action
+       * resource.permissions = [{ role: 'admin', actions: ['list', 'show', 'create', 'edit', 'delete'] }]
        */
-      const permissions = (resource.permissions || [])
-        .filter((p) => {
-          return typeof p === "string" || p.actions.includes(action);
-        })
-        .map((p) => {
-          return typeof p === "string" ? p : p.name;
-        });
+      const { getRoles } = useAppStore();
 
-      // Test if current user can access
-      return permissions.length && can(permissions);
+      for (let i = 0; i < resource.permissions.length; i++) {
+        if (getRoles.includes(resource.permissions[i].role)) {
+          if (resource.permissions[i].actions.includes(action)) {
+            return can(action + "-" + resource.name);
+          }
+        }
+      }
+
+      return false;
     },
   };
 
