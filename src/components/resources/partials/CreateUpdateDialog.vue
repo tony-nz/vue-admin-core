@@ -145,7 +145,8 @@ export default defineComponent({
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
           await create(modalData.value, dataId.value, props.subId)
-            .then(() => {
+            .then((repsonse) => {
+              console.log("repsonse", repsonse);
               emit("close");
             })
             .catch((e) => {
@@ -155,7 +156,8 @@ export default defineComponent({
             });
         } else if (modalType.value == "update") {
           await update(modalData.value, dataId.value, props.subId)
-            .then(() => {
+            .then((repsonse) => {
+              console.log("repsonse", repsonse);
               emit("close");
             })
             .catch((e) => {
@@ -207,9 +209,11 @@ export default defineComponent({
       dataValues.value = props.fieldValues;
 
       // set modalData
-      // if (props.type == "update") {
-      modalData.value = props.data;
-      // }
+      if (props.type == "update") {
+        modalData.value = props.data;
+      } else {
+        modalData.value = {};
+      }
 
       // show modal
       showModal.value = true;

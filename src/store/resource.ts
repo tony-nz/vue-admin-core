@@ -175,8 +175,11 @@ const useResourceStore = function (resource) {
             getApiUrl(newApiUrl, action, payload),
             params,
             action === UPDATE ? payload.params : null
-          );
+          ).catch((response) => {
+            return Promise.reject(response);
+          });
 
+          console.log("After apiservice");
           // if the response contains a data object, use that,
           // otherwise use the response itself
           const data = response.data?.data?.data
@@ -208,6 +211,7 @@ const useResourceStore = function (resource) {
           const message = e.response?.data?.message || false;
           appStore.setApiLoading(false);
           resourceStore.showError(resourceStore, e.message, message);
+          return Promise.reject(e);
         }
       })
   );

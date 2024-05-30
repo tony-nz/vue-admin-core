@@ -125,10 +125,12 @@ export default function useResource(
             apiUrl: apiUrl.value,
             subId: subId,
           })
-          .then(() => {
-            resolve();
+          .then((response) => {
+            console.log("create response", response);
+            resolve(response);
           })
           .catch((e) => {
+            console.log("create error", e);
             reject(e);
           });
       });
@@ -153,8 +155,9 @@ export default function useResource(
             apiUrl: apiUrl.value,
             subId: subId,
           })
-          .then(() => {
-            resolve();
+          .then((response) => {
+            console.log("response");
+            resolve(response);
           })
           .catch((e) => {
             reject(e);
@@ -179,8 +182,8 @@ export default function useResource(
             apiUrl: apiUrl.value,
             subId: subId,
           })
-          .then(() => {
-            resolve();
+          .then((response) => {
+            resolve(response);
           })
           .catch((e) => {
             reject(e);
@@ -205,8 +208,8 @@ export default function useResource(
             apiUrl: apiUrl.value,
             subId: subId,
           })
-          .then(() => {
-            resolve();
+          .then((response) => {
+            resolve(response);
           })
           .catch((e) => {
             reject(e);
