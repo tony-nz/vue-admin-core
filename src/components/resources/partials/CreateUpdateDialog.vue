@@ -206,7 +206,7 @@ export default defineComponent({
 
     onMounted(() => {
       dataId.value = props.data[props.primaryKey];
-      dataValues.value = props.fieldValues;
+      dataValues.value = props.data;
 
       // set modalData
       if (props.type == "update") {

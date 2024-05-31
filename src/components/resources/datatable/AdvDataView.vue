@@ -200,7 +200,7 @@
             <div :class="gridClass" class="h-full">
               <button
                 v-if="resource?.create?.modal && show?.create"
-                class="flex flex-col w-full h-full space-y-4 justify-evenly items-center"
+                class="flex flex-col w-full h-full p-8 space-y-4 justify-evenly items-center"
                 type="button"
                 @click="showCreateEdit('dialog', 'create', modalData)"
               >
