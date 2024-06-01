@@ -126,11 +126,9 @@ export default function useResource(
             subId: subId,
           })
           .then((response) => {
-            console.log("create response", response);
             resolve(response);
           })
           .catch((e) => {
-            console.log("create error", e);
             reject(e);
           });
       });
@@ -156,7 +154,6 @@ export default function useResource(
             subId: subId,
           })
           .then((response) => {
-            console.log("response");
             resolve(response);
           })
           .catch((e) => {
@@ -336,6 +333,7 @@ export default function useResource(
           })
           .then((response) => {
             resourceData.value = response.data;
+            totalRecords.value = response.data.length;
             return response.data;
           })
           .catch((e) => {

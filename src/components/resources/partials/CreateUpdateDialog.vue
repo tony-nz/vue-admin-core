@@ -146,7 +146,6 @@ export default defineComponent({
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
           await create(modalData.value, dataId.value, props.subId)
             .then((repsonse) => {
-              console.log("repsonse", repsonse);
               emit("close");
             })
             .catch((e) => {
@@ -157,7 +156,6 @@ export default defineComponent({
         } else if (modalType.value == "update") {
           await update(modalData.value, dataId.value, props.subId)
             .then((repsonse) => {
-              console.log("repsonse", repsonse);
               emit("close");
             })
             .catch((e) => {
