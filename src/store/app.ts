@@ -240,7 +240,7 @@ const useAppStore = defineStore({
               message: "Failed to verify authentication",
               severity: "error",
             });
-            // reject(response);
+            reject(response);
           });
       });
     },
