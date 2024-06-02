@@ -48,6 +48,7 @@
           class="p-button-text"
         />
         <Button
+          :disabled="submit"
           :label="type === 'create' ? 'Create' : 'Update'"
           icon="pi pi-check"
           class="btn bg-primary-500"
@@ -61,7 +62,7 @@
 
 <script>
 import useResource from "../../../composables/useResource";
-import { computed, defineComponent, onMounted, watch, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useAppStore from "../../../store/app";
 import useResourceStore from "../../../store/resource";
@@ -122,7 +123,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const dataId = ref();
-    const dataValues = ref();
+    const fieldValues = ref();
     const modalData = ref();
     const modalType = ref(props.type);
     const showModal = ref(false);
@@ -132,15 +133,19 @@ export default defineComponent({
     const { create, update } = useResource(props.resource);
 
     const validated = async (valid, data = null) => {
+      console.log("validated", valid, data);
       modalData.value = data;
       // clear errors
       errors.value = [];
+      console.log("modalData 1", modalData.value);
 
       if (valid) {
-        if (dataValues.value) {
-          // add dataValues to modalData
-          modalData.value = { ...modalData.value, ...dataValues.value };
+        if (fieldValues.value) {
+          // add fieldValues to modalData
+          modalData.value = { ...modalData.value, ...fieldValues.value };
         }
+
+        console.log("modalData 2", modalData.value);
 
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {
@@ -149,9 +154,14 @@ export default defineComponent({
               emit("close");
             })
             .catch((e) => {
-              Object.keys(e.response.data.errors).forEach((key, index) => {
-                errors.value[index] = e.response.data.errors[key][0];
-              });
+              if (e.response.errors) {
+                Object.keys(e.response.data.errors).forEach((key, index) => {
+                  errors.value[index] = e.response.data.errors[key][0];
+                });
+              } else if (e.message) {
+                errors.value[0] = e.message;
+              }
+              submit.value = false;
             });
         } else if (modalType.value == "update") {
           await update(modalData.value, dataId.value, props.subId)
@@ -159,9 +169,14 @@ export default defineComponent({
               emit("close");
             })
             .catch((e) => {
-              Object.keys(e.response.data.errors).forEach((key, index) => {
-                errors.value[index] = e.response.data.errors[key][0];
-              });
+              if (e.response.errors) {
+                Object.keys(e.response.data.errors).forEach((key, index) => {
+                  errors.value[index] = e.response.data.errors[key][0];
+                });
+              } else if (e.message) {
+                errors.value[0] = e.message;
+              }
+              submit.value = false;
             });
         }
         // this.$emit("close");
@@ -204,7 +219,7 @@ export default defineComponent({
 
     onMounted(() => {
       dataId.value = props.data[props.primaryKey];
-      dataValues.value = props.data;
+      fieldValues.value = props.fieldValues;
 
       // set modalData
       if (props.type == "update") {
@@ -219,7 +234,6 @@ export default defineComponent({
 
     return {
       dataId,
-      dataValues,
       errors,
       fetchData,
       getSingularizedLabel,
