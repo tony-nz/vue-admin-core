@@ -240,7 +240,7 @@ const useAppStore = defineStore({
               message: "Failed to verify authentication",
               severity: "error",
             });
-            reject(response);
+            // reject(response);
           });
       });
     },
@@ -346,7 +346,12 @@ const useAppStore = defineStore({
         ApiService.put(this.getAppConfig("api.settings"), payload)
           .then(({ data }) => {
             this.setSettings(data.data);
-            resolve();
+            this.showToast({
+              summary: "Success",
+              message: "Settings saved successfully",
+              severity: "success",
+            });
+            resolve(data);
           })
           .catch(({ response }) => {
             this.showToast({
@@ -355,7 +360,6 @@ const useAppStore = defineStore({
               severity: "error",
             });
             this.setErrors(response.data.errors);
-            reject();
           });
       });
     },
