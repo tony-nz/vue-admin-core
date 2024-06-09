@@ -1,6 +1,7 @@
 <template>
   <!-- SecondaryMenu starts -->
   <div
+    v-if="hasChild"
     class="w-full mx-auto bg-white dark:bg-slate-800 shadow relative z-10 hidden lg:flex shadow-md"
   >
     <div
@@ -122,6 +123,12 @@ export default defineComponent({
       return active;
     };
 
+    /**
+     * Check to see if mainMenuConfig children have them items property
+     * @returns boolean
+     */
+    const hasChild = mainMenuConfig.some((item) => item.items);
+
     const store = useAppStore();
     const activeClass = ref("text-gray-900 bg-gray-200");
     const defaultClass = ref(
@@ -131,6 +138,7 @@ export default defineComponent({
     return {
       activeClass,
       defaultClass,
+      hasChild,
       store,
       activeTab,
       checkChild,

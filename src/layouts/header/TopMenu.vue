@@ -12,10 +12,16 @@
       class="px-6 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
     >
       <div class="flex w-full content-end">
-        <div class="z-30 pr-32 lg:hidden items-center h-full w-full">
+        <div
+          :class="{ '-mt-[4px]': !hasChild }"
+          class="z-30 pr-32 lg:hidden items-center h-full w-full"
+        >
           <OffCanvas />
         </div>
-        <ul class="pr-32 hidden lg:flex lg:grow items-center h-full">
+        <ul
+          :class="{ '-mt-[4px]': !hasChild }"
+          class="pr-32 hidden lg:flex lg:grow items-center h-full"
+        >
           <div v-if="displayLogo">
             <img
               :src="darkMode ? logoDark : logoLight"
@@ -92,10 +98,10 @@ import {
 } from "../../core/helpers/app";
 import { translate } from "../../core/helpers/functions";
 import { useRouter } from "vue-router";
+import type { MainMenu } from "../../core/types/MainMenuTypes";
 import AppBar from "./AppBar.vue";
 import OffCanvas from "../offcanvas/OffCanvas.vue";
 import InlineSvg from "vue-inline-svg";
-import MainMenu from "../../core/types/MainMenuTypes";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
 import Tab from "../../components/ui/tabs/Tab.vue";
 import useAppStore from "../../store/app";
@@ -139,11 +145,18 @@ export default defineComponent({
       changeBackground(item);
     };
 
+    /**
+     * Check to see if mainMenuConfig children have them items property
+     * @returns boolean
+     */
+    const hasChild = mainMenuConfig.some((item) => item.items);
+
     return {
       activeTab,
       changeBackground,
       darkMode,
       displayLogo,
+      hasChild,
       logoAlt,
       logoClass,
       mainMenuConfig,
