@@ -165,6 +165,7 @@
           :resource="resource"
           :showDefaults="show.actionDefaults"
           @deletePopup="showDeletePopup"
+          @lockPopup="showLockPopup"
           @showCreateEdit="showCreateEdit"
         >
           <template v-slot:actionCol="slotProps">
@@ -378,6 +379,7 @@ export default defineComponent({
       getResourceFields,
       isLoading,
       lazyParams,
+      lock,
       modalData,
       modalType,
       onFilter,
@@ -389,6 +391,7 @@ export default defineComponent({
       showDeletePopup,
       showModal,
       totalRecords,
+      unlock,
       update,
     } = useResource(props.resource, filters, props, {
       params: props.params,
@@ -409,6 +412,20 @@ export default defineComponent({
     const changeActive = async (event: any) => {
       if (event && event.id) {
         await update(event, event.id);
+      }
+    };
+
+    /**
+     * Change lock
+     * @param event
+     */
+    const changeLock = async (event: any) => {
+      if (event && event.id) {
+        if (event.locked) {
+          await unlock(event.id);
+        } else {
+          await lock(event.id);
+        }
       }
     };
 
@@ -487,6 +504,7 @@ export default defineComponent({
       activeOptions,
       canAction,
       changeActive,
+      changeLock,
       debounce,
       dtOptions,
       expandedRows,

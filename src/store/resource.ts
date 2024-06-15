@@ -17,6 +17,8 @@ const {
   GET_NODES,
   GET_ONE,
   GET_TREE,
+  LOCK,
+  UNLOCK,
   MOVE_NODE,
   UPDATE,
   UPDATE_MANY,
@@ -267,6 +269,14 @@ const useResourceStore = function (resource) {
           [UPDATE_MANY]: translate("va.messages.updatedMany", {
             resource: resource.getName(data.length).toLowerCase(),
             count: data?.length ? data.length : 1,
+          }),
+          [LOCK]: translate("va.messages.locked", {
+            resource: resource.getName(1),
+            id: params,
+          }),
+          [UNLOCK]: translate("va.messages.unlocked", {
+            resource: resource.getName(1),
+            id: params,
           }),
         };
         if (

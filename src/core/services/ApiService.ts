@@ -226,11 +226,34 @@ class ApiService {
       .catch((error) => {
         return Promise.reject(error);
       });
-    // return Promise.all(
-    //   params.data.forEach(item => {
-    //     ApiService.vueInstance.axios.delete(`${resource}/${item['id']}`);
-    //   })
-    // );
+  }
+
+  /**
+   * @description Lock a resource
+   * @param resource: string
+   * @param slug: string
+   * @returns Promise<AxiosResponse>
+   */
+  public static lock(resource: string, slug: string): Promise<AxiosResponse> {
+    return ApiService.vueInstance.axios
+      .put(`${resource}/${slug}/lock`)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
+  }
+
+  /**
+   * @description Unlock a resource
+   * @param resource: string
+   * @param slug: string
+   * @returns Promise<AxiosResponse>
+   */
+  public static unlock(resource: string, slug: string): Promise<AxiosResponse> {
+    return ApiService.vueInstance.axios
+      .put(`${resource}/${slug}/unlock`)
+      .catch((error) => {
+        return Promise.reject(error);
+      });
   }
 }
 

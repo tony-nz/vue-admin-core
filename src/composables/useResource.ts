@@ -164,6 +164,56 @@ export default function useResource(
   }
 
   /**
+   * Lock a resource
+   * @param id
+   * @param subId
+   * @returns Promise<void>
+   */
+  function lock(id, subId?: number) {
+    if (id && resourceName) {
+      return new Promise<void>((resolve, reject) => {
+        resourceStore
+          .lock({
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            subId: subId,
+          })
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    }
+  }
+
+  /**
+   * Unlock a resource
+   * @param id
+   * @param subId
+   * @returns Promise<void>
+   */
+  function unlock(id, subId?: number) {
+    if (id && resourceName) {
+      return new Promise<void>((resolve, reject) => {
+        resourceStore
+          .unlock({
+            routeId: routeId.value,
+            apiUrl: apiUrl.value,
+            subId: subId,
+          })
+          .then((response) => {
+            resolve(response);
+          })
+          .catch((e) => {
+            reject(e);
+          });
+      });
+    }
+  }
+
+  /**
    * Remove a resource
    * @param id
    * @param subId
@@ -352,6 +402,7 @@ export default function useResource(
     getResourceFields,
     isLoading,
     lazyParams,
+    lock,
     modalData,
     modalType,
     onFilter,
@@ -367,6 +418,7 @@ export default function useResource(
     showDeletePopup,
     showModal,
     totalRecords,
+    unlock,
     update,
   };
 }
