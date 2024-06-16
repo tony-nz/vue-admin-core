@@ -166,18 +166,13 @@ export default function useResource(
   /**
    * Lock a resource
    * @param id
-   * @param subId
    * @returns Promise<void>
    */
-  function lock(id, subId?: number) {
+  function lock(id) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
-          .lock({
-            routeId: routeId.value,
-            apiUrl: apiUrl.value,
-            subId: subId,
-          })
+          .lock({ params: { id: id } })
           .then((response) => {
             resolve(response);
           })
@@ -191,18 +186,13 @@ export default function useResource(
   /**
    * Unlock a resource
    * @param id
-   * @param subId
    * @returns Promise<void>
    */
-  function unlock(id, subId?: number) {
+  function unlock(id) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
-          .unlock({
-            routeId: routeId.value,
-            apiUrl: apiUrl.value,
-            subId: subId,
-          })
+          .unlock({ params: { id: id } })
           .then((response) => {
             resolve(response);
           })

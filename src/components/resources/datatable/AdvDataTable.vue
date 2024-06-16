@@ -9,6 +9,7 @@
     @onRowExpand="onLocalRowExpand"
     @sort="onSort"
     :loading="show.loading ? isLoading : false"
+    :row-class="rowClass"
     :state-key="stateKey"
     :totalRecords="totalRecords"
     :value="resourceData"
@@ -128,6 +129,7 @@
       v-model:selection="selectedResources"
       selectionMode="multiple"
       headerStyle="width: 3em"
+      :selectable="isRowSelectable"
     />
     <Column
       v-if="show.active"
@@ -140,6 +142,7 @@
         <InputSwitch
           v-model="data.active"
           @update:modelValue="changeActive(data)"
+          :disabled="data.locked"
         />
       </template>
     </Column>
@@ -165,7 +168,7 @@
           :resource="resource"
           :showDefaults="show.actionDefaults"
           @deletePopup="showDeletePopup"
-          @lockPopup="showLockPopup"
+          @changeLock="changeLock"
           @showCreateEdit="showCreateEdit"
         >
           <template v-slot:actionCol="slotProps">
@@ -457,6 +460,25 @@ export default defineComponent({
       );
     };
 
+    /**
+     * Is row selectable
+     * @param rowData
+     */
+    const isRowSelectable = (rowData: any) => {
+      return !rowData.locked;
+    };
+
+    /**
+     * rowClass
+     * @param rowData
+     */
+    const rowClass = (rowData: any) => {
+      return {
+        // "bg-red-100": rowData.locked,
+        locked: rowData.locked,
+      };
+    };
+
     onMounted(async () => {
       /**
        * Check for props apiUrl
@@ -513,6 +535,7 @@ export default defineComponent({
       getResourceFields,
       getSingularizedLabel,
       isLoading,
+      isRowSelectable,
       modalData,
       modalType,
       onFilter,
@@ -520,6 +543,7 @@ export default defineComponent({
       onPage,
       onSort,
       resourceData,
+      rowClass,
       selectedResources,
       showCreateEdit,
       showDeletePopup,

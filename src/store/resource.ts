@@ -123,6 +123,16 @@ function processStoreData(state, action, payload, data) {
       break;
     case UPDATE_MANY:
       break;
+    case LOCK:
+      if (params.id) {
+        state.data.list.find((item) => item.id === params.id).locked = true;
+      }
+      break;
+    case UNLOCK:
+      if (params.id) {
+        state.data.list.find((item) => item.id === params.id).locked = false;
+      }
+      break;
     default:
       break;
   }
@@ -161,7 +171,7 @@ const useResourceStore = function (resource) {
           /**
            * Check action and return correct params
            */
-          params = [DELETE, GET_ONE, UPDATE].includes(action)
+          params = [DELETE, GET_ONE, UPDATE, LOCK, UNLOCK].includes(action)
             ? params.id
             : params;
 

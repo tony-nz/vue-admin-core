@@ -133,19 +133,15 @@ export default defineComponent({
     const { create, update } = useResource(props.resource);
 
     const validated = async (valid, data = null) => {
-      console.log("validated", valid, data);
       modalData.value = data;
       // clear errors
       errors.value = [];
-      console.log("modalData 1", modalData.value);
 
       if (valid) {
         if (fieldValues.value) {
           // add fieldValues to modalData
           modalData.value = { ...modalData.value, ...fieldValues.value };
         }
-
-        console.log("modalData 2", modalData.value);
 
         if (modalType.value == "create") {
           // emit("create", modalData.value, dataId.value, props.subId).then(() => {

@@ -236,7 +236,7 @@ class ApiService {
    */
   public static lock(resource: string, slug: string): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios
-      .put(`${resource}/${slug}/lock`)
+      .post(`${resource}/${slug}/lock`)
       .catch((error) => {
         return Promise.reject(error);
       });
@@ -250,7 +250,7 @@ class ApiService {
    */
   public static unlock(resource: string, slug: string): Promise<AxiosResponse> {
     return ApiService.vueInstance.axios
-      .put(`${resource}/${slug}/unlock`)
+      .post(`${resource}/${slug}/unlock`)
       .catch((error) => {
         return Promise.reject(error);
       });
