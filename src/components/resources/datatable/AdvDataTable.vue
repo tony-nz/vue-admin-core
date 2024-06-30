@@ -27,6 +27,7 @@
             <InputText
               v-model="filters['global'].value"
               @input="debounce(onFilter, 500)"
+              id="dt_search"
               class="pl-10 font-normal w-full"
               placeholder="Keyword search"
             />
@@ -46,7 +47,7 @@
         <button
           v-if="toolbar?.refresh"
           type="button"
-          class="fill-white p-2 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          class="fill-white py-2 px-3 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
           @click="getResourceData"
         >
           <span class="text-white pi pi-refresh mx-0" data-pc-section="icon" />
