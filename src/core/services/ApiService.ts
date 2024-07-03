@@ -20,7 +20,6 @@ class ApiService {
    */
   public static init(app: App<Element>) {
     const appStore = useAppStore();
-
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
     ApiService.vueInstance.axios.defaults.baseURL = appStore.getAppConfig(
@@ -36,6 +35,14 @@ class ApiService {
         return response;
       },
       function (error) {
+        if (error.message.includes("Network Error")) {
+          appStore.showToast({
+            severity: "error",
+            summary: "Error",
+            message:
+              "Connection refused. Please check your internet connection.",
+          });
+        }
         if (
           error.response &&
           [401, 419].includes(error.response.status) &&
