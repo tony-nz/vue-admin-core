@@ -42,7 +42,8 @@ export default function useResource(
    * Set the searchable columns
    */
   const searchableColumns = ref(
-    props.searchableColumns || extractIds(resource?.fields)
+    props.searchableColumns || resource?.datatable?.globalFilterFields || []
+    // props.searchableColumns || extractIds(resource?.fields)
   );
 
   /**
@@ -50,25 +51,19 @@ export default function useResource(
    * @param obj
    * @returns string[]
    */
-  function extractIds(obj: any): string[] {
+  function extractIds(fields: any): string[] {
     let ids: string[] = [];
-
-    // Base case: if obj is a field with an id property
-    if (obj && obj.id) {
-      ids.push(obj.id);
-    }
-
-    // Recursive case: if obj has children or fields
-    if (obj.children) {
-      obj.children.forEach((child: any) => {
-        ids = ids.concat(extractIds(child));
-      });
-    } else if (obj.fields) {
-      obj.fields.forEach((field: any) => {
+    fields.forEach((field) => {
+      if (field.id) {
         ids.push(field.id);
-      });
-    }
-
+      }
+      if (field.fields) {
+        ids = [...ids, ...extractIds(field.fields)];
+      }
+      if (field.children) {
+        ids = [...ids, ...extractIds(field.children)];
+      }
+    });
     return ids;
   }
 
