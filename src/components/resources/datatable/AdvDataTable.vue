@@ -10,10 +10,8 @@
     @sort="onSort"
     :loading="show.loading ? isLoading : false"
     :row-class="rowClass"
-    :state-key="stateKey"
     :totalRecords="totalRecords"
     :value="resourceData"
-    state-storage="session"
   >
     <template v-if="show.toolbar" #header>
       <div
