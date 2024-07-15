@@ -265,8 +265,11 @@ const useAppStore = defineStore({
         /**
          * Initialize API Config
          */
-        if (payload.api) {
-          this.config.api = payload.api;
+        if (payload.auth.api) {
+          this.config.api = payload.auth.api;
+        }
+        if (payload.auth.oauth) {
+          this.config.oauth = payload.auth.oauth;
         }
 
         /**
