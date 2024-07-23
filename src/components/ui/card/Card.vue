@@ -37,17 +37,7 @@
 
       <!-- Footer with 3 columns -->
       <div v-if="isFooterVisible" :class="mergedClass.footer">
-        <div class="w-3/12">
-          <slot name="footer_left"></slot>
-        </div>
-
-        <div class="w-6/12">
-          <slot name="footer_middle"></slot>
-        </div>
-
-        <div class="w-3/12">
-          <slot name="footer_right"></slot>
-        </div>
+        <slot name="footer"></slot>
       </div>
     </div>
   </div>
@@ -178,7 +168,6 @@ export default defineComponent({
     const mergedClass = computed(() => {
       const merged: Class = { ...defaultClass };
 
-
       for (const key of props.clearCss) {
         if (merged[key] && Array.isArray(merged[key])) {
           merged[key] = [];
@@ -200,11 +189,7 @@ export default defineComponent({
     };
 
     const isFooterVisible = computed(() => {
-      return (
-        hasSlot("footer_left") ||
-        hasSlot("footer_middle") ||
-        hasSlot("footer_right")
-      );
+      return hasSlot("footer");
     });
 
     const isHeaderVisible = computed(() => {
