@@ -13,6 +13,26 @@
       class="justify-between px-6 py-6 h-14 flex items-center lg:items-stretch mx-auto"
     >
       <div class="flex items-center">
+        <!-- go back button -->
+        <button
+          @click="goBack"
+          class="transition duration-150 ease-in-out btn bg-primary-500 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-400 disabled:hover:bg-gray-100 dark:bg-slate-800 hover:fill-white p-2 shadow mr-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+          >
+            <path
+              class="fill-none"
+              stroke="white"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 18h3.75a5.25 5.25 0 1 0 0-10.5H5M7.5 4L4 7.5L7.5 11"
+            />
+          </svg>
+        </button>
         <TabPanels v-model="activeTab">
           <template v-for="(menu, i) in mainMenuConfig" :key="i">
             <TabPanel v-if="menu.items">
@@ -78,6 +98,7 @@ import { defineComponent, ref } from "vue";
 import { layoutWidth } from "../../core/helpers/app";
 import { translate } from "../../core/helpers/functions";
 import type { MainMenu } from "../../core/types/MainMenuTypes";
+import { goBack } from "../../core/helpers/functions";
 
 import DropdownMenu from "./partials/DropdownMenu.vue";
 import InlineSvg from "vue-inline-svg";
@@ -143,6 +164,7 @@ export default defineComponent({
       activeTab,
       checkChild,
       checkRoute,
+      goBack,
       mainMenuConfig,
       routeClass,
       layoutWidth,

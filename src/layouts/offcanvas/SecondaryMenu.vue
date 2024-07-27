@@ -5,7 +5,7 @@
         <template v-for="(menu, i) in mainMenuConfig" :key="i">
           <VaTabPanel>
             <div class="space-y-3">
-              <div v-for="(item, index) in menu.items" :key="index">
+              <template v-for="(item, index) in menu.items" :key="index">
                 <label
                   v-if="item.divider"
                   class="px-3 text-xs text-gray-500 uppercase dark:text-gray-400"
@@ -52,7 +52,7 @@
                   >
                     {{ translate(item.label) }}
                   </button>
-                  <div v-if="item.items">
+                  <template v-if="item.items">
                     <ul id="dropdown-example" class="py-2 space-y-2">
                       <li
                         v-for="(childMenu, childIndex) in item.items"
@@ -74,9 +74,9 @@
                         </router-link>
                       </li>
                     </ul>
-                  </div>
+                  </template>
                 </router-link>
-              </div>
+              </template>
             </div>
           </VaTabPanel>
         </template>

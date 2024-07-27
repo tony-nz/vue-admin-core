@@ -11,24 +11,14 @@
     <Header>
       <slot name="header"></slot>
     </Header>
-    <Toolbar
-      :title="pageTitle"
-      :breadcrumbs="breadcrumbs"
-      :currentPage="currentPage"
-    >
-      <slot name="toolbar"></slot>
-    </Toolbar>
-    <main
-      class="relative flex flex-col flex-1 overflow-auto h-full z-0"
-      :class="displayToolbar ? '-mt-16' : '-mt-[120px]'"
-    >
+    <main class="relative flex flex-col flex-1 overflow-auto h-full z-0">
       <div
         id="vueadmin-content"
         :class="{
           'container-fluid': contentWidth == 'fluid',
           container: contentWidth == 'fixed',
         }"
-        class="mx-auto py-6 px-6 flex flex-col flex-1 overflow-y-auto"
+        class="flex flex-col flex-1 mx-auto overflow-y-auto"
       >
         <router-view v-slot="{ Component, route }">
           <component v-if="route" :is="Component" />
@@ -58,19 +48,18 @@
 </template>
 
 <script lang="ts">
+import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
+import { useLoading } from "vue-loading-overlay";
+import { useRoute } from "vue-router";
 import {
   contentWidth,
   darkMode,
   displayLoader,
   displayToolbar,
 } from "../core/helpers/app";
-import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
-import { useLoading } from "vue-loading-overlay";
-import { useRoute, useRouter } from "vue-router";
 import Header from "./header/Header.vue";
 import LayoutService from "../core/services/LayoutService";
 import Toast from "primevue/toast";
-import Toolbar from "./toolbar/Toolbar.vue";
 import useAppStore from "../store/app";
 
 export default defineComponent({
@@ -78,37 +67,36 @@ export default defineComponent({
   components: {
     Header,
     Toast,
-    Toolbar,
   },
   setup() {
-    const currentRoute = useRoute();
-    const router = useRouter();
-    const loading = useLoading({
-      //
-    });
-    let loader;
-
     const appStore = useAppStore();
+    const cacheArr = [];
+    const currentRoute = useRoute();
+    const loading = useLoading({});
+    let loader;
 
     const breadcrumbs = computed(() => {
       return appStore.pageBreadcrumbPath;
     });
+
     const currentPage = computed(() => {
       return appStore.currentPage;
     });
+
     const pageTitle = computed(() => {
       return appStore.pageTitle;
     });
+
     const viewKey = computed(() => {
       return currentRoute.path || Date.now();
     });
+
     const scrollToTop = () => {
       const content = document.getElementById("vueadmin-content");
       if (content) {
         content.scrollTo(0, 0);
       }
     };
-    const cacheArr = [];
 
     onBeforeMount(() => {
       LayoutService.init();

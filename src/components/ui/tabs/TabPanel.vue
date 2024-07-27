@@ -28,7 +28,7 @@ export default {
 </script>
 
 <template>
-  <div v-if="isActive">
+  <template v-if="isActive">
     <slot></slot>
-  </div>
+  </template>
 </template>

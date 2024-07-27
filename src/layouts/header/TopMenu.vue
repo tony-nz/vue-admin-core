@@ -22,13 +22,13 @@
           :class="{ '-mt-[4px]': !hasChild }"
           class="pr-32 hidden lg:flex lg:grow items-center h-full"
         >
-          <div v-if="displayLogo">
+          <template v-if="displayLogo">
             <img
               :src="darkMode ? logoDark : logoLight"
               :class="logoClass"
               :alt="logoAlt"
             />
-          </div>
+          </template>
           <Tabs v-model="activeTab">
             <template v-for="(item, i) in mainMenuConfig" :key="i">
               <Tab
