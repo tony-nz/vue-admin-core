@@ -397,6 +397,7 @@ export default defineComponent({
       update,
     } = useResource(props.resource, filters, props, {
       params: props.params,
+      dtOptions: dtOptions,
     });
     const { canAction } = props.resource;
 
@@ -451,7 +452,7 @@ export default defineComponent({
         lazyParams.value = {
           first: 0,
           filters: filters.value,
-          rows: 10,
+          rows: dtOptions.rows || 10,
         };
       }
       lazyParams.value.page = Math.fround(

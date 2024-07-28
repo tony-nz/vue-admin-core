@@ -2,7 +2,7 @@
   "name": "@tony-nz/vue-admin-core",
   "author": "Tony Myers",
   "private": false,
-  "version": "0.8.5",
+  "version": "0.8.6",
   "type": "module",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
@@ -60,7 +60,7 @@
     "nprogress": "^0.2.0",
     "object-path": "^0.11.8",
     "pinia": "^2.1.7",
-    "primevue": "^3.46.0",
+    "primevue": "^4.0.0",
     "sass": "^1.58.3",
     "vue3-toastify": "^0.1.6"
   }

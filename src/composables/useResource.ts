@@ -6,6 +6,7 @@ import ResourceType from "../core/types/ResourceConfigTypes";
 import useResourceStore from "../store/resource";
 
 interface Options {
+  dtOptions?: object;
   dataFilters?: object;
   params?: object | any;
 }
