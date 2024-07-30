@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import {
   darkMode,
   displayLogo,
@@ -145,11 +145,45 @@ export default defineComponent({
       changeBackground(item);
     };
 
+    const activeRoute = (url, config) => {
+      for (let i = 0; i < config.length; i++) {
+        const parent = config[i];
+
+        // Check parent URL
+        if (parent.to === url) {
+          return i;
+        }
+
+        // Check children URLs
+        if (parent.items) {
+          for (let j = 0; j < parent.items.length; j++) {
+            if (parent.items[j].to === url) {
+              return i;
+            }
+          }
+        }
+      }
+
+      return -1; // Return -1 if URL is not found
+    };
+
     /**
      * Check to see if mainMenuConfig children have them items property
      * @returns boolean
      */
     const hasChild = mainMenuConfig.some((item) => item.items);
+
+    onMounted(() => {
+      const active = activeRoute(
+        router.currentRoute.value.path,
+        mainMenuConfig
+      );
+      console.log("active", active);
+      if (active > -1) {
+        activeTab.value = active;
+        // changeBackground(mainMenuConfig[active]);
+      }
+    });
 
     return {
       activeTab,
