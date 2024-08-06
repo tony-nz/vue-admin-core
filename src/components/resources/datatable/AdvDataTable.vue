@@ -223,6 +223,7 @@
   <CreateUpdateDialog
     v-if="showModal && resource"
     @close="showModal = false"
+    @liveData="emitLiveData"
     :data="modalData"
     :hidden="form.hidden"
     :fields="getResourceFields(resource.fields)"
@@ -442,6 +443,14 @@ export default defineComponent({
     ];
 
     /**
+     * Emit live data
+     * @param data
+     */
+    const emitLiveData = (data: any) => {
+      emit("liveData", data);
+    };
+
+    /**
      * Lazy load resource data
      */
     const lazyLoad = () => {
@@ -529,6 +538,7 @@ export default defineComponent({
       changeLock,
       debounce,
       dtOptions,
+      emitLiveData,
       expandedRows,
       filters,
       getResourceData,

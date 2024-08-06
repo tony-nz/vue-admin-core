@@ -18,6 +18,7 @@
         <VueFormGenerator
           @updateData="updateData"
           @validated="validated"
+          @onChange="onChange"
           :allowedFields="allowedFields"
           :data="modalData"
           :fetchData="fetchData"
@@ -62,7 +63,7 @@
 
 <script>
 import useResource from "../../../composables/useResource";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useAppStore from "../../../store/app";
 import useResourceStore from "../../../store/resource";
@@ -213,6 +214,14 @@ export default defineComponent({
       });
     }
 
+    /**
+     * Emit liveData event
+     * @param data
+     */
+    const onChange = (data) => {
+      emit("liveData", data);
+    };
+
     onMounted(() => {
       dataId.value = props.data[props.primaryKey];
       fieldValues.value = props.fieldValues;
@@ -230,6 +239,7 @@ export default defineComponent({
       getSingularizedLabel,
       modalData,
       modalType,
+      onChange,
       showModal,
       submit,
       validated,
