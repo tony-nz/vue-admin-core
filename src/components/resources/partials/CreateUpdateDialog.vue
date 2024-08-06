@@ -222,6 +222,17 @@ export default defineComponent({
       emit("liveData", data);
     };
 
+    /**
+     * Watch for new prop data
+     */
+    watch(
+      () => props.data,
+      async (newData) => {
+        modalData.value = newData;
+      },
+      { deep: true }
+    );
+
     onMounted(() => {
       dataId.value = props.data[props.primaryKey];
       fieldValues.value = props.fieldValues;

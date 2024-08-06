@@ -527,6 +527,17 @@ export default defineComponent({
       getResourceData();
     });
 
+    /**
+     * Watch for new prop data
+     */
+    watch(
+      () => props.form?.data,
+      async (newData: any) => {
+        modalData.value = newData;
+      },
+      { deep: true }
+    );
+
     watch(refresh, (val) => {
       getResourceData();
     });
