@@ -46,10 +46,7 @@
                   >
                     <button
                       @click="navigate"
-                      :class="[
-                        defaultClass,
-                        (isActive || isExactActive) && activeClass,
-                      ]"
+                      :class="[defaultClass, isExactActive && activeClass]"
                     >
                       <div
                         class="flex flex-row items-center justify-center dark:text-slate-800"
