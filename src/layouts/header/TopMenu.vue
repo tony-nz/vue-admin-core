@@ -178,7 +178,6 @@ export default defineComponent({
         router.currentRoute.value.path,
         mainMenuConfig
       );
-      console.log("active", active);
       if (active > -1) {
         activeTab.value = active;
         // changeBackground(mainMenuConfig[active]);
