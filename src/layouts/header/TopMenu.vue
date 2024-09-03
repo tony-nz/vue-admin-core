@@ -1,7 +1,7 @@
 <template>
   <nav
     class="w-full mx-auto dark:bg-slate-900 relative z-30"
-    :class="slugBackground ? slugBackground : 'bg-primary-500'"
+    :class="slugBackground ? slugBackground : 'bg-primary-600'"
   >
     <div
       id="vueadmin-topMenu"
@@ -9,7 +9,7 @@
         'container-fluid': layoutWidth == 'fluid',
         container: layoutWidth == 'fixed',
       }"
-      class="px-6 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
+      class="px-4 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
     >
       <div class="flex w-full content-end">
         <div
@@ -37,18 +37,24 @@
                   'top-menu-item cursor-pointer flex items-center text-sm font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1 group',
                   !item.items ? 'ml-1.5 my-1 py-2 px-2.5 rounded-lg' : '',
                 ]"
-                :activeClass="'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active'"
-                :inActiveClass="'bg-black bg-opacity-10 group-hover:bg-primary-800 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white'"
+                :activeClass="'group bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active'"
+                :inActiveClass="'group bg-black bg-opacity-10 group-hover:bg-primary-800 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white'"
                 :isRoute="item.items ? false : true"
                 @click="tabClick(item)"
               >
-                <span v-if="item.icon && item.icon['path']" class="mr-2">
-                  <inline-svg
-                    :src="item.icon['path']"
-                    class="!fill-current h-6 w-6"
-                  />
-                </span>
-                {{ translate(item.label) }}
+                <template v-slot:item="{ isActive }">
+                  <span v-if="item.icon && item.icon['path']" class="mr-2">
+                    <inline-svg
+                      :src="item.icon['path']"
+                      class="group-hover:fill-primary-600 h-6 w-6"
+                      :class="{
+                        'fill-white': !isActive,
+                        'fill-primary-600': isActive,
+                      }"
+                    />
+                  </span>
+                  {{ translate(item.label) }}
+                </template>
               </Tab>
 
               <router-link

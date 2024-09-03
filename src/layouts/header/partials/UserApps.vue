@@ -4,41 +4,36 @@
       <button
         @focus="showMenu"
         type="button"
-        class="flex text-sm rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white w-10"
+        class="fill-white hover:bg-white dark:hover:bg-slate-800 hover:bg-opacity-20 rounded-lg p-2"
         id="userMenuBtn"
         x-ref="button"
         aria-haspopup="true"
         aria-controls="userMenu"
       >
-        <span class="sr-only">Open user menu</span>
-        <button
-          class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 rounded-lg p-2"
+        <svg
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          class="h-5 w-5 rounded-sm"
+          viewBox="0 0 35 35"
+          xml:space="preserve"
         >
-          <svg
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            class="h-5 w-5 rounded-sm"
-            viewBox="0 0 35 35"
-            xml:space="preserve"
-          >
+          <g>
             <g>
-              <g>
-                <rect width="16" height="16" />
-                <rect x="19" width="16" height="16" />
-                <rect y="19" width="16" height="16" />
-                <rect x="19" y="19" width="16" height="16" />
-              </g>
+              <rect width="16" height="16" />
+              <rect x="19" width="16" height="16" />
+              <rect y="19" width="16" height="16" />
+              <rect x="19" y="19" width="16" height="16" />
             </g>
-          </svg>
-        </button>
+          </g>
+        </svg>
       </button>
 
       <div class="absolute w-full">&nbsp;</div>
       <transition name="mega-menu-fade">
         <div
           v-show="isVisible"
-          class="mega-menu absolute normal-case font-normal bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden w-160 z-30 right-0"
+          class="mega-menu absolute normal-case font-normal bg-white dark:bg-slate-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 overflow-hidden w-160 z-30 right-0"
         >
           <div class="flex flex-col lg:flex-row px-8 py-6 -mx-4 pb-0">
             <ul class="w-full grid grid-cols-2 gap-4 px-4">

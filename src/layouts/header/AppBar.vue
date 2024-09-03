@@ -2,7 +2,7 @@
   <div class="flex z-30 -mt-[9px] items-center grow justify-end">
     <button
       @click="toggleDarkMode()"
-      class="fill-white hover:bg-white hover:fill-emerald-300 dark:hover:bg-slate-800 hover:bg-opacity-20 rounded-lg p-2"
+      class="fill-white hover:bg-white dark:hover:bg-slate-800 hover:bg-opacity-20 rounded-lg p-2"
     >
       <svg
         v-if="!darkMode"

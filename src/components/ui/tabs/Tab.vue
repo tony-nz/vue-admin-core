@@ -45,6 +45,6 @@ export default {
 
 <template>
   <div :class="isActive ? activeClass : inActiveClass" @click="activeteTab">
-    <slot />
+    <slot name="item" :isActive="isActive" />
   </div>
 </template>
