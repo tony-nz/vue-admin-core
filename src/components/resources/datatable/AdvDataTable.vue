@@ -70,7 +70,7 @@
             resource?.create?.modal && toolbar?.create && canAction('create')
           "
           type="button"
-          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          class="bg-primary-500 hover:bg-primary-600 rounded shadow whitespace-nowrap"
           :class="{
             'fill-white p-2': toolbar?.simpleCreate,
             'text-white py-2 px-4': !toolbar?.simpleCreate,
@@ -99,7 +99,7 @@
           "
           :to="resource.url + '/create'"
           type="button"
-          class="bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
+          class="bg-primary-500 hover:bg-primary-600 rounded shadow whitespace-nowrap"
           :class="{
             'fill-white p-2': toolbar?.simpleCreate,
             'text-white py-2 px-4': !toolbar?.simpleCreate,

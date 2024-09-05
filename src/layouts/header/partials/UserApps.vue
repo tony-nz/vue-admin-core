@@ -35,57 +35,51 @@
           v-show="isVisible"
           class="mega-menu absolute normal-case font-normal bg-white dark:bg-slate-800 shadow-lg rounded-md ring-1 ring-black ring-opacity-5 overflow-hidden w-160 z-30 right-0"
         >
-          <div class="flex flex-col lg:flex-row px-8 py-6 -mx-4 pb-0">
-            <ul class="w-full grid grid-cols-2 gap-4 px-4">
+          <div class="flex flex-col lg:flex-row">
+            <ul class="w-full grid grid-cols-2">
               <template
                 v-for="(item, index) in userAppsConfig.grid"
                 :key="index"
               >
-                <li class="mb-8">
-                  <router-link
-                    v-if="item.to"
-                    @click="hideMenu"
-                    @keydown.esc.exact="hideMenu"
-                    :to="item.to"
-                    class="flex group"
+                <router-link
+                  v-if="item.to"
+                  @click="hideMenu"
+                  @keydown.esc.exact="hideMenu"
+                  :to="item.to"
+                  class="flex group p-4 hover:bg-gray-100"
+                >
+                  <div
+                    v-if="item.icon && item.icon['path']"
+                    :class="item.icon['bg']"
+                    class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gray-200 text-white sm:h-12 sm:w-12"
                   >
-                    <div
-                      v-if="item.icon && item.icon['path']"
-                      :class="item.icon['bg']"
-                      class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-md bg-gray-200 text-white sm:h-12 sm:w-12"
+                    <Duotone
+                      :icon="item.icon['path']"
+                      :class="item.icon['fill']"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <span class="ml-2">
+                    <span
+                      class="block font-bold text-blue-600 group-hover:text-blue-800 flex items-center"
                     >
-                      <Duotone
-                        :icon="item.icon['path']"
-                        :class="item.icon['fill']"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <span class="ml-2">
-                      <span
-                        class="block font-bold text-blue-800 group-hover:text-blue-800 flex items-center"
-                      >
-                        <span>{{ translate(item.label) }}</span>
-                      </span>
-                      <span
-                        class="block text-sm text-gray-600 group-hover:text-blue-800"
-                        >{{ translate(item.description) }}</span
-                      >
+                      <span>{{ translate(item.label) }}</span>
                     </span>
-                  </router-link>
-                </li>
+                    <span
+                      class="block text-sm text-gray-600 group-hover:text-blue-800"
+                      >{{ translate(item.description) }}</span
+                    >
+                  </span>
+                </router-link>
               </template>
             </ul>
           </div>
-          <ul class="bg-gray-100 dark:bg-slate-700 p-8 rounded-b-md">
-            <li
-              v-for="(item, index) in userAppsConfig.list"
-              :key="index"
-              :class="{ 'mt-4': index > 0 }"
-            >
+          <ul class="bg-gray-100 dark:bg-slate-700 rounded-b-md">
+            <template v-for="(item, index) in userAppsConfig.list" :key="index">
               <router-link
                 v-if="item.to"
                 :to="item.to"
-                class="flex lg:items-center group"
+                class="flex p-4 hover:bg-gray-200 lg:items-center group"
               >
                 <div
                   class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-md text-white"
@@ -109,7 +103,7 @@
                   >
                 </span>
               </router-link>
-            </li>
+            </template>
           </ul>
         </div>
       </transition>
