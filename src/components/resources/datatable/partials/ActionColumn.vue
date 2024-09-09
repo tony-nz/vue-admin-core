@@ -3,7 +3,7 @@
     <slot name="actionCol" :data="data" />
     <div v-if="resource.lock && showDefaults && canAction('update')">
       <button
-        @click="$emit('changeLock', data)"
+        @click.stop="$emit('changeLock', data)"
         v-tooltip="
           data.locked
             ? 'Unlock ' + resource.singularName.toLowerCase()
@@ -36,7 +36,7 @@
     </div>
     <div v-if="resource.edit.modal && showDefaults && canAction('update')">
       <button
-        @click="$emit('showCreateEdit', 'dialog', 'update', data)"
+        @click.stop="$emit('showCreateEdit', 'dialog', 'update', data)"
         v-tooltip="'Edit ' + resource.singularName.toLowerCase()"
         :disabled="data.locked"
         :class="btnClass"
@@ -81,7 +81,7 @@
     </div>
     <div v-if="resource.delete && showDefaults && canAction('delete')">
       <button
-        @click="$emit('deletePopup', { $event, data })"
+        @click.stop="$emit('deletePopup', { $event, data })"
         v-tooltip="'Delete ' + resource.singularName.toLowerCase()"
         :disabled="data.locked"
         :class="btnDelClass"
