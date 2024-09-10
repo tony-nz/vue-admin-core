@@ -59,7 +59,7 @@
     </div>
     <div v-if="resource.show.page && showDefaults && canAction('update')">
       <router-link
-        :to="{ name: resource.singularName + 'Show', params: { id: data.id } }"
+        :to="{ name: resource.label + 'Show', params: { id: data.id } }"
         v-tooltip="'Open ' + resource.singularName.toLowerCase()"
       >
         <button :class="btnClass">

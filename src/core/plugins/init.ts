@@ -16,6 +16,19 @@ import "vue-loading-overlay/dist/css/index.css";
  * @param app vue instance
  */
 export const initPlugins = async function (app: App<Element>, router, options) {
+  // Apply locales
+  app.use(i18n);
+
+  /**
+   * Initialize Locales
+   */
+  if (options.config?.locales) {
+    // loop through payload and set each locale
+    for (const [key, value] of Object.entries(options.config.locales)) {
+      i18n.global.setLocaleMessage(key, Object.assign({}, value));
+    }
+  }
+
   /**
    * Register permission directive
    */
@@ -47,9 +60,6 @@ export const initPlugins = async function (app: App<Element>, router, options) {
   // Load Error Log
   initErrorLog(app);
 
-  // Apply locales
-  app.use(i18n);
-
   // Load additional plugins
   initInlineSvg(app);
 
@@ -65,16 +75,6 @@ export const initPlugins = async function (app: App<Element>, router, options) {
     autoClose: 3000,
     // ...
   } as ToastContainerOptions);
-
-  /**
-   * Initialize Locales
-   */
-  if (options.config?.locales) {
-    // loop through payload and set each locale
-    for (const [key, value] of Object.entries(options.config.locales)) {
-      i18n.global.setLocaleMessage(key, Object.assign({}, value));
-    }
-  }
 
   // loader
   app.use(LoadingPlugin);

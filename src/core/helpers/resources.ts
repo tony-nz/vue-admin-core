@@ -154,7 +154,9 @@ const buildResourceConfig = (resource) => {
 
   const getName = (count) => {
     const { t, te, tc } = i18n.global;
-    return te(nameKey) ? tc(nameKey, count) : upperCaseFirst(resource.name);
+    return te(nameKey)
+      ? tc(nameKey, count)
+      : formatKebabCase(upperCaseFirst(resource.name));
   };
 
   // convert below into const
