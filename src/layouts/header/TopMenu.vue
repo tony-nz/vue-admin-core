@@ -145,7 +145,7 @@ export default defineComponent({
     };
 
     const tabClick = (item) => {
-      if (!item.items) {
+      if (!item.items || item.to) {
         router.push({ path: item.to });
       }
       changeBackground(item);
