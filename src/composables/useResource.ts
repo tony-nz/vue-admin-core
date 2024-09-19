@@ -111,15 +111,15 @@ export default function useResource(
    * @param subId
    * @returns Promise<void>
    */
-  function create(params: unknown, subId?: number) {
+  function create(params: unknown, dataId?: number) {
+    console.log(params, dataId, routeId.value);
     if (params && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
           .create({
             params,
-            routeId: routeId.value,
+            routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-            subId: subId,
           })
           .then((response) => {
             resolve(response);
@@ -138,16 +138,15 @@ export default function useResource(
    * @param subId
    * @returns Promise<void>
    */
-  function update(params, id, subId?: number) {
+  function update(params, id, dataId?: number) {
     if (params && id && resourceName) {
       params.id = id;
       return new Promise<void>((resolve, reject) => {
         resourceStore
           .update({
             params,
-            routeId: routeId.value,
+            routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-            subId: subId,
           })
           .then((response) => {
             resolve(response);
@@ -205,15 +204,14 @@ export default function useResource(
    * @param subId
    * @returns Promise<void>
    */
-  function remove(id, subId?: number) {
+  function remove(id, dataId?: number) {
     if (id && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
           .delete({
             params: { id },
-            routeId: routeId.value,
+            routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-            subId: subId,
           })
           .then((response) => {
             resolve(response);
@@ -231,15 +229,14 @@ export default function useResource(
    * @param subId
    * @returns Promise<void>
    */
-  function bulkRemove(data, subId?: number) {
+  function bulkRemove(data, dataId?: number) {
     if (data && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
           .deleteMany({
             params: { data },
-            routeId: routeId.value,
+            routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-            subId: subId,
           })
           .then((response) => {
             resolve(response);

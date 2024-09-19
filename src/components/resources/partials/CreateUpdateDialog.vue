@@ -131,7 +131,7 @@ export default defineComponent({
     const submit = ref(false);
     const resource = ref();
     const errors = ref([]);
-    const { create, update } = useResource(props.resource);
+    const { create, update, routeId } = useResource(props.resource);
 
     const validated = async (valid, data = null) => {
       modalData.value = data;
@@ -145,8 +145,7 @@ export default defineComponent({
         }
 
         if (modalType.value == "create") {
-          // emit("create", modalData.value, dataId.value, props.subId).then(() => {
-          await create(modalData.value, dataId.value, props.subId)
+          await create(modalData.value, dataId.value)
             .then((repsonse) => {
               emit("close");
             })
@@ -161,7 +160,7 @@ export default defineComponent({
               submit.value = false;
             });
         } else if (modalType.value == "update") {
-          await update(modalData.value, dataId.value, props.subId)
+          await update(modalData.value, dataId.value)
             .then((repsonse) => {
               emit("close");
             })
@@ -234,6 +233,7 @@ export default defineComponent({
     );
 
     onMounted(() => {
+      routeId.value = props.subId;
       dataId.value = props.data[props.primaryKey];
       fieldValues.value = props.fieldValues;
 
