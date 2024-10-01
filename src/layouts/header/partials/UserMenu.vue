@@ -49,7 +49,7 @@
       <div
         role="menu"
         tabindex="0"
-        class="origin-top-right absolute right-0 w-56 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
+        class="origin-top-right absolute right-0 w-56 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none dark:divide-gray-800 dark:bg-slate-800"
       >
         <div
           v-if="userMenuConfig.header"
@@ -91,7 +91,7 @@
           class="flex justify-end p-2 bg-white dark:bg-slate-600 rounded-b-lg"
         >
           <button @click="toggleDarkMode()" :class="btnClass">
-            <span class="hover:fill-gray-400 fill-primary-400">
+            <span class="hover:fill-primary-400 fill-gray-400">
               <svg
                 viewBox="0 0 512 512"
                 xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +110,7 @@
             </span>
           </button>
           <button @click="toggleContentWidth()" :class="btnClass">
-            <span class="hover:fill-gray-400 fill-primary-400">
+            <span class="hover:fill-primary-400 fill-gray-400">
               <svg
                 viewBox="0 0 512 512"
                 xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@
             </span>
           </button>
           <button @click="toggleFullscreen()" :class="btnClass">
-            <span class="hover:fill-gray-400 fill-primary-400">
+            <span class="hover:fill-primary-400 fill-gray-400">
               <svg
                 viewBox="0 0 512 512"
                 xmlns="http://www.w3.org/2000/svg"

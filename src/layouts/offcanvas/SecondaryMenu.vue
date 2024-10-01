@@ -4,7 +4,7 @@
       <VaTabPanels v-model="activeTab">
         <template v-for="(menu, i) in mainMenuConfig" :key="i">
           <VaTabPanel>
-            <div class="space-y-3">
+            <div class="flex flex-col text-left space-y-3">
               <template v-for="(item, index) in menu.items" :key="index">
                 <label
                   v-if="item.divider"
@@ -39,9 +39,8 @@
                     @click="navigate"
                     :class="[
                       {
-                        'bg-gray-200 bg-opacity-70 text-blue-300': checkRoute(
-                          item.to
-                        ),
+                        'bg-gray-200 bg-opacity-70 text-blue-300 dark:text-white dark:bg-opacity-10':
+                          checkRoute(item.to),
                         'bg-gray-200': isActive && !item.items,
                         'bg-gray-200 ':
                           isExactActive && item.items && checkChild(item),
@@ -83,7 +82,7 @@
       </VaTabPanels>
     </nav>
     <div class="w-56 self-end">
-      <div class="flex items-center justify-between">
+      <!-- <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold text-gray-800 dark:text-white">
           Projects
         </h2>
@@ -106,9 +105,9 @@
             />
           </svg>
         </button>
-      </div>
+      </div> -->
 
-      <nav class="mt-4 -mx-3 space-y-3">
+      <!-- <nav class="mt-4 -mx-3 space-y-3">
         <button
           class="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
         >
@@ -132,7 +131,7 @@
             />
           </svg>
         </button>
-      </nav>
+      </nav> -->
     </div>
   </div>
 </template>
@@ -157,7 +156,7 @@ export default defineComponent({
     const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
     const routeActiveClass = ref("text-blue-600");
     const routeClass = ref(
-      "hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2"
+      "text-left hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2 dark:text-white"
     );
     const checkRoute = (to) => {
       if (window.location.href.indexOf(to) > -1) {

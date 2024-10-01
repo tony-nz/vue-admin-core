@@ -149,13 +149,13 @@ export default defineComponent({
     const { canAction } = props.resource;
 
     const btnClass = computed(() => {
-      return "transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-400 disabled:hover:bg-gray-100 dark:bg-slate-800 hover:fill-white p-2 shadow";
+      return "transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-400 disabled:hover:bg-gray-100 dark:bg-slate-700 hover:fill-white p-2 shadow";
     });
     const btnDelClass = computed(() => {
       return "transition duration-150 ease-in-out btn bg-red-100 border-gray-800 rounded-lg fill-red-400 disabled:hover:fill-gray-400 hover:bg-red-400 hover:fill-white disabled:hover:bg-gray-100 dark:bg-red-800 p-2 shadow";
     });
     const btnLockClass = computed(() => {
-      return "transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-orange-300 hover:fill-white disabled:hover:bg-gray-100 dark:bg-slate-800 p-2 shadow";
+      return "transition duration-150 ease-in-out btn bg-gray-100 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-orange-300 hover:fill-white disabled:hover:bg-gray-100 dark:bg-slate-700 p-2 shadow";
     });
     const getData = computed(() => {
       return props.data.data;

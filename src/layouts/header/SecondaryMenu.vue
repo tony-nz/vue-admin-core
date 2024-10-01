@@ -49,7 +49,7 @@
                       :class="[defaultClass, isExactActive && activeClass]"
                     >
                       <div
-                        class="flex flex-row items-center justify-center dark:text-slate-800"
+                        class="flex flex-row items-center justify-center dark:text-white"
                       >
                         <div v-if="item.icon" class="mr-2">
                           <inline-svg :src="item.icon" class="h-4 w-4" />
@@ -150,7 +150,7 @@ export default defineComponent({
     const store = useAppStore();
     const activeClass = ref("text-gray-900 bg-gray-200");
     const defaultClass = ref(
-      "px-2 py-2 text-sm rounded-md dark-mode:hover:bg-gray-600 dark-mode:focus:bg-gray-600 dark-mode:focus:text-white dark-mode:hover:text-white dark-mode:text-gray-200 md:mt-0 md:mr-2 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline"
+      "px-2 py-2 text-sm rounded-md dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white dark:text-white md:mt-0 md:mr-2 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline dark:bg-opacity-40"
     );
 
     return {

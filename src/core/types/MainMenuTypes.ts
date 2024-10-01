@@ -1,4 +1,5 @@
 interface MenuItemIcon {
+  path?: string;
   name: string;
   fill?: string;
   bg?: string;
@@ -22,7 +23,7 @@ interface MainMenu {
   class?: string;
   slug?: string;
   svgIcon?: string;
-  icon?: Array<MenuItemIcon>;
+  icon?: MenuItemIcon;
   items?: Array<MenuItem>;
 }
 

@@ -38,7 +38,7 @@
                   !item.items ? 'ml-1.5 my-1 py-2 px-2.5 rounded-lg' : '',
                 ]"
                 :activeClass="'group bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active'"
-                :inActiveClass="'group bg-black bg-opacity-10 group-hover:bg-primary-800 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white'"
+                :inActiveClass="'group bg-black bg-opacity-10 dark:bg-opacity-40 group-hover:bg-primary-800 hover:bg-white dark:hover:bg-slate-800 dark:text-slate-300 dark:hover:text-white hover:bg-opacity-100 hover:text-slate-800 text-white'"
                 :isRoute="item.items ? false : true"
                 @click="tabClick(item)"
               >

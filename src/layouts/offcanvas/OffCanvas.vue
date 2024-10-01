@@ -1,8 +1,5 @@
 <template>
-  <div
-    @click="isVisible = !isVisible"
-    class="z-30 lg:hidden absolute"
-  >
+  <div @click="isVisible = !isVisible" class="z-30 lg:hidden absolute">
     <svg
       class="w-6 h-6"
       fill="none"
@@ -12,14 +9,8 @@
       stroke="white"
       viewBox="0 0 24 24"
     >
-      <path
-        v-if="!isVisible"
-        d="M4 6h16M4 12h16M4 18h16"
-      ></path>
-      <path
-        v-else
-        d="M6 18L18 6M6 6l12 12"
-      ></path>
+      <path v-if="!isVisible" d="M4 6h16M4 12h16M4 18h16"></path>
+      <path v-else d="M6 18L18 6M6 6l12 12"></path>
     </svg>
   </div>
   <transition
@@ -28,7 +19,7 @@
   >
     <div
       v-if="isVisible"
-      class="fixed top-0 left-0 z-10 bg-primary-500 dark:bg-slate-900 w-full h-full"
+      class="fixed top-0 left-0 z-10 backdrop-blur-sm w-full h-full"
       tabindex="-1"
       id="offcanvasTop"
       aria-labelledby="offcanvasTopLabel"
@@ -37,10 +28,6 @@
       <aside class="flex h-full pt-[52px]">
         <TopMenu :tab="activeTab" @changeTab="switchTab" />
         <SecondaryMenu :tab="activeTab" @closeOffCanvas="close" />
-        <div class="w-full bg-emerald-600 md:block">
-          <Header />
-          <Content />
-        </div>
       </aside>
     </div>
   </transition>

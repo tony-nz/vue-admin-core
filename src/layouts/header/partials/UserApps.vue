@@ -46,7 +46,7 @@
                   @click="hideMenu"
                   @keydown.esc.exact="hideMenu"
                   :to="item.to"
-                  class="flex group p-4 hover:bg-gray-100"
+                  class="flex group p-4 hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
                   <div
                     v-if="item.icon && item.icon['path']"
@@ -61,12 +61,12 @@
                   </div>
                   <span class="ml-2">
                     <span
-                      class="block font-bold text-blue-600 group-hover:text-blue-800 flex items-center"
+                      class="block font-bold text-blue-600 group-hover:text-blue-800 dark:group-hover:text-white flex items-center"
                     >
                       <span>{{ translate(item.label) }}</span>
                     </span>
                     <span
-                      class="block text-sm text-gray-600 group-hover:text-blue-800"
+                      class="block text-sm text-gray-600 group-hover:text-blue-800 dark:group-hover:text-white"
                       >{{ translate(item.description) }}</span
                     >
                   </span>
@@ -79,7 +79,7 @@
               <router-link
                 v-if="item.to"
                 :to="item.to"
-                class="flex p-4 hover:bg-gray-200 lg:items-center group"
+                class="flex p-4 hover:bg-gray-200 lg:items-center group dark:hover:bg-slate-800"
               >
                 <div
                   class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-md text-white"
@@ -94,11 +94,11 @@
 
                 <span class="flex flex-col lg:flex-row lg:items-center">
                   <span
-                    class="block ml-2 font-bold text-blue-800 group-hover:text-blue-800"
+                    class="block ml-2 font-bold text-blue-800 group-hover:text-blue-800 dark:group-hover:text-white"
                     >{{ translate(item.label) }}</span
                   >
                   <span
-                    class="block ml-2 lg:ml-4 text-sm text-gray-600 group-hover:text-blue-800"
+                    class="block ml-2 lg:ml-4 text-sm text-gray-600 group-hover:text-blue-800 dark:group-hover:text-white"
                     >{{ translate(item.description) }}</span
                   >
                 </span>
