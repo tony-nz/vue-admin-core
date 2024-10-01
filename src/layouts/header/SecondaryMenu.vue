@@ -16,7 +16,7 @@
         <!-- go back button -->
         <button
           @click="goBack"
-          class="transition duration-150 ease-in-out btn bg-primary-500 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-600 disabled:hover:bg-gray-100 dark:bg-slate-800 hover:fill-white p-2 shadow mr-2"
+          class="transition duration-150 ease-in-out btn bg-primary-500 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-600 disabled:hover:bg-gray-100 dark:bg-slate-900 hover:fill-white p-2 shadow mr-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +148,9 @@ export default defineComponent({
     const hasChild = mainMenuConfig.some((item) => item.items);
 
     const store = useAppStore();
-    const activeClass = ref("text-gray-900 bg-gray-200");
+    const activeClass = ref(
+      "text-gray-900 bg-gray-200 dark:bg-gray-600 dark:bg-opacity-40"
+    );
     const defaultClass = ref(
       "px-2 py-2 text-sm rounded-md dark:hover:bg-gray-600 dark:focus:bg-gray-600 dark:focus:text-white dark:hover:text-white dark:text-white md:mt-0 md:mr-2 hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline dark:bg-opacity-40"
     );
