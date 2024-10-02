@@ -210,16 +210,14 @@
     </template>
   </DataTable>
   <!-- Start:Delete popup -->
-  <div v-if="resource">
-    <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
-      <template #message="slotProps">
-        <div class="flex p-4">
-          <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
-          <p class="pl-2">{{ slotProps.message.message }}</p>
-        </div>
-      </template>
-    </ConfirmPopup>
-  </div>
+  <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
+    <template #message="slotProps">
+      <div class="flex p-4">
+        <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
+        <p class="pl-2">{{ slotProps.message.message }}</p>
+      </div>
+    </template>
+  </ConfirmPopup>
   <CreateUpdateDialog
     v-if="showModal && resource"
     @close="showModal = false"
@@ -356,6 +354,7 @@ export default defineComponent({
     const filters = ref({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       ...props.resource.datatable?.filters,
+      ...props.filters,
     });
 
     /**
@@ -541,6 +540,18 @@ export default defineComponent({
     watch(refresh, (val) => {
       getResourceData();
     });
+
+    watch(
+      () => props.filters,
+      (newFilters) => {
+        filters.value = {
+          global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          ...props.resource.datatable?.filters,
+          ...newFilters,
+        };
+      },
+      { deep: true, immediate: true }
+    );
 
     return {
       activeOptions,

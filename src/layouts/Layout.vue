@@ -2,11 +2,7 @@
   <Toast />
   <div
     id="vueadmin-app"
-    class="flex flex-col w-full max-h-full overflow-hidden"
-    :class="{
-      'bg-gray-200': !darkMode,
-      'bg-slate-700 dark': darkMode,
-    }"
+    class="flex flex-col w-full max-h-full overflow-hidden bg-gray-200 dark:bg-slate-700"
   >
     <Header>
       <slot name="header"></slot>
@@ -48,12 +44,17 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, onMounted } from "vue";
+import {
+  computed,
+  defineComponent,
+  onBeforeMount,
+  onMounted,
+  watch,
+} from "vue";
 import { useLoading } from "vue-loading-overlay";
 import { useRoute } from "vue-router";
 import {
   contentWidth,
-  darkMode,
   displayLoader,
   displayToolbar,
 } from "../core/helpers/app";
@@ -125,7 +126,6 @@ export default defineComponent({
       cacheArr,
       contentWidth,
       currentPage,
-      darkMode,
       displayToolbar,
       pageTitle,
       scrollToTop,

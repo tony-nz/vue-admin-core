@@ -501,7 +501,7 @@ const useAppStore = defineStore({
       }
     },
     toggleDarkMode(): void {
-      const element = document.getElementById("vueadmin-app");
+      const element = document.body;
 
       if (this.config.layout.theme) {
         this.config.layout.theme.darkMode = !this.config.layout.theme?.darkMode;

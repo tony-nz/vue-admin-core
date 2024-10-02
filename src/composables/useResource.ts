@@ -254,15 +254,9 @@ export default function useResource(
    * @returns void
    */
   function showDeletePopup(params) {
-    if (resource && params.$event) {
+    if (resource && resource.name && params.$event) {
       confirmDelete.require({
-        group:
-          "DT_" +
-          upperCaseFirst(
-            resourceName
-              ? resourceName
-              : (Math.random() + 1).toString(36).substring(7)
-          ),
+        group: "DT_" + upperCaseFirst(resource.name),
         target: params.$event.currentTarget,
         message: "Are you sure you want to proceed?",
         acceptClass: "bg-primary-500",
