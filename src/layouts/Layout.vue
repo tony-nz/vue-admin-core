@@ -4,9 +4,18 @@
     id="vueadmin-app"
     class="flex flex-col w-full max-h-full overflow-hidden bg-gray-200 dark:bg-slate-700"
   >
-    <Header>
-      <slot name="header"></slot>
-    </Header>
+    <header class="sticky top-0 z-10">
+      <TopMenu :tab="activeTab" @changeTab="switchTab">
+        <template v-slot:appBar>
+          <AppBar>
+            <template v-slot:content>
+              <slot name="appBar" />
+            </template>
+          </AppBar>
+        </template>
+      </TopMenu>
+      <SecondaryMenu :tab="activeTab" />
+    </header>
     <main class="relative flex flex-col flex-1 overflow-auto h-full z-0">
       <div
         id="vueadmin-content"
@@ -44,13 +53,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  onMounted,
-  watch,
-} from "vue";
+import { computed, defineComponent, onBeforeMount, onMounted, ref } from "vue";
 import { useLoading } from "vue-loading-overlay";
 import { useRoute } from "vue-router";
 import {
@@ -58,7 +61,9 @@ import {
   displayLoader,
   displayToolbar,
 } from "../core/helpers/app";
-import Header from "./header/Header.vue";
+import AppBar from "./header/AppBar.vue";
+import TopMenu from "./header/TopMenu.vue";
+import SecondaryMenu from "./header/SecondaryMenu.vue";
 import LayoutService from "../core/services/LayoutService";
 import Toast from "primevue/toast";
 import useAppStore from "../store/app";
@@ -66,10 +71,13 @@ import useAppStore from "../store/app";
 export default defineComponent({
   name: "VueAdmin",
   components: {
-    Header,
+    AppBar,
+    SecondaryMenu,
     Toast,
+    TopMenu,
   },
   setup() {
+    const activeTab = ref(0);
     const appStore = useAppStore();
     const cacheArr = [];
     const currentRoute = useRoute();
@@ -87,6 +95,10 @@ export default defineComponent({
     const pageTitle = computed(() => {
       return appStore.pageTitle;
     });
+
+    const switchTab = (tab) => {
+      activeTab.value = tab;
+    };
 
     const viewKey = computed(() => {
       return currentRoute.path || Date.now();
@@ -122,6 +134,7 @@ export default defineComponent({
     });
 
     return {
+      activeTab,
       breadcrumbs,
       cacheArr,
       contentWidth,
@@ -129,6 +142,7 @@ export default defineComponent({
       displayToolbar,
       pageTitle,
       scrollToTop,
+      switchTab,
       viewKey,
     };
   },

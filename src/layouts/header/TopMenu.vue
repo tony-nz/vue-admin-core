@@ -85,7 +85,7 @@
             </template>
           </Tabs>
         </ul>
-        <AppBar />
+        <slot name="appBar" />
       </div>
     </div>
   </nav>
@@ -105,7 +105,6 @@ import {
 import { translate } from "../../core/helpers/functions";
 import { useRouter } from "vue-router";
 import type { MainMenu } from "../../core/types/MainMenuTypes";
-import AppBar from "./AppBar.vue";
 import OffCanvas from "../offcanvas/OffCanvas.vue";
 import InlineSvg from "vue-inline-svg";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
@@ -121,7 +120,6 @@ export default defineComponent({
     },
   },
   components: {
-    AppBar,
     InlineSvg,
     OffCanvas,
     Tabs,
