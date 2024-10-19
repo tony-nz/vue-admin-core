@@ -294,9 +294,21 @@ const useResourceStore = function (resource) {
           state.resource.notifications["all"] ||
           state.resource.notifications[action]
         ) {
+          // if create or update, add following html to message
+          let message = "";
+
+          if ([CREATE, UPDATE].includes(action)) {
+            message = `<a class="mt-2" href="/${resource
+              .getName(1)
+              .toLowerCase()}/${data.id}">Open ${
+              data.name || data.title || data.id
+            }</a>`;
+          }
+
           appStore.showToast({
             severity: "success",
             summary: messages[action],
+            message,
           });
         }
       },

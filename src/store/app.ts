@@ -476,7 +476,7 @@ const useAppStore = defineStore({
           : payload.summary;
         const options = {
           dangerouslyHTMLString: true, // "dangerous"
-          autoClose: 1200,
+          autoClose: 2500,
           type: toast.TYPE.INFO,
           hideProgressBar: false,
           position: toast.POSITION.TOP_RIGHT,
