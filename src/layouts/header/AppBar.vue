@@ -3,7 +3,7 @@
     <slot name="content" />
     <label
       :class="darkMode ? 'bg-primary-800' : 'bg-primary-500'"
-      class="relative m-0 block h-7 w-14 rounded-full bg-gray-300 cursor-pointer duration-75 ease-linear mr-2"
+      class="relative m-0 block h-7 w-14 rounded-full bg-gray-300 cursor-pointer duration-75 ease-linear mr-2 min-w-[55px]"
     >
       <input
         type="checkbox"
