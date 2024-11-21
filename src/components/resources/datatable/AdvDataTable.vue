@@ -63,7 +63,8 @@
           class="py-2 px-4 border rounded shadow whitespace-nowrap text-white"
           type="button"
         >
-          Bulk Delete {{ getSingularizedLabel(resource.label) }}s
+          {{ translate("va.actions.bulkDelete") }}
+          {{ getSingularizedLabel(resource.label) }}s
         </button>
         <button
           v-if="
@@ -146,7 +147,6 @@
       </template>
     </Column>
     <slot name="columns">
-      <!-- TODO:: rewrite this.. -->
       <div
         v-for="field in getResourceFields(resource.fields)"
         v-bind:key="field.id"
