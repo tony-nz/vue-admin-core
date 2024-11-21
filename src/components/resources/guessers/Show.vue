@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { defineComponent, onActivated, onMounted, watch, ref } from "vue";
+import { defineComponent, onActivated, onMounted, ref } from "vue";
 import { translate } from "../../../core/helpers/functions";
 import { useRoute } from "vue-router";
 import ApiService from "../../../core/services/ApiService";
@@ -37,6 +37,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const appStore = useAppStore();
     const dataValues = ref();
     const isMounted = ref(false);
     const modalData = ref();
@@ -69,12 +70,14 @@ export default defineComponent({
           }
           return null;
         } catch (e) {
-          // TODO ERROR LOG
-          console.log(e);
+          appStore.showToast({
+            severity: "error",
+            summary: "Error",
+            message: e.message ? e.message : "An error occurred",
+          });
         }
       }
       return ApiService.get(params.url).then((res) => {
-        // state.value.options[fieldId] = res.data.data;
         return res.data.data;
       });
     }

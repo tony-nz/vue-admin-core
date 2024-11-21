@@ -3,11 +3,9 @@ import { defineStore } from "pinia";
 import { toast, type ToastOptions } from "vue3-toastify";
 import { version } from "../../package.json";
 import ApiService from "../core/services/ApiService";
-import Echo from "laravel-echo";
 import getAppConfig from "../core/config/AppConfig";
 import i18n from "../core/plugins/i18n";
 import objectPath from "object-path";
-import Pusher from "pusher-js";
 import UserMenu from "../core/types/UserMenuTypes";
 import UserAppMenu from "../core/types/UserAppsMenuTypes";
 import type MainMenu from "../core/types/MainMenuTypes";
@@ -384,7 +382,6 @@ const useAppStore = defineStore({
           message: "Failed to retrieve settings",
           severity: "error",
         });
-        console.log(e);
       }
 
       return this.settings;
@@ -413,35 +410,6 @@ const useAppStore = defineStore({
       this.setPermissions([]);
       this.setRoles([]);
       this.setUser([]);
-    },
-    /**
-     * Initialize Echo Pusher
-     * @returns void
-     */
-    initEchoPusher() {
-      window.Pusher = Pusher;
-
-      this.notifications.echo = new Echo({
-        broadcaster: "pusher",
-        key: process.env.VUE_APP_PUSHER_APP_KEY,
-        cluster: process.env.VUE_APP_PUSHER_APP_CLUSTER,
-        forceTLS: true,
-        // Other configurations if needed
-      });
-    },
-    /**
-     * Listen to channel
-     * @returns void
-     */
-    listenToChannel() {
-      // Access Echo instance and listen to events
-      this.notifications.echo
-        .channel("notification")
-        .listen("YourEventName", (event) => {
-          console.log("Received event:", event);
-          // Handle the received event data here within the store
-          // Update state or trigger mutations/actions as needed
-        });
     },
     addLog(payload) {
       if (payload.log === "error") {
@@ -569,7 +537,6 @@ const useAppStore = defineStore({
           message: "Failed to find resource",
           severity: "error",
         });
-        console.log(e);
       }
       return [];
     },

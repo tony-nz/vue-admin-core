@@ -203,12 +203,14 @@ export default defineComponent({
               return data;
             });
         } catch (e) {
-          // TODO ERROR LOG
-          console.log(e);
+          appStore.showToast({
+            severity: "error",
+            summary: "Error",
+            message: e.message ? e.message : "An error occurred",
+          });
         }
       }
       return ApiService.get(params.url).then((res) => {
-        // state.value.options[fieldId] = res.data.data;
         return res.data.data;
       });
     }
@@ -233,13 +235,10 @@ export default defineComponent({
     );
 
     onMounted(() => {
-      routeId.value = props.subId;
       dataId.value = props.data[props.primaryKey];
       fieldValues.value = props.fieldValues;
-
       modalData.value = props.data;
-
-      // show modal
+      routeId.value = props.subId;
       showModal.value = true;
     });
 

@@ -255,11 +255,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      try {
-        currentUser.value = await store.getUser;
-      } catch (e) {
-        console.log(e);
-      }
+      currentUser.value = await store.getUser;
     });
 
     return {

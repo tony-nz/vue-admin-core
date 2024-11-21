@@ -45,7 +45,6 @@ export default function roles({ next, to }) {
           return next();
         })
         .catch((e) => {
-          console.log(e);
           return next({
             path: "403",
           });

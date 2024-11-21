@@ -53,6 +53,7 @@ export const useResourceRoutes = function (resource) {
    * Build routes for resource
    */
   const buildRoute = (resource: any, action, path) => {
+    const appStore = useAppStore();
     try {
       const routerPermissions = buildPermissions(resource);
       const store = useResourceStore(resource)();
@@ -62,17 +63,13 @@ export const useResourceRoutes = function (resource) {
         name: resourceName(name, action),
         props: true,
         component: {
-          // TODO: Remove this after testing
-          // props: ["id", "title", "resource", "store", "permissions"],
           render(c) {
             const components = JSON.parse(
               JSON.stringify(getCurrentInstance()?.appContext.components)
             );
             const props = {
-              // id: route.params.id,
               title: getTitle(action),
               resource,
-              // store,
               permissions: appStore.getPermissions,
             };
             if (
@@ -86,7 +83,6 @@ export const useResourceRoutes = function (resource) {
                 props
               );
             }
-
             /**
              * Return guesser page component
              */
@@ -132,7 +128,6 @@ export const useResourceRoutes = function (resource) {
                       : message,
                 });
                 to.meta.title = message;
-                // document.title = message;
                 return next();
               }
             }
@@ -157,7 +152,11 @@ export const useResourceRoutes = function (resource) {
         },
       };
     } catch (error) {
-      console.log(error);
+      appStore.showToast({
+        severity: "error",
+        summary: "Error",
+        message: "An error occurred",
+      });
     }
   };
 

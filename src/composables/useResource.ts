@@ -112,7 +112,6 @@ export default function useResource(
    * @returns Promise<void>
    */
   function create(params: unknown, dataId?: number) {
-    console.log(params, dataId, routeId.value);
     if (params && resourceName) {
       return new Promise<void>((resolve, reject) => {
         resourceStore
