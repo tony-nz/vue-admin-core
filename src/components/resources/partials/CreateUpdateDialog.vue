@@ -67,7 +67,6 @@ import { defineComponent, onMounted, ref, watch } from "vue";
 import ApiService from "../../../core/services/ApiService";
 import useAppStore from "../../../store/app";
 import useResourceStore from "../../../store/resource";
-import { getSingularizedLabel } from "../../../core/helpers/functions";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
@@ -246,7 +245,6 @@ export default defineComponent({
       dataId,
       errors,
       fetchData,
-      getSingularizedLabel,
       modalData,
       modalType,
       onChange,

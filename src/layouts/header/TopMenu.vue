@@ -34,7 +34,7 @@
               <Tab
                 v-if="item && item.items"
                 :class="[
-                  'top-menu-item cursor-pointer flex items-center text-sm font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1 group',
+                  'top-menu-item cursor-pointer flex items-center font-medium tracking-normal rounded-t-lg px-4 py-3 rounded-tl-lg rounded-tr-lg overflow-hidden ml-1 group',
                   !item.items ? 'ml-1.5 my-1 py-2 px-2.5 rounded-lg' : '',
                 ]"
                 :activeClass="'group bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active'"
@@ -65,7 +65,7 @@
               >
                 <button
                   @click="navigate"
-                  class="cursor-pointer flex items-center text-sm font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg group"
+                  class="cursor-pointer flex items-center font-medium tracking-normal overflow-hidden ml-1.5 my-1 py-2 px-2.5 rounded-lg group"
                   :class="{
                     'bg-white dark:bg-slate-800 dark:text-white text-slate-800 menu-active':
                       isExactActive,

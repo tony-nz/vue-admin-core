@@ -1,7 +1,7 @@
 <template>
   <div :class="flex" class="flex gap-2">
     <slot name="actionCol" :data="data" />
-    <div v-if="resource.lock && showDefaults && canAction('update')">
+    <template v-if="resource.lock && showDefaults && canAction('update')">
       <button
         @click.stop="$emit('changeLock', data)"
         v-tooltip="
@@ -33,8 +33,8 @@
           />
         </svg>
       </button>
-    </div>
-    <div v-if="resource.edit.modal && showDefaults && canAction('update')">
+    </template>
+    <template v-if="resource.edit.modal && showDefaults && canAction('update')">
       <button
         @click.stop="$emit('showCreateEdit', 'dialog', 'update', data)"
         v-tooltip="'Edit ' + resource.singularName.toLowerCase()"
@@ -56,8 +56,8 @@
           />
         </svg>
       </button>
-    </div>
-    <div v-if="resource.show.page && showDefaults && canAction('update')">
+    </template>
+    <template v-if="resource.show.page && showDefaults && canAction('update')">
       <router-link
         :to="{ name: resource.label + 'Show', params: { id: data.id } }"
         v-tooltip="'Open ' + resource.singularName.toLowerCase()"
@@ -78,8 +78,8 @@
           </svg>
         </button>
       </router-link>
-    </div>
-    <div v-if="resource.delete && showDefaults && canAction('delete')">
+    </template>
+    <template v-if="resource.delete && showDefaults && canAction('delete')">
       <button
         @click="$emit('deletePopup', { $event, data })"
         v-tooltip="'Delete ' + resource.singularName.toLowerCase()"
@@ -101,7 +101,7 @@
           />
         </svg>
       </button>
-    </div>
+    </template>
   </div>
 </template>
 

@@ -66,7 +66,10 @@
           class="py-2 px-4 border rounded shadow whitespace-nowrap text-white"
           type="button"
         >
-          Bulk Delete {{ getSingularizedLabel(resource.label) }}s
+          Bulk Delete
+          {{
+            resource.singularLabel ? resource.singularLabel : resource.label
+          }}s
         </button>
         <button
           v-if="resource?.create?.modal && toolbar?.createBtn != false"
@@ -80,7 +83,9 @@
         >
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
-            {{ getSingularizedLabel(resource.label) }}</span
+            {{
+              resource.singularLabel ? resource.singularLabel : resource.label
+            }}</span
           >
           <span v-else>
             <svg
@@ -106,7 +111,9 @@
         >
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
-            {{ getSingularizedLabel(resource.label) }}</span
+            {{
+              resource.singularLabel ? resource.singularLabel : resource.label
+            }}</span
           >
           <span v-else>
             <svg
@@ -221,7 +228,11 @@
                     class="bg-primary-500 group-hover:bg-primary-400 rounded shadow whitespace-nowrap text-white py-2 px-4"
                   >
                     {{ translate("va.actions.create") }}
-                    {{ getSingularizedLabel(resource.label) }}
+                    {{
+                      resource.singularLabel
+                        ? resource.singularLabel
+                        : resource.label
+                    }}
                   </button>
                 </slot>
               </button>
@@ -292,10 +303,7 @@ import { defineComponent, onMounted, PropType, ref, toRef, watch } from "vue";
 import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode } from "primevue/api";
 import { useDebounce } from "../../../composables/useDebounce";
-import {
-  upperCaseFirst,
-  getSingularizedLabel,
-} from "../../../core/helpers/functions";
+import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
@@ -599,7 +607,6 @@ export default defineComponent({
       filters,
       getResourceData,
       getResourceFields,
-      getSingularizedLabel,
       isLoading,
       modalData,
       modalType,

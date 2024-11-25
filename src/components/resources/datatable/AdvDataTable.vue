@@ -64,7 +64,9 @@
           type="button"
         >
           {{ translate("va.actions.bulkDelete") }}
-          {{ getSingularizedLabel(resource.label) }}s
+          {{
+            resource.singularLabel ? resource.singularLabel : resource.label
+          }}s
         </button>
         <button
           v-if="
@@ -80,7 +82,9 @@
         >
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
-            {{ getSingularizedLabel(resource.label) }}</span
+            {{
+              resource.singularLabel ? resource.singularLabel : resource.label
+            }}</span
           >
           <span v-else>
             <svg
@@ -108,7 +112,9 @@
         >
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
-            {{ getSingularizedLabel(resource.label) }}</span
+            {{
+              resource.singularLabel ? resource.singularLabel : resource.label
+            }}</span
           >
           <span v-else>
             <svg
@@ -240,10 +246,7 @@ import { defineComponent, onMounted, PropType, ref, toRef, watch } from "vue";
 import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode } from "primevue/api";
 import { useDebounce } from "../../../composables/useDebounce";
-import {
-  upperCaseFirst,
-  getSingularizedLabel,
-} from "../../../core/helpers/functions";
+import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
@@ -565,7 +568,6 @@ export default defineComponent({
       filters,
       getResourceData,
       getResourceFields,
-      getSingularizedLabel,
       isLoading,
       isRowSelectable,
       modalData,
