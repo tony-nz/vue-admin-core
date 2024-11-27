@@ -92,7 +92,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import {
   darkMode,
   displayLogo,
@@ -187,6 +187,21 @@ export default defineComponent({
         // changeBackground(mainMenuConfig[active]);
       }
     });
+
+    /**
+     * Watch for route changes and update the active tab
+     * @param to
+     */
+    watch(
+      () => router.currentRoute.value,
+      (to) => {
+        const active = activeRoute(to.path, mainMenuConfig);
+        if (active > -1) {
+          activeTab.value = active;
+          // changeBackground(mainMenuConfig[active]);
+        }
+      }
+    );
 
     return {
       activeTab,
