@@ -312,6 +312,71 @@ export default function useResource(
     return allFields;
   }
 
+  interface Constraint {
+    value: string | null;
+    matchMode: string;
+  }
+
+  interface Filter {
+    value: string | null;
+    matchMode?: string;
+    operator?: string;
+    constraints?: Constraint[];
+  }
+
+  /**
+   * Clean filters
+   * @param filters
+   * @returns { [key: string]: Filter }
+   */
+  function cleanFilters(filters: { [key: string]: Filter }): {
+    [key: string]: Filter;
+  } {
+    const cleanedFilters: { [key: string]: Filter } = {};
+
+    for (const [key, filter] of Object.entries(filters)) {
+      if (
+        // key === "global" ||
+        filter.value !== null &&
+        filter.value !== undefined
+      ) {
+        if (Array.isArray(filter.constraints)) {
+          // Clean constraints array
+          const cleanedConstraints = (
+            filter.constraints as Constraint[]
+          ).filter(
+            (constraint) =>
+              constraint.value !== null && constraint.value !== undefined
+          );
+          if (cleanedConstraints.length > 0 || filter.operator) {
+            cleanedFilters[key] = {
+              ...filter,
+              constraints: cleanedConstraints,
+            };
+          }
+        } else {
+          cleanedFilters[key] = filter;
+        }
+      }
+    }
+
+    return cleanedFilters;
+  }
+
+  /**
+   * Add searchable columns
+   * @returns string
+   */
+  function addSearchableColumns() {
+    // check to see if cleanFilters(filters.value) has global filter
+    const cleanedFilters = cleanFilters(filters.value);
+    if (cleanedFilters.global) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Get resource data
    * @returns Promise<void>
@@ -324,7 +389,7 @@ export default function useResource(
        * Check for resource.lazy
        */
       if (resource.lazy) {
-        lazyParams.value.filters = filters.value;
+        lazyParams.value.filters = cleanFilters(filters.value);
         if (!lazyParams.value.sortField) {
           lazyParams.value.sortField = props.sortField || "id";
         }
@@ -334,8 +399,13 @@ export default function useResource(
         const params = {
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
-          searchable_columns: JSON.stringify(searchableColumns.value),
         };
+
+        if (addSearchableColumns()) {
+          params["searchable_columns"] = JSON.stringify(
+            searchableColumns.value
+          );
+        }
 
         await resourceStore
           .getList({
