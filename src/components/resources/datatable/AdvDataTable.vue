@@ -14,6 +14,18 @@
     :value="resourceData"
   >
     <template v-if="show.toolbar" #header>
+      <div class="px-2 py-1">
+        <h3
+          class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
+        >
+          {{ resource.label }}
+        </h3>
+        <p
+          class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
+        >
+          List of {{ resource.label.toLowerCase() }}
+        </p>
+      </div>
       <div
         class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
       >
@@ -26,9 +38,26 @@
               v-model="filters['global'].value"
               @input="debounce(onFilter, 500)"
               id="dt_search"
-              class="pl-10 font-normal w-full"
+              class="pl-10 font-normal w-full min-w-[350px]"
               placeholder="Keyword search"
             />
+            <button
+              v-if="filters['global'].value"
+              @click="filters['global'].value = ''"
+              type="button"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                class="h-5 w-5"
+              >
+                <path
+                  fill="currentColor"
+                  d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m1.41-1.41A8 8 0 1 0 15.66 4.34A8 8 0 0 0 4.34 15.66m9.9-8.49L11.41 10l2.83 2.83l-1.41 1.41L10 11.41l-2.83 2.83l-1.41-1.41L8.59 10L5.76 7.17l1.41-1.41L10 8.59l2.83-2.83z"
+                />
+              </svg>
+            </button>
           </span>
         </div>
         <div v-if="toolbar?.active" class="flex gap-2">
@@ -165,7 +194,7 @@
         />
       </div>
     </slot>
-    <Column v-if="show.actions" :exportable="false">
+    <Column v-if="show.actions" :exportable="false" class="w-24">
       <template #body="{ data }">
         <ActionColumn
           :data="data"
@@ -214,6 +243,62 @@
       </div>
       <div v-else>No records found</div>
     </template>
+    <template #paginatorcontainer="slotProps">
+      <div
+        class="flex items-center justify-between gap-4 border border-primary bg-transparent rounded-full w-full py-2 px-4"
+      >
+        <!-- Left Section: Rows Per Page Dropdown -->
+        <div class="flex items-center gap-2">
+          <label for="rows-dropdown" class="text-sm font-medium text-color"
+            >Rows:</label
+          >
+          <select
+            id="rows-dropdown"
+            class="border border-gray-300 rounded-md px-2 py-1 text-sm text-color focus:ring-primary focus:border-primary"
+          >
+            <option
+              v-for="option in [10, 25, 50, 100]"
+              @click="slotProps.setRows(option)"
+              :key="option"
+              :value="option"
+            >
+              {{ option }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Center Section: Showing X to Y of Z -->
+        <div class="text-color font-medium">
+          <span class="hidden sm:block"
+            >Showing {{ slotProps.first }} to {{ slotProps.last }} of
+            {{ slotProps.totalRecords }}</span
+          >
+          <span class="block sm:hidden"
+            >Page {{ slotProps.page + 1 }} of {{ slotProps.pageCount }}</span
+          >
+        </div>
+
+        <!-- Right Section: Navigation Buttons -->
+        <div class="flex items-center gap-2">
+          <Button
+            icon="pi pi-chevron-left"
+            rounded
+            text
+            @click="slotProps.prevPageCallback"
+            :disabled="slotProps.page === 0"
+            aria-label="Previous"
+          />
+          <Button
+            icon="pi pi-chevron-right"
+            rounded
+            text
+            @click="slotProps.nextPageCallback"
+            :disabled="slotProps.page === slotProps.pageCount - 1"
+            aria-label="Next"
+          />
+        </div>
+      </div>
+    </template>
   </DataTable>
   <!-- Start:Delete popup -->
   <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
@@ -250,7 +335,16 @@ import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
-
+interface PaginatorContainerProps {
+  first: number;
+  last: number;
+  page: number;
+  pageCount: number;
+  totalRecords: number;
+  setRows: (rows: number) => void;
+  prevPageCallback: () => void;
+  nextPageCallback: () => void;
+}
 interface DataTableToolbar {
   active: Boolean;
   bulkDeleteBtn: Boolean;
@@ -368,9 +462,9 @@ export default defineComponent({
       paginator: true,
       rows: 10,
       rowsPerPageOptions: [10, 25, 50, 100],
-      paginatorTemplate:
-        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
-      currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
+      // paginatorTemplate:
+      //   "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
+      // currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
       first: 0,
       ...attrs,
     };
