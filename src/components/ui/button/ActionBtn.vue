@@ -58,7 +58,7 @@ export default defineComponent({
       const bg =
         props.type === "delete"
           ? "bg-red-100 border-red-800 fill-red-400 dark:bg-red-800 hover:bg-red-400 hover:fill-white"
-          : "bg-gray-100 border-gray-800 fill-gray-400 dark:bg-slate-900 hover:bg-primary-400 hover:fill-white";
+          : "bg-gray-100 border-gray-300 fill-gray-400 dark:bg-slate-900 hover:bg-primary-400 hover:fill-white";
       return props.class
         ? props.class
         : "transition duration-150 ease-in-out rounded-lg p-2 shadow " + bg;

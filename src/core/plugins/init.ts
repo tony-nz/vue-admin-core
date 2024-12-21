@@ -63,12 +63,8 @@ export const initPlugins = async function (app: App<Element>, router, options) {
   // Load additional plugins
   initInlineSvg(app);
 
-  // PrimeVue with preset
-  if (options.primevue.preset) {
-    initPrimeVue(app, options.primevue.preset);
-  } else {
-    initPrimeVue(app);
-  }
+  // PrimeVuet\
+  initPrimeVue(app);
 
   // toast
   app.use(Vue3Toasity, {

@@ -11,7 +11,7 @@
           <VaTab
             :class="'p-1.5 inline-block focus:outline-nones transition-colors duration-200 rounded-lg dark:fill-gray-400 dark:hover:bg-gray-800 hover:bg-gray-100 hover:fill-gray-500'"
             :activeClass="'bg-white dark:bg-slate-600 dark:fill-white fill-gray-800 menu-active'"
-            :inActiveClass="'bg-black bg-opacity-10 hover:bg-white hover:bg-opacity-100 hover:fill-gray-800 fill-white fill-opacity-70'"
+            :inActiveClass="'bg-black/10 hover:bg-white hover:bg-opacity-100 hover:fill-gray-800 fill-white fill-opacity-70'"
             @click="changeBackground(item)"
           >
             <inline-svg

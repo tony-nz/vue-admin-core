@@ -5,9 +5,6 @@ import * as methods from "./enums/ResourceEnums";
 import ApiService from "../core/services/ApiService";
 import useAppStore from "./app";
 
-const stores = {};
-let storeActions = {};
-
 const {
   CREATE,
   DELETE,
@@ -33,316 +30,364 @@ interface IState {
   resource: ResourceConfig;
 }
 
-/**
- * Function to figure out the correct apiUrl
- */
-function getApiUrl(apiUrl, action, params) {
-  const replaceUrlId = (url, id) => {
-    return url.replace(":id", id);
-  };
-  const routeId = params?.routeId ? params?.routeId : null;
-  const subId = params?.subId ? params?.subId : null;
+// Helper for URL manipulation
+function getApiUrl(apiUrl: string, action: string, params: any): string {
+  const replaceUrlId = (url: string, id: any) => url.replace(":id", id ?? "");
+  const id = params?.routeId ?? params?.subId ?? null;
+  apiUrl = replaceUrlId(apiUrl, id);
 
-  apiUrl = replaceUrlId(apiUrl, routeId ? routeId : subId);
-
-  if (action === "getOne") {
-    return apiUrl + "/" + params.id;
+  if (action.toLowerCase() === "getone") {
+    return `${apiUrl}/${params.id ?? ""}`;
   }
   return apiUrl;
 }
 
-/**
- * processStoreData
- * Modify store lists with updated data
- * @param state
- * @param action
- * @param params
- * @param data
- */
-function processStoreData(state, action, payload, data) {
-  const params = payload?.params ? payload.params : {};
+// Action to process data based on the given action type
+function processStoreData(
+  store: any,
+  resourceName: string,
+  action: string,
+  payload: any,
+  data: any
+) {
+  const params = payload?.params || {};
+  const state = store.resources[resourceName];
 
   switch (action) {
     case CREATE:
       state.data.list.push(data);
       break;
+
     case DELETE:
-      if (params.id) {
-        state.data.list.splice(
-          state.data.list.map((item) => item.id).indexOf(params.id),
-          1
+      state.data.list = state.data.list.filter((item) => item.id !== params.id);
+      break;
+
+    case DELETE_MANY:
+      if (params.values) {
+        state.data.list = state.data.list.filter(
+          (item) => !params.values.includes(item.id)
         );
       }
       break;
-    case DELETE_MANY:
-      if (params.values) {
-        params.values.forEach((id) => {
-          state.data.list.splice(
-            state.data.list.map((item) => id).indexOf(id),
-            1
-          );
-        });
-      }
+
+    case GET:
+    case GET_ONE:
+      store.setItem(resourceName, data);
       break;
+
     case GET_LIST:
     case GET_TREE:
-      state.setList(state, data);
+      store.setList(resourceName, data);
       break;
-    case GET_ONE:
-      break;
-    case MOVE_NODE:
-      break;
+
     case UPDATE:
-      /**
-       * Check for param Id
-       */
-      let updatedResource: string[] = [];
-
-      updatedResource =
-        params?.id && state.data.list
-          ? state.data.list.find((val) => val["id"] === params.id)
-          : null;
-
-      // go through resource and update any values that are not null
-      if (updatedResource) {
-        Object.keys(data).forEach((key) => {
-          if (updatedResource) {
-            if (
-              updatedResource[key] ||
-              updatedResource[key] === "" ||
-              updatedResource[key] === null ||
-              updatedResource[key] === false
-            ) {
-              updatedResource[key] = data[key];
-            }
-          }
-        });
+      const itemIndex = state.data.list.findIndex(
+        (item) => item.id === params.id
+      );
+      if (itemIndex !== -1) {
+        state.data.list[itemIndex] = { ...state.data.list[itemIndex], ...data };
+        store.setItem(resourceName, data);
       }
+      break;
 
-      state.setItem(state, data);
-      break;
-    case UPDATE_MANY:
-      break;
     case LOCK:
-      if (params.id) {
-        state.data.list.find((item) => item.id === params.id).locked = true;
-      }
-      break;
     case UNLOCK:
       if (params.id) {
-        state.data.list.find((item) => item.id === params.id).locked = false;
+        const item = state.data.list.find((item) => item.id === params.id);
+        if (item) item.locked = action === LOCK;
       }
       break;
+
     default:
-      break;
+      console.warn(`Unhandled action in processStoreData: ${action}`);
   }
 }
 
-const useResourceStore = function (resource) {
-  if (!resource.name) {
-    throw new Error(translate("errors.missingResourceName"));
+// Centralized error handling
+function handleError(
+  appStore: any,
+  resourceStore: any,
+  resource: IState,
+  error: any
+): Promise<any> {
+  const message = error.response?.data?.message || "An error occurred";
+  appStore.setApiLoading(false);
+  resourceStore.showError(resource, error.message, message);
+  return Promise.reject(error);
+}
+
+async function handleApiCall(
+  this: ReturnType<typeof useResourceStore>,
+  action: string,
+  resourceName: string,
+  payload: any
+) {
+  const appStore = useAppStore();
+  const resource = this.resources[resourceName];
+  const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
+  const needsIdOnly = [DELETE, GET_ONE, UPDATE, LOCK, UNLOCK].includes(action);
+
+  try {
+    let params = payload?.params || {};
+    if (action === UPDATE && !params.id) params.id = resource.data.item.id;
+
+    const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
+    const apiMethod = loadingActions.includes(action)
+      ? "get"
+      : action.toLowerCase();
+
+    if (loadingActions.includes(action)) {
+      appStore.setApiLoading(true);
+    }
+
+    // correct payload or certain actions
+    const response = await ApiService[apiMethod](
+      getApiUrl(apiUrl, action, params),
+      needsIdOnly ? {} : params,
+      action === UPDATE ? payload.params : null
+    );
+
+    const data = response.data?.data?.data || response.data.data;
+
+    processStoreData(this, resourceName, action, payload, data);
+
+    appStore.setApiLoading(false);
+    this.showSuccess(resource, { action, params, data });
+
+    return data;
+  } catch (error) {
+    return handleError(appStore, this, resource, error);
   }
-  const storeName = "Resource" + upperCaseFirst(resource.name);
+}
 
-  Object.values(methods).forEach(
-    (action) =>
-      (storeActions[action] = async (payload) => {
-        const appStore = useAppStore();
-        const resourceStore = useResourceStore(resource)();
-
-        try {
-          let params = payload?.params ? payload.params : {};
-
-          /**
-           * Set loading for certain methods
-           */
-          if ([GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE].includes(action)) {
-            appStore.setApiLoading(true);
-          }
-
-          /**
-           * Set params.id to state.item.id if action
-           * is UPDATE and params.id is not set
-           */
-          if (action === UPDATE && !params.id) {
-            params.id = resourceStore.data.item.id;
-          }
-
-          /**
-           * Check action and return correct params
-           */
-          params = [DELETE, GET_ONE, UPDATE, LOCK, UNLOCK].includes(action)
-            ? params.id
-            : params;
-
-          const newApiUrl = payload?.apiUrl
-            ? payload?.apiUrl
-            : resourceStore.resource.apiUrl;
-
-          let response = await ApiService[
-            [GET_LIST, GET_NODES, GET_ONE, GET_TREE].includes(action)
-              ? "get"
-              : action
-          ](
-            getApiUrl(newApiUrl, action, payload),
-            params,
-            action === UPDATE ? payload.params : null
-          ).catch((response) => {
-            return Promise.reject(response);
-          });
-
-          // if the response contains a data object, use that,
-          // otherwise use the response itself
-          const data = response.data?.data?.data
-            ? response.data.data.data
-            : response.data.data;
-
-          /**
-           * Process data into store for caching
-           * and referencing
-           */
-          processStoreData(resourceStore, action, payload, data);
-
-          /**
-           * Set loading to false
-           * and show success message
-           */
-          appStore.setApiLoading(false);
-          resourceStore.showSuccess(resourceStore, { action, params, data });
-
-          /**
-           * Return response data if it exists
-           */
-          if (response.data?.data) {
-            return Promise.resolve(response.data);
-          }
-
-          return Promise.resolve(response);
-        } catch (e: any) {
-          const message = e.response?.data?.message || false;
-          appStore.setApiLoading(false);
-          resourceStore.showError(resourceStore, e.message, message);
-          return Promise.reject(e);
-        }
-      })
-  );
-  stores[storeName] = defineStore({
-    id: storeName,
-    state: (): IState => ({
-      data: {
-        item: {},
-        list: [],
-      },
-      loading: false,
-      resource,
-    }),
-    actions: {
-      ...storeActions,
-      setItem(state, item) {
-        state.data.item = item;
-      },
-      setList(state, data) {
-        state.data.list = data;
-      },
-      showSuccess(state, { action, params, data }): any {
-        const appStore = useAppStore();
-        const messages = {
-          [CREATE]: translate("va.messages.created", {
-            resource: resource.getName(1),
-          }),
-          [DELETE]: translate("va.messages.deleted", {
-            resource: resource.getName(1),
-            id: params,
-          }),
-          [DELETE_MANY]: translate("va.messages.deletedMany", {
-            resource: resource.getName(data.length).toLowerCase(),
-            count: data?.length ? data.length : 1,
-          }),
-          [GET]: translate("va.messages.fetched", {
-            resource: resource.getName(data.length).toLowerCase(),
-            count: data?.length ? data.length : 1,
-          }),
-          [GET_LIST]: translate("va.messages.fetched", {
-            resource: resource.getName(data.length).toLowerCase(),
-            count: data?.length ? data.length : 1,
-          }),
-          [GET_NODES]: translate("va.messages.fetched"),
-          [GET_ONE]: translate("va.messages.fetched", {
-            resource: resource.getName(1),
-            id: params,
-          }),
-          [GET_TREE]: translate("va.messages.fetched"),
-          [UPDATE]: translate("va.messages.updated", {
-            resource: resource.getName(1),
-            id: params,
-          }),
-          [UPDATE_MANY]: translate("va.messages.updatedMany", {
-            resource: resource.getName(data.length).toLowerCase(),
-            count: data?.length ? data.length : 1,
-          }),
-          [LOCK]: translate("va.messages.locked", {
-            resource: resource.getName(1),
-            id: params,
-          }),
-          [UNLOCK]: translate("va.messages.unlocked", {
-            resource: resource.getName(1),
-            id: params,
-          }),
+const useResourceStore = defineStore({
+  id: "ResourceStore",
+  state: () => ({
+    resources: {} as { [key: string]: IState },
+  }),
+  actions: {
+    addResource(resourceName: string, resourceConfig: ResourceConfig) {
+      if (!this.resources[resourceName]) {
+        this.resources[resourceName] = {
+          data: { item: {}, list: [] },
+          loading: false,
+          resource: resourceConfig,
         };
-        if (
-          !state.resource.notifications ||
-          state.resource.notifications["all"] ||
-          state.resource.notifications[action]
-        ) {
-          // if create or update, add following html to message
-          let message = "";
-
-          if ([CREATE, UPDATE].includes(action)) {
-            message = `<a class="mt-2" href="/${resource
-              .getName(1)
-              .toLowerCase()}/${data.id}">Open ${
-              data.name || data.title || data.id
-            }</a>`;
-          }
-
-          appStore.showToast({
-            severity: "success",
-            summary: messages[action],
-            message,
-          });
-        }
-      },
-      showError(state, summary, message): any {
-        const appStore = useAppStore();
-        if (
-          !state.resource.notifications ||
-          state.resource.notifications["error"] === true
-        ) {
-          appStore.showToast({
-            severity: "error",
-            summary,
-            message,
-          });
-        }
-      },
+      }
     },
-    getters: {
-      getDataItem(): any {
-        return this.data.item;
-      },
-      getDataList(): any {
-        return this.data.list;
-      },
-      getResource(): ResourceConfig {
-        return this.resource;
-      },
-      getLoading(): boolean {
-        return this.loading;
-      },
+    setItem(resourceName: string, item: any) {
+      console.log("setItem", resourceName, item);
+      this.resources[resourceName].data.item = item;
     },
-  });
+    setList(resourceName: string, data: any[]) {
+      this.resources[resourceName].data.list = data;
+    },
+    // CRUD and State Management Actions
+    async create({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, CREATE, resourceName, payload);
+    },
+    async delete({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, DELETE, resourceName, payload);
+    },
+    async deleteMany({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, DELETE_MANY, resourceName, payload);
+    },
+    async get({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, GET, resourceName, payload);
+    },
+    async getList({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, GET_LIST, resourceName, payload);
+    },
+    async getNodes({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, GET_NODES, resourceName, payload);
+    },
+    async getOne({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, GET_ONE, resourceName, payload);
+    },
+    async getTree({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, GET_TREE, resourceName, payload);
+    },
+    async lock({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, LOCK, resourceName, payload);
+    },
+    async unlock({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, UNLOCK, resourceName, payload);
+    },
+    async moveNode({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, MOVE_NODE, resourceName, payload);
+    },
+    async update({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, UPDATE, resourceName, payload);
+    },
+    async updateMany({
+      resourceName,
+      payload,
+    }: {
+      resourceName: string;
+      payload: any;
+    }) {
+      return handleApiCall.call(this, UPDATE_MANY, resourceName, payload);
+    },
+    showSuccess(
+      resource: IState,
+      { action, params, data }: { action: string; params: any; data: any }
+    ) {
+      const appStore = useAppStore();
+      const resourceConfig = resource.resource as ResourceConfig;
 
-  return stores[storeName];
-};
+      const messages = {
+        [CREATE]: "va.messages.created",
+        [DELETE]: "va.messages.deleted",
+        [DELETE_MANY]: "va.messages.deletedMany",
+        [GET]: "va.messages.fetched",
+        [GET_LIST]: "va.messages.fetched",
+        [GET_NODES]: "va.messages.fetched",
+        [GET_ONE]: "va.messages.fetched",
+        [GET_TREE]: "va.messages.fetched",
+        [UPDATE]: "va.messages.updated",
+        [UPDATE_MANY]: "va.messages.updatedMany",
+        [LOCK]: "va.messages.locked",
+        [UNLOCK]: "va.messages.unlocked",
+      };
+
+      const getMessage = (actionKey: string, extras: any = {}) => {
+        const baseMessage = messages[actionKey];
+        if (!baseMessage) return "";
+
+        const count = data?.length || 1;
+        const singularOrPlural = resourceConfig.getName?.(count).toLowerCase();
+
+        return translate(baseMessage, {
+          resource: singularOrPlural,
+          id: params.id,
+          count,
+          ...extras,
+        });
+      };
+
+      // Check if notifications should be shown for this action
+      if (
+        !resourceConfig.notifications ||
+        resourceConfig.notifications["all"] ||
+        resourceConfig.notifications[action]
+      ) {
+        let message = "";
+        if ([CREATE, UPDATE].includes(action)) {
+          message = `<a class="mt-2" href="/${resourceConfig
+            .getName?.(1)
+            .toLowerCase()}/${data.id}">Open ${
+            data.name || data.title || data.id
+          }</a>`;
+        }
+
+        appStore.showToast({
+          severity: "success",
+          summary: getMessage(action),
+          message,
+        });
+      }
+    },
+    showError(resource: IState, summary: string, message: string) {
+      const appStore = useAppStore();
+      const resourceConfig = resource.resource;
+
+      // Check if error notifications are enabled
+      if (
+        !resourceConfig.notifications ||
+        resourceConfig.notifications["error"] === true
+      ) {
+        appStore.showToast({
+          severity: "error",
+          summary,
+          message,
+        });
+      }
+    },
+  },
+  getters: {
+    getResourceData: (state) => (resourceName: string) =>
+      state.resources[resourceName],
+    getDataItem: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.data.item,
+    getDataList: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.data.list,
+    getResource: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.resource,
+    getLoading: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.loading,
+  },
+});
 
 export default useResourceStore;

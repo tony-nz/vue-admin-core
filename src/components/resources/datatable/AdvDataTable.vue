@@ -244,7 +244,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType, ref, toRef, watch } from "vue";
 import { translate } from "../../../core/helpers/functions";
-import { FilterMatchMode } from "primevue/api";
+import { FilterMatchMode } from "@primevue/core/api";
 import { useDebounce } from "../../../composables/useDebounce";
 import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";

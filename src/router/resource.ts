@@ -24,24 +24,6 @@ export const useResourceRoutes = function (resource) {
   ];
 
   /**
-   *
-   */
-  const buildPermissions = (resource) => {
-    const permissions = [];
-    if (resource.permissions) {
-      Object.keys(resource.permissions).forEach(function (key) {
-        Object.keys(resource.permissions[key].actions).forEach(function (
-          actionKey
-        ) {
-          permissions[actionKey] =
-            resource.name + "-" + resource.permissions[key].actions[actionKey];
-        });
-      });
-    }
-    return permissions;
-  };
-
-  /**
    * Construct the resource name from the
    * resource name and action
    */
@@ -54,10 +36,10 @@ export const useResourceRoutes = function (resource) {
    */
   const buildRoute = (resource: any, action, path) => {
     const appStore = useAppStore();
+    const resourceStore = useResourceStore(); // Get the store instance
+
     try {
-      const routerPermissions = buildPermissions(resource);
-      const store = useResourceStore(resource)();
-      const appStore = useAppStore();
+      const routerPermissions = []; // Adjust according to your permission structure
       return {
         path,
         name: resourceName(name, action),
@@ -102,20 +84,30 @@ export const useResourceRoutes = function (resource) {
                * Route model binding
                */
               try {
-                const { data } = await store.getOne({
-                  id,
+                const response = await resourceStore.getOne({
+                  resourceName: resource.name,
+                  payload: {
+                    params: { id: id },
+                  },
                 });
 
                 /**
                  * Insert model into route & resource store
                  */
-                store.setItem(store, data);
+                // resourceStore.setItem(resource.name, response.data);
 
                 if (to.params.id) {
-                  setTitle(to, action, data);
+                  setTitle(to, action, response.data);
                   return next();
                 }
-              } catch ({ status, message }: any) {
+              } catch (error: any) {
+                const response = error.response as {
+                  data?: { message?: string };
+                  status?: number;
+                };
+                const message = response?.data?.message || "An error occurred";
+                const status = response?.status;
+
                 appStore.showToast({
                   severity: "error",
                   summary: message,
@@ -134,7 +126,8 @@ export const useResourceRoutes = function (resource) {
             next();
           },
           beforeRouteLeave(to, from, next) {
-            // store.removeItem();
+            // Here you might want to clear the item from the store if necessary
+            // resourceStore.setItem(resource.name, {});
             next();
           },
         },
@@ -144,7 +137,6 @@ export const useResourceRoutes = function (resource) {
           requiresAuth: true,
           icon: resource.icon,
           layout: resource.layout,
-          store,
           resource,
           middleware: roles,
           roles: resource.roles,

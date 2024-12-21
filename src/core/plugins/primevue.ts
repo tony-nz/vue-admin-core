@@ -1,10 +1,8 @@
-/* eslint-disable vue/multi-word-component-names */
-import { App, provide } from "vue";
+import { App } from "vue";
 import PrimeVue from "primevue/config";
 import DialogService from "primevue/dialogservice";
 import ConfirmationService from "primevue/confirmationservice";
 import ToastService from "primevue/toastservice";
-import DynamicDialog from "primevue/dynamicdialog";
 
 // directives
 import BadgeDirective from "primevue/badgedirective";
@@ -20,7 +18,7 @@ import Badge from "primevue/badge";
 import BlockUI from "primevue/blockui";
 import Button from "primevue/button";
 import Breadcrumb from "primevue/breadcrumb";
-import Calendar from "primevue/calendar";
+import DatePicker from "primevue/datepicker"; // Changed from Calendar
 import Card from "primevue/card";
 import Chart from "primevue/chart";
 import CascadeSelect from "primevue/cascadeselect";
@@ -36,20 +34,18 @@ import ConfirmPopup from "primevue/confirmpopup";
 import ContextMenu from "primevue/contextmenu";
 import DataTable from "primevue/datatable";
 import DataView from "primevue/dataview";
-import DataViewLayoutOptions from "primevue/dataviewlayoutoptions";
 import DeferredContent from "primevue/deferredcontent";
 import Dialog from "primevue/dialog";
 import Divider from "primevue/divider";
 import Dock from "primevue/dock";
-import Dropdown from "primevue/dropdown";
+import Select from "primevue/select"; // Changed from Dropdown
 import Editor from "primevue/editor";
 import Fieldset from "primevue/fieldset";
 import FileUpload from "primevue/fileupload";
 import Galleria from "primevue/galleria";
 import Image from "primevue/image";
-import InlineMessage from "primevue/inlinemessage";
 import Inplace from "primevue/inplace";
-import InputSwitch from "primevue/inputswitch";
+import ToggleSwitch from "primevue/toggleswitch"; // Changed from InputSwitch
 import InputText from "primevue/inputtext";
 import InputMask from "primevue/inputmask";
 import InputNumber from "primevue/inputnumber";
@@ -62,7 +58,7 @@ import Message from "primevue/message";
 import MultiSelect from "primevue/multiselect";
 import OrderList from "primevue/orderlist";
 import OrganizationChart from "primevue/organizationchart";
-import OverlayPanel from "primevue/overlaypanel";
+import Popover from "primevue/popover"; // Changed from OverlayPanel
 import Paginator from "primevue/paginator";
 import Panel from "primevue/panel";
 import PanelMenu from "primevue/panelmenu";
@@ -79,20 +75,21 @@ import ScrollPanel from "primevue/scrollpanel";
 import ScrollTop from "primevue/scrolltop";
 import Skeleton from "primevue/skeleton";
 import Slider from "primevue/slider";
-import Sidebar from "primevue/sidebar";
+import Drawer from "primevue/drawer"; // Changed from Sidebar
 import SpeedDial from "primevue/speeddial";
 import SplitButton from "primevue/splitbutton";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
-import Steps from "primevue/steps";
+import Stepper from "primevue/stepper"; // New component, replaces Steps in some contexts
 import StyleClass from "primevue/styleclass";
 import TabMenu from "primevue/tabmenu";
 import TieredMenu from "primevue/tieredmenu";
 import Textarea from "primevue/textarea";
 import Toast from "primevue/toast";
 import Toolbar from "primevue/toolbar";
-import TabView from "primevue/tabview";
+import Tabs from "primevue/tabs"; // Changed from TabView
 import TabPanel from "primevue/tabpanel";
+import TabPanels from "primevue/tabpanels";
 import Tag from "primevue/tag";
 import Terminal from "primevue/terminal";
 import Timeline from "primevue/timeline";
@@ -100,27 +97,14 @@ import ToggleButton from "primevue/togglebutton";
 import Tree from "primevue/tree";
 import TreeSelect from "primevue/treeselect";
 import TreeTable from "primevue/treetable";
-import TriStateCheckbox from "primevue/tristatecheckbox";
 import VirtualScroller from "primevue/virtualscroller";
 
 /**
  * Initialize PrimeVUE component
  * @param app vue instance
  */
-export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
-  if (!zIndex) {
-    zIndex = {
-      modal: 1100, //dialog, sidebar
-      overlay: 1000, //dropdown, overlaypanel
-      menu: 1000, //overlay menus
-      tooltip: 1100, //tooltip
-    };
-  }
-  if (preset) {
-    app.use(PrimeVue, { unstyled: true, pt: preset, zIndex: zIndex });
-  } else {
-    app.use(PrimeVue);
-  }
+export function initPrimeVue(app: App<Element>) {
+  app.use(PrimeVue, { theme: "none" });
 
   // register services
   app.use(ToastService);
@@ -134,20 +118,20 @@ export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
   app.directive("styleclass", StyleClass);
 
   // register components
+  app.component("AutoComplete", AutoComplete);
   app.component("Accordion", Accordion);
   app.component("AccordionTab", AccordionTab);
-  app.component("AutoComplete", AutoComplete);
   app.component("Avatar", Avatar);
   app.component("AvatarGroup", AvatarGroup);
   app.component("Badge", Badge);
   app.component("BlockUI", BlockUI);
-  app.component("Breadcrumb", Breadcrumb);
   app.component("Button", Button);
-  app.component("Calendar", Calendar);
+  app.component("Breadcrumb", Breadcrumb);
+  app.component("DatePicker", DatePicker);
   app.component("Card", Card);
   app.component("Chart", Chart);
-  app.component("Carousel", Carousel);
   app.component("CascadeSelect", CascadeSelect);
+  app.component("Carousel", Carousel);
   app.component("Checkbox", Checkbox);
   app.component("Chip", Chip);
   app.component("Chips", Chips);
@@ -159,24 +143,21 @@ export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
   app.component("ContextMenu", ContextMenu);
   app.component("DataTable", DataTable);
   app.component("DataView", DataView);
-  app.component("DataViewLayoutOptions", DataViewLayoutOptions);
   app.component("DeferredContent", DeferredContent);
   app.component("Dialog", Dialog);
   app.component("Divider", Divider);
   app.component("Dock", Dock);
-  app.component("Dropdown", Dropdown);
-  app.component("DynamicDialog", DynamicDialog);
+  app.component("Select", Select);
   app.component("Editor", Editor);
   app.component("Fieldset", Fieldset);
   app.component("FileUpload", FileUpload);
   app.component("Galleria", Galleria);
   app.component("Image", Image);
-  app.component("InlineMessage", InlineMessage);
   app.component("Inplace", Inplace);
+  app.component("ToggleSwitch", ToggleSwitch);
+  app.component("InputText", InputText);
   app.component("InputMask", InputMask);
   app.component("InputNumber", InputNumber);
-  app.component("InputSwitch", InputSwitch);
-  app.component("InputText", InputText);
   app.component("Knob", Knob);
   app.component("Listbox", Listbox);
   app.component("MegaMenu", MegaMenu);
@@ -186,7 +167,7 @@ export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
   app.component("MultiSelect", MultiSelect);
   app.component("OrderList", OrderList);
   app.component("OrganizationChart", OrganizationChart);
-  app.component("OverlayPanel", OverlayPanel);
+  app.component("Popover", Popover);
   app.component("Paginator", Paginator);
   app.component("Panel", Panel);
   app.component("PanelMenu", PanelMenu);
@@ -194,35 +175,35 @@ export function initPrimeVue(app: App<Element>, preset?, zIndex?) {
   app.component("PickList", PickList);
   app.component("ProgressBar", ProgressBar);
   app.component("ProgressSpinner", ProgressSpinner);
-  app.component("RadioButton", RadioButton);
   app.component("Rating", Rating);
+  app.component("RadioButton", RadioButton);
   app.component("Row", Row);
   app.component("SelectButton", SelectButton);
   app.component("ScrollPanel", ScrollPanel);
   app.component("ScrollTop", ScrollTop);
-  app.component("Slider", Slider);
-  app.component("Sidebar", Sidebar);
   app.component("Skeleton", Skeleton);
+  app.component("Slider", Slider);
+  app.component("Drawer", Drawer);
   app.component("SpeedDial", SpeedDial);
   app.component("SplitButton", SplitButton);
   app.component("Splitter", Splitter);
   app.component("SplitterPanel", SplitterPanel);
-  app.component("Steps", Steps);
+  app.component("Stepper", Stepper);
   app.component("TabMenu", TabMenu);
-  app.component("TabView", TabView);
-  app.component("TabPanel", TabPanel);
-  app.component("Tag", Tag);
-  app.component("Textarea", Textarea);
-  app.component("Terminal", Terminal);
   app.component("TieredMenu", TieredMenu);
-  app.component("Timeline", Timeline);
+  app.component("Textarea", Textarea);
   app.component("Toast", Toast);
   app.component("Toolbar", Toolbar);
+  app.component("Tabs", Tabs);
+  app.component("TabPanel", TabPanel);
+  app.component("TabPanels", TabPanels);
+  app.component("Tag", Tag);
+  app.component("Terminal", Terminal);
+  app.component("Timeline", Timeline);
   app.component("ToggleButton", ToggleButton);
   app.component("Tree", Tree);
   app.component("TreeSelect", TreeSelect);
   app.component("TreeTable", TreeTable);
-  app.component("TriStateCheckbox", TriStateCheckbox);
   app.component("VirtualScroller", VirtualScroller);
 
   // providers

@@ -26,7 +26,7 @@ export default function useResource(
   const modalType = ref();
   const props: any = ref(dtProps);
   const resourceData = ref();
-  const resourceStore = useResourceStore(resource)();
+  const resourceStore = useResourceStore();
   const route = useRoute();
   const routeId = ref(route?.params?.id);
   const showModal = ref(false);
@@ -108,25 +108,26 @@ export default function useResource(
   /**
    * Create a new resource
    * @param params
-   * @param subId
+   * @param dataId
    * @returns Promise<void>
    */
-  function create(params: unknown, dataId?: number) {
+  async function create(params: unknown, dataId?: number): Promise<void> {
     if (params && resourceName) {
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .create({
+      try {
+        await resourceStore.create({
+          resourceName: resourceName,
+          payload: {
             params,
             routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+          },
+        });
+        // If you need to handle the response, you can do so here
+      } catch (e) {
+        // Handle error appropriately
+        console.error("Error creating resource:", e);
+        throw e; // Re-throw the error to maintain the promise chain's error state
+      }
     }
   }
 
@@ -134,26 +135,25 @@ export default function useResource(
    * Update a resource
    * @param params
    * @param id
-   * @param subId
+   * @param dataId
    * @returns Promise<void>
    */
-  function update(params, id, dataId?: number) {
+  async function update(params: any, id: any, dataId?: number): Promise<void> {
     if (params && id && resourceName) {
       params.id = id;
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .update({
+      try {
+        await resourceStore.update({
+          resourceName: resourceName,
+          payload: {
             params,
             routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+          },
+        });
+      } catch (e) {
+        console.error("Error updating resource:", e);
+        throw e;
+      }
     }
   }
 
@@ -162,18 +162,19 @@ export default function useResource(
    * @param id
    * @returns Promise<void>
    */
-  function lock(id) {
+  async function lock(id: any): Promise<void> {
     if (id && resourceName) {
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .lock({ params: { id: id } })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+      try {
+        await resourceStore.lock({
+          resourceName: resourceName,
+          payload: {
+            params: { id },
+          },
+        });
+      } catch (e) {
+        console.error("Error locking resource:", e);
+        throw e;
+      }
     }
   }
 
@@ -182,68 +183,67 @@ export default function useResource(
    * @param id
    * @returns Promise<void>
    */
-  function unlock(id) {
+  async function unlock(id: any): Promise<void> {
     if (id && resourceName) {
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .unlock({ params: { id: id } })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+      try {
+        await resourceStore.unlock({
+          resourceName: resourceName,
+          payload: {
+            params: { id },
+          },
+        });
+      } catch (e) {
+        console.error("Error unlocking resource:", e);
+        throw e;
+      }
     }
   }
 
   /**
    * Remove a resource
    * @param id
-   * @param subId
+   * @param dataId
    * @returns Promise<void>
    */
-  function remove(id, dataId?: number) {
+  async function remove(id: any, dataId?: number): Promise<void> {
     if (id && resourceName) {
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .delete({
+      try {
+        await resourceStore.delete({
+          resourceName: resourceName,
+          payload: {
             params: { id },
             routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+          },
+        });
+      } catch (e) {
+        console.error("Error removing resource:", e);
+        throw e;
+      }
     }
   }
 
   /**
    * Bulk remove resources
    * @param data
-   * @param subId
+   * @param dataId
    * @returns Promise<void>
    */
-  function bulkRemove(data, dataId?: number) {
+  async function bulkRemove(data: any, dataId?: number): Promise<void> {
     if (data && resourceName) {
-      return new Promise<void>((resolve, reject) => {
-        resourceStore
-          .deleteMany({
+      try {
+        await resourceStore.deleteMany({
+          resourceName: resourceName,
+          payload: {
             params: { data },
             routeId: dataId ? dataId : routeId.value,
             apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((e) => {
-            reject(e);
-          });
-      });
+          },
+        });
+      } catch (e) {
+        console.error("Error bulk removing resources:", e);
+        throw e;
+      }
     }
   }
 
@@ -407,34 +407,38 @@ export default function useResource(
           );
         }
 
-        await resourceStore
-          .getList({
-            params: params,
-            routeId: routeId.value,
-            apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            totalRecords.value = response.data.total;
-            resourceData.value = response.data.data;
-            return response.data.data;
-          })
-          .catch((e) => {
-            totalRecords.value = 0;
+        try {
+          const response = await resourceStore.getList({
+            resourceName: resource.name,
+            payload: {
+              params: params,
+              routeId: routeId.value,
+              apiUrl: apiUrl.value,
+            },
           });
+
+          totalRecords.value = response.length;
+          resourceData.value = response;
+        } catch (e) {
+          totalRecords.value = 0;
+          console.error("Error fetching resource list:", e);
+        }
       } else {
-        await resourceStore
-          .getList({
-            routeId: routeId.value,
-            apiUrl: apiUrl.value,
-          })
-          .then((response) => {
-            resourceData.value = response.data;
-            totalRecords.value = response.data.length;
-            return response.data;
-          })
-          .catch((e) => {
-            totalRecords.value = 0;
+        try {
+          const response = await resourceStore.getList({
+            resourceName: resource.name,
+            payload: {
+              routeId: routeId.value,
+              apiUrl: apiUrl.value,
+            },
           });
+
+          resourceData.value = response;
+          totalRecords.value = response.length;
+        } catch (e) {
+          totalRecords.value = 0;
+          console.error("Error fetching resource list:", e);
+        }
       }
       isLoading.value = false;
     }

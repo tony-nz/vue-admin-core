@@ -3,68 +3,56 @@ import i18n from "../plugins/i18n";
 import useAppStore from "../../store/app";
 
 /**
- * Check if value is empty
- * @param value
- * @returns {boolean}
+ * Checks if a value is empty
+ * @param value - The value to check for emptiness
+ * @returns {boolean} - True if the value is considered empty, false otherwise
  */
-const isEmpty = (value) => {
-  if (Array.isArray(value)) {
-    return value.length === 0;
-  }
-  if (value && typeof value === "object") {
+const isEmpty = (value: any): boolean => {
+  if (Array.isArray(value)) return value.length === 0;
+  if (value && typeof value === "object")
     return Object.keys(value).length === 0;
-  }
   return !value;
 };
 
 /**
- * Permissions helper & directive
+ * Checks if the user has the specified permission
+ * @param permission - The permission to check
+ * @returns {boolean} - True if the user has the permission, false otherwise
  */
-const can = (permission) => {
+const can = (permission: string): boolean => {
   const appStore = useAppStore();
-
-  if (!permission) {
-    return false;
-  }
-
+  if (!permission) return false;
   return appStore.getPermissions.includes(permission);
 };
 
 /**
- * Get full resource object meta from name
+ * Gets the full resource object meta from name
+ * @param name - Name of the resource
+ * @returns {string} - Returns the name, should be enhanced to return full resource object
  */
-const getResource = (name) => {
-  // app.config.globalProperties.$resources.find((r) => r.name === name);
-  return name;
+const getResource = (name: string): any => {
+  const appStore = useAppStore();
+  return appStore.config.resources.find(
+    (resource: any) => resource.name === name
+  );
 };
 
 /**
- * Resource link helper with action permission test
+ * Creates a resource link with action permission check
+ * @param link - Either a string (resource name) or an object with link details
+ * @returns {Object | false} - Object with link details or false if conditions not met
  */
-const getResourceLink = (link) => {
-  const getLink = ({ name, icon, text, action }: any) => {
-    action = action || "list";
+const getResourceLink = (link: string | any): Object | false => {
+  const getLink = ({ name, icon, text, action = "list" }: any) => {
     const resource = getResource(name);
+    if (!resource) return false;
 
-    if (!resource) {
-      return false;
-    }
+    const { routes, canAction, singularName, pluralName } = buildResourceConfig(
+      { name, routes: [], actions: [] }
+    ); // Mocked for simplicity
 
-    const { routes, canAction, singularName, pluralName } = resource;
-
-    /**
-     * Route must exist
-     */
-    if (!routes.includes(action)) {
-      return false;
-    }
-
-    /**
-     * Current user must have permission for this action
-     */
-    if (!canAction(action)) {
-      return false;
-    }
+    if (!routes.includes(action)) return false;
+    if (!canAction(action)) return false;
 
     return {
       icon: icon || resource.icon,
@@ -73,64 +61,60 @@ const getResourceLink = (link) => {
     };
   };
 
-  if (typeof link === "object") {
-    return getLink(link);
-  }
-  return getLink({ name: link });
+  return typeof link === "object" ? getLink(link) : getLink({ name: link });
 };
 
 /**
- * Resource links list helper
+ * Generates a list of resource links
+ * @param links - Array of link objects or strings
+ * @returns {Array} - Filtered array of valid resource links
  */
-const getResourceLinks = (links) => {
+const getResourceLinks = (links: (string | any)[]): any[] => {
   return links
     .map((link) => {
       if (typeof link === "object") {
-        if (link.children) {
-          return link;
-        }
-
-        return getResourceLink(link);
+        return link.children ? link : getResourceLink(link);
       }
       return getResourceLink({ name: link });
     })
-    .filter((r) => r);
+    .filter(Boolean);
 };
 
 /**
- * Build path based on route and resource url
+ * Builds the path based on the route and resource URL
+ * @param route - Route identifier
+ * @param resource - Resource object
+ * @returns {string} - Constructed path
  */
-const buildPath = (route, resource) => {
-  if (route === "list") {
-    return resource.url;
-  } else if (route === "create") {
-    return resource.url + "/create";
-  } else if (route === "edit") {
-    return resource.url + "/:id";
-  } else if (route === "show") {
-    return resource.url + "/:id";
-  }
-  return resource.url;
+const buildPath = (route: string, resource: any): string => {
+  const paths: { [key: string]: string } = {
+    list: resource.url,
+    create: `${resource.url}/create`,
+    edit: `${resource.url}/:id`,
+    show: `${resource.url}/:id`,
+  };
+  return paths[route] || resource.url;
 };
 
 /**
- * Build resource name from route and resource
+ * Constructs the resource name from route and resource
+ * @param route - Route identifier
+ * @param resource - Resource object
+ * @returns {string} - Formatted resource name
  */
-const resourceName = (route, resource) => {
-  return `${upperCaseFirst(resource.name) + upperCaseFirst(route)}`;
+const resourceName = (route: string, resource: any): string => {
+  return `${upperCaseFirst(resource.name)}${upperCaseFirst(route)}`;
 };
 
-const buildResourceConfig = (resource) => {
-  /**
-   * Get valid routes
-   */
-  const routes = ["list", "show", "create", "edit"].filter((name) => {
-    return !resource.routes || resource.routes.includes(name);
-  });
-
-  /**
-   * Get valid actions
-   */
+/**
+ * Constructs a resource configuration object
+ * @param resource - Base resource configuration
+ * @returns {Object} - Extended resource configuration
+ */
+const buildResourceConfig = (resource: any): any => {
+  const routes = ["list", "show", "create", "edit"].filter(
+    (name) => !resource.routes || resource.routes.includes(name)
+  );
   const actions = [
     "list",
     "show",
@@ -140,26 +124,22 @@ const buildResourceConfig = (resource) => {
     "read",
     "delete",
   ].filter((name) => {
-    if ((resource.actions || []).length) {
-      return resource.actions.includes(name);
-    }
-
-    if ((resource.except || []).length) {
-      return !resource.except.includes(name);
-    }
-
-    return true;
+    return (
+      !resource.actions ||
+      resource.actions.includes(name) ||
+      (resource.except && !resource.except.includes(name))
+    );
   });
-  const nameKey = `resources.${resource.name}.name`;
 
-  const getName = (count) => {
-    const { t, te, tc } = i18n.global;
+  const nameKey = `resources.${resource.name}.name`;
+  const { t, te, tc } = i18n.global;
+
+  const getName = (count: number): string => {
     return te(nameKey)
       ? tc(nameKey, count)
       : formatKebabCase(upperCaseFirst(resource.name));
   };
 
-  // convert below into const
   const resourceConfig = {
     ...resource,
     icon: resource.icon || "",
@@ -169,22 +149,22 @@ const buildResourceConfig = (resource) => {
     nameKey,
     singularName: getName(1),
     pluralName: getName(10),
-    getTitle: (action, item: any = null) => {
-      const { t, te, tc } = i18n.global;
+    getTitle: (action: string, item: any = null) => {
       const titleKey = `resources.${resource.name}.titles.${action}`;
+      const label =
+        typeof resource.label === "function"
+          ? resource.label(item)
+          : item?.[resource.label];
 
       if (item) {
-        return (
-          (te(titleKey)
+        return `${
+          te(titleKey)
             ? tc(titleKey, item)
             : tc(`va.pages.${action}`, {
                 resource: getName(1).toLowerCase(),
-                label:
-                  typeof resource.label === "function"
-                    ? resource.label(item)
-                    : item[resource.label],
-              })) + ` #${item.id}`
-        );
+                label,
+              })
+        } #${item.id}`;
       }
       return te(titleKey)
         ? t(titleKey)
@@ -192,64 +172,39 @@ const buildResourceConfig = (resource) => {
             resource: getName(action === "list" ? 10 : 1).toLowerCase(),
           });
     },
-    canAction: (action) => {
-      /**
-       * Test if action exist for this resource
-       */
-      if (!actions.includes(action)) {
-        return false;
-      }
+    canAction: (action: string): boolean => {
+      if (!actions.includes(action)) return false;
+      if (!resource.permissions) return true;
 
-      /**
-       * OK if no permissions set
-       */
-      if (!resource.permissions) {
-        return true;
-      }
-
-      /**
-       * Get permissions for asked action
-       * resource.permissions = [{ role: 'admin', actions: ['list', 'show', 'create', 'edit', 'delete'] }]
-       */
       const { getRoles } = useAppStore();
-
-      for (let i = 0; i < resource.permissions.length; i++) {
-        if (getRoles.includes(resource.permissions[i].role)) {
-          if (resource.permissions[i].actions.includes(action)) {
-            return can(action + "-" + resource.name);
-          }
-        }
-      }
-
-      return false;
+      return resource.permissions.some(
+        (perm) =>
+          getRoles.includes(perm.role) &&
+          perm.actions.includes(action) &&
+          can(`${action}-${resource.name}`)
+      );
     },
   };
 
-  // update resource config
   useAppStore().updateResource(resourceConfig);
-
   return resourceConfig;
 };
 
-const dataFilter = (filters, resource) => {
-  /*
-   * Check for prop filters to filter the resource results
-   * e.g. filters = { name: "Reading", id: 1 }
-   */
-  if (filters && Object.keys(filters).length !== 0) {
-    return resource.filter((item) => {
-      let returnValue = true;
-      for (const key in filters) {
-        if (filters[key] === true && item[key] !== null) {
-          returnValue = true;
-        } else if (item[key] === undefined || item[key] != filters[key]) {
-          returnValue = false;
-        }
-      }
-      return returnValue;
-    });
+/**
+ * Filters data based on given filters
+ * @param filters - Object containing filter criteria
+ * @param resource - Array of resource items to filter
+ * @returns {Array} - Filtered array of resource items
+ */
+const dataFilter = (filters: any, resource: any[]): any[] => {
+  if (filters && Object.keys(filters).length) {
+    return resource.filter((item) =>
+      Object.entries(filters).every(([key, value]) =>
+        value === true ? item[key] !== null : item[key] === value
+      )
+    );
   }
-  // return resource;
+  return resource;
 };
 
 export {

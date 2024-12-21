@@ -35,7 +35,7 @@ interface Notifications {
 
 interface ResourceConfig {
   name?: string;
-  label?: string;
+  label?: string | ((item: any) => string);
   url?: string;
   apiUrl?: string;
   userApiUrl?: string;
@@ -49,9 +49,15 @@ interface ResourceConfig {
   edit?: ModalPage;
   routes?: Array<string>;
   lists?: Array<List>;
-  notifications?: Array<Notifications>;
+  notifications?: Notifications;
   lazy?: boolean;
   datatable?: any;
+  getName?: (count: number) => string;
+  nameKey?: string;
+  singularName?: string;
+  pluralName?: string;
+  getTitle?: (action: string, item?: any) => string;
+  canAction?: (action: string) => boolean;
 }
 
 export default ResourceConfig;

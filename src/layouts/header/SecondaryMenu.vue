@@ -35,7 +35,7 @@
         </button>
         <TabPanels v-model="activeTab">
           <template v-for="(menu, i) in mainMenuConfig" :key="i">
-            <TabPanel v-if="menu.items">
+            <TabPanelCustom v-if="menu.items">
               <nav class="flex-row hidden md:pb-0 md:flex md:justify-end">
                 <template v-for="item in menu.items" :key="item.to">
                   <router-link
@@ -81,7 +81,7 @@
                   </div>
                 </template>
               </nav>
-            </TabPanel>
+            </TabPanelCustom>
           </template>
         </TabPanels>
       </div>
@@ -100,7 +100,7 @@ import { goBack } from "../../core/helpers/functions";
 import DropdownMenu from "./partials/DropdownMenu.vue";
 import InlineSvg from "vue-inline-svg";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
-import TabPanel from "../../components/ui/tabs/TabPanel.vue";
+import TabPanelCustom from "../../components/ui/tabs/TabPanel.vue";
 import useAppStore from "../../store/app";
 
 export default defineComponent({
@@ -110,7 +110,7 @@ export default defineComponent({
     DropdownMenu,
     InlineSvg,
     TabPanels,
-    TabPanel,
+    TabPanelCustom,
   },
   watch: {
     tab(value) {
