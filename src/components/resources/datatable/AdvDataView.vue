@@ -35,7 +35,7 @@
           </span>
         </div>
         <div v-if="show.active" class="flex gap-2">
-          <Dropdown
+          <Select
             v-model="filters['active'].value"
             :options="activeOptions"
             optionLabel="label"

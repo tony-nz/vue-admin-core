@@ -52,7 +52,6 @@ export const useResourceRoutes = function (resource) {
             const props = {
               title: getTitle(action),
               resource,
-              permissions: appStore.getPermissions,
             };
             if (
               Array.prototype.includes.call(

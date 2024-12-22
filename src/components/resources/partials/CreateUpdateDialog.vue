@@ -179,28 +179,27 @@ export default defineComponent({
       submit.value = false;
     };
 
-    function fetchData(params) {
+    async function fetchData(params) {
       const appStore = useAppStore();
       const resources = appStore.getResources;
+      const foundResource = ref();
 
       if (params.resource) {
         try {
           for (const [key, value] of Object.entries(resources)) {
             if (value.name == params.resource.name) {
-              resource.value = value;
+              foundResource.value = value;
             }
           }
-          const resourceStore = useResourceStore(resource.value)();
-          return resourceStore
-            .getList({
+          const store = useResourceStore();
+          const response = await store.getList({
+            resourceName: foundResource.value.name,
+            payload: {
               subId: props.subId,
-            })
-            .then(({ data }) => {
-              if (typeof data == "undefined") {
-                return null;
-              }
-              return data;
-            });
+            },
+          });
+
+          return response;
         } catch (e) {
           appStore.showToast({
             severity: "error",

@@ -18,12 +18,16 @@
         <h3
           class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
         >
-          {{ resource.label }}
+          {{ toolbar?.title ? toolbar.title : resource.label }}
         </h3>
         <p
           class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
         >
-          List of {{ resource.label.toLowerCase() }}
+          {{
+            toolbar?.description
+              ? toolbar.description
+              : `List of ${resource.label.toLowerCase()}`
+          }}
         </p>
       </div>
       <div
@@ -61,7 +65,7 @@
           </span>
         </div>
         <div v-if="toolbar?.active" class="flex gap-2">
-          <Dropdown
+          <Select
             v-model="filters['active'].value"
             :options="activeOptions"
             optionLabel="label"
@@ -243,62 +247,6 @@
       </div>
       <div v-else>No records found</div>
     </template>
-    <template #paginatorcontainer="slotProps">
-      <div
-        class="flex items-center justify-between gap-4 border border-primary bg-transparent rounded-full w-full py-2 px-4"
-      >
-        <!-- Left Section: Rows Per Page Dropdown -->
-        <div class="flex items-center gap-2">
-          <label for="rows-dropdown" class="text-sm font-medium text-color"
-            >Rows:</label
-          >
-          <select
-            id="rows-dropdown"
-            class="border border-gray-300 rounded-md px-2 py-1 text-sm text-color focus:ring-primary focus:border-primary"
-          >
-            <option
-              v-for="option in [10, 25, 50, 100]"
-              @click="slotProps.setRows(option)"
-              :key="option"
-              :value="option"
-            >
-              {{ option }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Center Section: Showing X to Y of Z -->
-        <div class="text-color font-medium">
-          <span class="hidden sm:block"
-            >Showing {{ slotProps.first }} to {{ slotProps.last }} of
-            {{ slotProps.totalRecords }}</span
-          >
-          <span class="block sm:hidden"
-            >Page {{ slotProps.page + 1 }} of {{ slotProps.pageCount }}</span
-          >
-        </div>
-
-        <!-- Right Section: Navigation Buttons -->
-        <div class="flex items-center gap-2">
-          <Button
-            icon="pi pi-chevron-left"
-            rounded
-            text
-            @click="slotProps.prevPageCallback"
-            :disabled="slotProps.page === 0"
-            aria-label="Previous"
-          />
-          <Button
-            icon="pi pi-chevron-right"
-            rounded
-            text
-            @click="slotProps.nextPageCallback"
-            :disabled="slotProps.page === slotProps.pageCount - 1"
-            aria-label="Next"
-          />
-        </div>
-      </div>
-    </template>
   </DataTable>
   <!-- Start:Delete popup -->
   <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
@@ -335,16 +283,7 @@ import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import useResource from "../../../composables/useResource";
-interface PaginatorContainerProps {
-  first: number;
-  last: number;
-  page: number;
-  pageCount: number;
-  totalRecords: number;
-  setRows: (rows: number) => void;
-  prevPageCallback: () => void;
-  nextPageCallback: () => void;
-}
+
 interface DataTableToolbar {
   active: Boolean;
   bulkDeleteBtn: Boolean;
@@ -353,6 +292,8 @@ interface DataTableToolbar {
   search: Boolean;
   select: Boolean;
   simpleCreate: Boolean;
+  title: String;
+  description: String;
 }
 
 interface Show {
@@ -462,9 +403,9 @@ export default defineComponent({
       paginator: true,
       rows: 10,
       rowsPerPageOptions: [10, 25, 50, 100],
-      // paginatorTemplate:
-      //   "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
-      // currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
+      paginatorTemplate:
+        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
+      currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
       first: 0,
       ...attrs,
     };

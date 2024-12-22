@@ -20,7 +20,7 @@
         <!-- Right slot with dropdown menu -->
         <div v-if="isHeaderRightVisible" class="relative flex items-center">
           <slot name="header_right"></slot>
-          <Dropdown
+          <Select
             v-if="menuItems.length > 0"
             :menuItems="menuItems"
             class="ml-4"
