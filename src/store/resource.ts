@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { translate, upperCaseFirst } from "../core/helpers/functions";
+import { translate } from "../core/helpers/functions";
 import { ResourceConfig } from "../core/types/ResourceConfigTypes";
 import * as methods from "./enums/ResourceEnums";
 import ApiService from "../core/services/ApiService";
@@ -125,13 +125,16 @@ async function handleApiCall(
   const appStore = useAppStore();
   const resource = this.resources[resourceName];
   const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
-  const needsIdOnly = [DELETE, GET_ONE, UPDATE, LOCK, UNLOCK].includes(action);
 
   try {
     let params = payload?.params || {};
     if (action === UPDATE && !params.id) params.id = resource.data.item.id;
 
     const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
+    // add routeId and subId to params
+    params.routeId = payload?.routeId;
+    params.subId = payload?.subId;
+
     const apiMethod = loadingActions.includes(action)
       ? "get"
       : action.toLowerCase();
@@ -140,12 +143,34 @@ async function handleApiCall(
       appStore.setApiLoading(true);
     }
 
-    // correct payload or certain actions
-    const response = await ApiService[apiMethod](
-      getApiUrl(apiUrl, action, params),
-      needsIdOnly ? {} : params,
-      action === UPDATE ? payload.params : null
-    );
+    // Adjusting the call based on the method
+    let response;
+    if (apiMethod === "delete") {
+      // For DELETE, pass only the id or null if no id
+      response = await ApiService.delete(
+        getApiUrl(apiUrl, action, params),
+        params.id ? params.id : null
+      );
+    } else if (apiMethod === "create") {
+      // For CREATE and UPDATE, pass the URL and params
+      response = await ApiService[apiMethod](
+        getApiUrl(apiUrl, action, params),
+        params
+      );
+    } else if (apiMethod === "update") {
+      // For CREATE and UPDATE, pass the URL and params
+      response = await ApiService[apiMethod](
+        getApiUrl(apiUrl, action, params),
+        params.id ? params.id : null,
+        params
+      );
+    } else {
+      // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
+      response = await ApiService.get(
+        getApiUrl(apiUrl, action, params),
+        action === GET_ONE ? {} : params
+      );
+    }
 
     const data = response.data?.data?.data || response.data.data;
 
@@ -176,7 +201,6 @@ const useResourceStore = defineStore({
       }
     },
     setItem(resourceName: string, item: any) {
-      console.log("setItem", resourceName, item);
       this.resources[resourceName].data.item = item;
     },
     setList(resourceName: string, data: any[]) {

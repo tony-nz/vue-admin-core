@@ -40,7 +40,7 @@
                 <template v-for="item in menu.items" :key="item.to">
                   <router-link
                     v-if="item && !item.items && !item.external && item.to"
-                    v-slot="{ isActive, isExactActive, navigate }"
+                    v-slot="{ isExactActive, navigate }"
                     :to="item.to"
                     custom
                   >

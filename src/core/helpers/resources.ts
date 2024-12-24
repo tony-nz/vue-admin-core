@@ -177,11 +177,13 @@ const buildResourceConfig = (resource: any): any => {
       if (!resource.permissions) return true;
 
       const { getRoles } = useAppStore();
-      return resource.permissions.some(
-        (perm) =>
-          getRoles.includes(perm.role) &&
-          perm.actions.includes(action) &&
-          can(`${action}-${resource.name}`)
+      return (
+        resource.permissions?.some(
+          (perm) =>
+            getRoles?.includes(perm.role) &&
+            perm.actions.includes(action) &&
+            can(`${action}-${resource.name}`)
+        ) || false
       );
     },
   };
@@ -196,15 +198,24 @@ const buildResourceConfig = (resource: any): any => {
  * @param resource - Array of resource items to filter
  * @returns {Array} - Filtered array of resource items
  */
-const dataFilter = (filters: any, resource: any[]): any[] => {
-  if (filters && Object.keys(filters).length) {
-    return resource.filter((item) =>
-      Object.entries(filters).every(([key, value]) =>
-        value === true ? item[key] !== null : item[key] === value
-      )
-    );
+const dataFilter = (filters: any, resource: any[]) => {
+  /*
+   * Check for prop filters to filter the resource results
+   * e.g. filters = { name: "Reading", id: 1 }
+   */
+  if (filters && Object.keys(filters).length !== 0) {
+    return resource.filter((item) => {
+      let returnValue = true;
+      for (const key in filters) {
+        if (filters[key] === true && item[key] !== null) {
+          returnValue = true;
+        } else if (item[key] === undefined || item[key] != filters[key]) {
+          returnValue = false;
+        }
+      }
+      return returnValue;
+    });
   }
-  return resource;
 };
 
 export {

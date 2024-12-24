@@ -1,7 +1,7 @@
 import { useRoute } from "vue-router";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
-import { Ref, ref } from "vue";
+import { computed, Ref, ref } from "vue";
 import ResourceType from "../core/types/ResourceConfigTypes";
 import useResourceStore from "../store/resource";
 
@@ -12,7 +12,7 @@ interface Options {
 }
 
 export default function useResource(
-  resource: ResourceType | undefined,
+  resource: ResourceType,
   dtFilters: Ref<any>,
   dtProps: any,
   options?: Options | undefined
@@ -25,7 +25,6 @@ export default function useResource(
   const modalData = ref([]);
   const modalType = ref();
   const props: any = ref(dtProps);
-  const resourceData = ref();
   const resourceStore = useResourceStore();
   const route = useRoute();
   const routeId = ref(route?.params?.id);
@@ -35,9 +34,7 @@ export default function useResource(
   /**
    * Set the resource name
    */
-  const resourceName = resource?.name
-    ? upperCaseFirst(resource.name)
-    : undefined;
+  const resourceName = resource.name;
 
   /**
    * Set the searchable columns
@@ -114,13 +111,20 @@ export default function useResource(
   async function create(params: unknown, dataId?: number): Promise<void> {
     if (params && resourceName) {
       try {
+        const payload = {
+          params,
+          apiUrl: apiUrl.value,
+        };
+
+        if (dataId) {
+          payload["routeId"] = dataId;
+        } else if (routeId.value) {
+          payload["routeId"] = routeId.value;
+        }
+
         await resourceStore.create({
-          resourceName: resourceName,
-          payload: {
-            params,
-            routeId: dataId ? dataId : routeId.value,
-            apiUrl: apiUrl.value,
-          },
+          resourceName,
+          payload,
         });
         // If you need to handle the response, you can do so here
       } catch (e) {
@@ -143,7 +147,7 @@ export default function useResource(
       params.id = id;
       try {
         await resourceStore.update({
-          resourceName: resourceName,
+          resourceName,
           payload: {
             params,
             routeId: dataId ? dataId : routeId.value,
@@ -166,7 +170,7 @@ export default function useResource(
     if (id && resourceName) {
       try {
         await resourceStore.lock({
-          resourceName: resourceName,
+          resourceName,
           payload: {
             params: { id },
           },
@@ -187,7 +191,7 @@ export default function useResource(
     if (id && resourceName) {
       try {
         await resourceStore.unlock({
-          resourceName: resourceName,
+          resourceName,
           payload: {
             params: { id },
           },
@@ -209,7 +213,7 @@ export default function useResource(
     if (id && resourceName) {
       try {
         await resourceStore.delete({
-          resourceName: resourceName,
+          resourceName,
           payload: {
             params: { id },
             routeId: dataId ? dataId : routeId.value,
@@ -233,7 +237,7 @@ export default function useResource(
     if (data && resourceName) {
       try {
         await resourceStore.deleteMany({
-          resourceName: resourceName,
+          resourceName,
           payload: {
             params: { data },
             routeId: dataId ? dataId : routeId.value,
@@ -329,14 +333,20 @@ export default function useResource(
    * @param filters
    * @returns { [key: string]: Filter }
    */
+  /**
+   * Clean filters
+   * @param filters - An object of filters to clean
+   * @returns An object of cleaned filters where only filters with non-null and non-undefined values are included
+   */
   function cleanFilters(filters: { [key: string]: Filter }): {
     [key: string]: Filter;
   } {
     const cleanedFilters: { [key: string]: Filter } = {};
 
     for (const [key, filter] of Object.entries(filters)) {
+      // Check if value exists
       if (
-        // key === "global" ||
+        "value" in filter &&
         filter.value !== null &&
         filter.value !== undefined
       ) {
@@ -348,6 +358,7 @@ export default function useResource(
             (constraint) =>
               constraint.value !== null && constraint.value !== undefined
           );
+
           if (cleanedConstraints.length > 0 || filter.operator) {
             cleanedFilters[key] = {
               ...filter,
@@ -356,6 +367,18 @@ export default function useResource(
           }
         } else {
           cleanedFilters[key] = filter;
+        }
+      } else if (Array.isArray(filter.constraints)) {
+        // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
+        const cleanedConstraints = (filter.constraints as Constraint[]).filter(
+          (constraint) =>
+            constraint.value !== null && constraint.value !== undefined
+        );
+        if (cleanedConstraints.length > 0 || filter.operator) {
+          cleanedFilters[key] = {
+            ...filter,
+            constraints: cleanedConstraints,
+          };
         }
       }
     }
@@ -389,7 +412,8 @@ export default function useResource(
        * Check for resource.lazy
        */
       if (resource.lazy) {
-        lazyParams.value.filters = cleanFilters(filters.value);
+        lazyParams.value.filters = filters.value;
+        // lazyParams.value.filters = cleanFilters(filters.value);
         if (!lazyParams.value.sortField) {
           lazyParams.value.sortField = props.sortField || "id";
         }
@@ -409,7 +433,7 @@ export default function useResource(
 
         try {
           const response = await resourceStore.getList({
-            resourceName: resource.name,
+            resourceName,
             payload: {
               params: params,
               routeId: routeId.value,
@@ -418,7 +442,6 @@ export default function useResource(
           });
 
           totalRecords.value = response.length;
-          resourceData.value = response;
         } catch (e) {
           totalRecords.value = 0;
           console.error("Error fetching resource list:", e);
@@ -426,14 +449,13 @@ export default function useResource(
       } else {
         try {
           const response = await resourceStore.getList({
-            resourceName: resource.name,
+            resourceName,
             payload: {
               routeId: routeId.value,
               apiUrl: apiUrl.value,
             },
           });
 
-          resourceData.value = response;
           totalRecords.value = response.length;
         } catch (e) {
           totalRecords.value = 0;
@@ -460,7 +482,6 @@ export default function useResource(
     onSort,
     remove,
     resource,
-    resourceData,
     route,
     routeId,
     searchableColumns,

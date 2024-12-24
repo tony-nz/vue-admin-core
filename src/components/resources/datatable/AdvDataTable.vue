@@ -33,7 +33,10 @@
       <div
         class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
       >
-        <div v-if="toolbar?.search != false" class="flex w-full justify-end">
+        <div
+          v-if="toolbar?.search != false"
+          class="flex w-full justify-end hidden md:block"
+        >
           <span class="flex w-full relative">
             <i
               class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"
@@ -97,9 +100,7 @@
           type="button"
         >
           {{ translate("va.actions.bulkDelete") }}
-          {{
-            resource.singularLabel ? resource.singularLabel : resource.label
-          }}s
+          {{ resource.singularName ? resource.singularName : resource.label }}s
         </button>
         <button
           v-if="
@@ -116,7 +117,7 @@
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
             {{
-              resource.singularLabel ? resource.singularLabel : resource.label
+              resource.singularName ? resource.singularName : resource.label
             }}</span
           >
           <span v-else>
@@ -146,7 +147,7 @@
           <span v-if="!toolbar?.simpleCreate"
             >{{ translate("va.actions.create") }}
             {{
-              resource.singularLabel ? resource.singularLabel : resource.label
+              resource.singularName ? resource.singularName : resource.label
             }}</span
           >
           <span v-else>
@@ -178,7 +179,7 @@
       headerStyle="width: 2rem"
     >
       <template #body="{ data }">
-        <InputSwitch
+        <ToggleSwitch
           v-model="data.active"
           @update:modelValue="changeActive(data)"
           :disabled="data.locked"
@@ -275,14 +276,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref, toRef, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  PropType,
+  ref,
+  toRef,
+  watch,
+} from "vue";
 import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode } from "@primevue/core/api";
 import { useDebounce } from "../../../composables/useDebounce";
 import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
+import ResourceType from "../../../core/types/ResourceConfigTypes";
 import useResource from "../../../composables/useResource";
+import useResourceStore from "../../../store/resource";
 
 interface DataTableToolbar {
   active: Boolean;
@@ -353,7 +364,7 @@ export default defineComponent({
       type: String,
     },
     resource: {
-      type: Object,
+      type: Object as PropType<ResourceType>,
       required: true,
     },
     routeId: {
@@ -384,6 +395,12 @@ export default defineComponent({
     const refresh = toRef(props, "refresh");
     const selectedResources = ref();
     const stateKey = ref("dt-" + props.resource.name + "-state:");
+    const store = useResourceStore();
+
+    /**
+     * Reactive resource data
+     */
+    const resourceData = computed(() => store.getDataList(props.resource.name));
 
     /**
      * Filters
@@ -425,7 +442,6 @@ export default defineComponent({
       onFilter,
       onPage,
       onSort,
-      resourceData,
       routeId,
       showCreateEdit,
       showDeletePopup,

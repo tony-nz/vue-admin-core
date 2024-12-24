@@ -34,8 +34,8 @@ interface Notifications {
 }
 
 interface ResourceConfig {
-  name?: string;
-  label?: string | ((item: any) => string);
+  name: string;
+  label: string;
   url?: string;
   apiUrl?: string;
   userApiUrl?: string;
@@ -57,7 +57,7 @@ interface ResourceConfig {
   singularName?: string;
   pluralName?: string;
   getTitle?: (action: string, item?: any) => string;
-  canAction?: (action: string) => boolean;
+  canAction: (action: string) => boolean;
 }
 
 export default ResourceConfig;
