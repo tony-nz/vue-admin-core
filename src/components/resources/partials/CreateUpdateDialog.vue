@@ -7,11 +7,9 @@
           : 'Update ' + resource.label
       "
       v-model:visible="showModal"
-      :modal="true"
-      :maximizable="true"
-      :breakpoints="{ '1280px': '75vw' }"
-      :style="{ width: '50vw' }"
       :closeOnEscape="true"
+      :modal="true"
+      :style="{ width: '50rem' }"
       @hide="close"
     >
       <div class="m-0">
@@ -43,17 +41,17 @@
       </div>
       <template #footer>
         <Button
-          label="Cancel"
-          icon="pi pi-times"
           @click="close"
-          class="p-button-text"
+          label="Close"
+          icon="pi pi-times"
+          severity="secondary"
         />
         <Button
-          :disabled="submit"
-          :label="type === 'create' ? 'Create' : 'Update'"
-          icon="pi pi-check"
-          class="btn bg-primary-500"
           @click="onSubmit"
+          :disabled="submit"
+          :label="type === 'create' ? 'Create' : 'Save'"
+          :icon="type === 'create' ? 'pi pi-plus' : 'pi pi-save'"
+          severity="success"
           autofocus
         />
       </template>
@@ -128,7 +126,6 @@ export default defineComponent({
     const modalType = ref(props.type);
     const showModal = ref(false);
     const submit = ref(false);
-    const resource = ref();
     const errors = ref([]);
     const { create, update, routeId } = useResource(props.resource);
 
