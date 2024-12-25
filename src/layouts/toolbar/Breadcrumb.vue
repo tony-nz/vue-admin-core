@@ -5,7 +5,7 @@
         {{ title }}
       </h4>
       <p
-        class="flex items-center text-gray-300 text-xs bg-emerald-700 bg-opacity-30 rounded-xl p-2 px-4"
+        class="flex items-center text-gray-300 text-xs bg-primary-700 bg-opacity-30 rounded-xl p-2 px-4"
       >
         <template v-for="(item, index) in breadcrumbs" :key="index">
           <router-link :to="generatePath(breadcrumbs, index)">
@@ -33,6 +33,11 @@ export default defineComponent({
     title: String,
   },
   setup() {
+    /**
+     * Generate path
+     * @param breadcrumbs
+     * @param index
+     */
     const generatePath = (breadcrumbs: any, index: number) => {
       let path = "";
       for (let i = 0; i <= index; i++) {
@@ -40,13 +45,7 @@ export default defineComponent({
       }
       return path.toLowerCase();
     };
-    // const generatePath = (breadcrumbs: Array, index: number) => {
-    //   let path = "";
-    //   for (let i = 0; i <= index; i++) {
-    //     path += "/" + breadcrumbs[i];
-    //   }
-    //   return path;
-    // };
+
     return {
       generatePath,
     };

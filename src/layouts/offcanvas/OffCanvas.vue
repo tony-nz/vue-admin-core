@@ -14,7 +14,7 @@
     </svg>
   </div>
   <transition
-    enter-from-class="-translate-y-[150%] opacity-0"
+    enter-from-class="-translate-x-[150%] opacity-0"
     enter-active-class="transition duration-700"
   >
     <div

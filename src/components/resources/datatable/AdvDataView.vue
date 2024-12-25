@@ -34,16 +34,6 @@
             />
           </span>
         </div>
-        <div v-if="show.active" class="flex gap-2">
-          <Select
-            v-model="filters['active'].value"
-            :options="activeOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Filter by activity"
-            class="w-48"
-          />
-        </div>
         <slot name="toolbar"></slot>
         <button
           v-if="show.refresh"
@@ -473,9 +463,7 @@ export default defineComponent({
       showModal,
       totalRecords,
       update,
-    } = useResource(props.resource, filters, props, {
-      params: props.params,
-    });
+    } = useResource(props.resource, filters, props);
 
     const onLocalRowExpand = (event) => {
       const resource = resourceData.value.find(
