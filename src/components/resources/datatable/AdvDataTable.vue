@@ -8,171 +8,34 @@
     @page="onPage"
     @onRowExpand="onLocalRowExpand"
     @sort="onSort"
-    :loading="show.loading ? isLoading : false"
+    :loading="options?.loading ? isLoading : false"
     :row-class="rowClass"
     :totalRecords="totalRecords"
     :value="resourceData"
   >
-    <template v-if="show.toolbar" #header>
-      <div class="px-2 py-1">
-        <h3
-          class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
-        >
-          {{ toolbar?.title ? toolbar.title : resource.label }}
-        </h3>
-        <p
-          class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
-        >
-          {{
-            toolbar?.description
-              ? toolbar.description
-              : `List of ${resource.label.toLowerCase()}`
-          }}
-        </p>
-      </div>
-      <div
-        class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
-      >
-        <div
-          v-if="toolbar?.search != false"
-          class="flex w-full justify-end hidden md:block"
-        >
-          <span class="flex w-full relative">
-            <i
-              class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"
-            />
-            <InputText
-              v-model="filters['global'].value"
-              @input="debounce(onFilter, 500)"
-              id="dt_search"
-              class="pl-10 font-normal w-full min-w-[350px]"
-              placeholder="Keyword search"
-            />
-            <button
-              v-if="filters['global'].value"
-              @click="filters['global'].value = ''"
-              type="button"
-              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                class="h-5 w-5"
-              >
-                <path
-                  fill="currentColor"
-                  d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m1.41-1.41A8 8 0 1 0 15.66 4.34A8 8 0 0 0 4.34 15.66m9.9-8.49L11.41 10l2.83 2.83l-1.41 1.41L10 11.41l-2.83 2.83l-1.41-1.41L8.59 10L5.76 7.17l1.41-1.41L10 8.59l2.83-2.83z"
-                />
-              </svg>
-            </button>
-          </span>
-        </div>
-        <div v-if="toolbar?.active" class="flex gap-2">
-          <Select
-            v-model="filters['active'].value"
-            :options="activeOptions"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Filter by activity"
-            class="w-48"
-          />
-        </div>
-        <slot name="toolbar"></slot>
-        <button
-          v-if="toolbar?.refresh"
-          type="button"
-          class="fill-white py-2 px-3 bg-primary-500 hover:bg-primary-400 rounded shadow whitespace-nowrap"
-          @click="getResourceData"
-        >
-          <span class="text-white pi pi-refresh mx-0" data-pc-section="icon" />
-        </button>
-        <button
-          v-if="toolbar?.select"
-          @click="showDeletePopup({ $event, selectedResources })"
-          :class="{
-            'bg-primary-500 hover:bg-primary-400 border-gray-400':
-              selectedResources?.length > 0,
-            'bg-gray-300 border-gray-300':
-              selectedResources?.length === 0 || !selectedResources,
-          }"
-          :disabled="selectedResources?.length === 0 || !selectedResources"
-          class="py-2 px-4 border rounded shadow whitespace-nowrap text-white"
-          type="button"
-        >
-          {{ translate("va.actions.bulkDelete") }}
-          {{ resource.singularName ? resource.singularName : resource.label }}s
-        </button>
-        <button
-          v-if="
-            resource?.create?.modal && toolbar?.create && canAction('create')
-          "
-          type="button"
-          class="bg-primary-500 hover:bg-primary-600 rounded shadow whitespace-nowrap"
-          :class="{
-            'fill-white p-2': toolbar?.simpleCreate,
-            'text-white py-2 px-4': !toolbar?.simpleCreate,
-          }"
-          @click="showCreateEdit('dialog', 'create', modalData)"
-        >
-          <span v-if="!toolbar?.simpleCreate"
-            >{{ translate("va.actions.create") }}
-            {{
-              resource.singularName ? resource.singularName : resource.label
-            }}</span
-          >
-          <span v-else>
-            <svg
-              class="h-4 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-            >
-              <path
-                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
-              />
-            </svg>
-          </span>
-        </button>
-        <router-link
-          v-else-if="
-            resource?.create?.page && toolbar?.create && canAction('create')
-          "
-          :to="resource.url + '/create'"
-          type="button"
-          class="bg-primary-500 hover:bg-primary-600 rounded shadow whitespace-nowrap"
-          :class="{
-            'fill-white p-2': toolbar?.simpleCreate,
-            'text-white py-2 px-4': !toolbar?.simpleCreate,
-          }"
-        >
-          <span v-if="!toolbar?.simpleCreate"
-            >{{ translate("va.actions.create") }}
-            {{
-              resource.singularName ? resource.singularName : resource.label
-            }}</span
-          >
-          <span v-else>
-            <svg
-              class="h-4 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 448 512"
-            >
-              <path
-                d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"
-              />
-            </svg>
-          </span>
-        </router-link>
-      </div>
+    <template v-if="toolbar?.visible" #header>
+      <AdvToolbar
+        @clearSearch="clearSearch"
+        @refresh="getResourceData"
+        @createEdit="showCreateEdit"
+        @delete="showDeletePopup"
+        :filters="filters"
+        :modalData="modalData"
+        :onFilter="onFilter"
+        :resource="resource"
+        :selectedResources="selectedResources"
+        :toolbar="toolbar"
+      />
     </template>
     <Column
-      v-if="show.select"
+      v-if="options?.columns?.select"
       v-model:selection="selectedResources"
       selectionMode="multiple"
       headerStyle="width: 3em"
       :selectable="isRowSelectable"
     />
     <Column
-      v-if="show.active"
+      v-if="options?.columns?.active"
       :exportable="false"
       :sortable="true"
       field="active"
@@ -199,13 +62,13 @@
         />
       </div>
     </slot>
-    <Column v-if="show.actions" :exportable="false" class="w-24">
+    <Column v-if="options?.columns?.actions" :exportable="false" class="w-24">
       <template #body="{ data }">
         <ActionColumn
           :data="data"
           :fields="resource.fields"
           :resource="resource"
-          :showDefaults="show.actionDefaults"
+          :showDefaults="options.actions?.enabled"
           @deletePopup="showDeletePopup"
           @changeLock="changeLock"
           @showCreateEdit="showCreateEdit"
@@ -285,43 +148,19 @@ import {
   toRef,
   watch,
 } from "vue";
-import { translate } from "../../../core/helpers/functions";
 import { FilterMatchMode } from "@primevue/core/api";
+import {
+  TableOptions,
+  ToolbarOptions,
+} from "../../../core/types/DatatableTypes";
+import { translate, upperCaseFirst } from "../../../core/helpers/functions";
 import { useDebounce } from "../../../composables/useDebounce";
-import { upperCaseFirst } from "../../../core/helpers/functions";
 import ActionColumn from "./partials/ActionColumn.vue";
+import AdvToolbar from "./partials/AdvToolbar.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
 import ResourceType from "../../../core/types/ResourceConfigTypes";
 import useResource from "../../../composables/useResource";
 import useResourceStore from "../../../store/resource";
-
-interface DataTableToolbar {
-  active: Boolean;
-  bulkDeleteBtn: Boolean;
-  create: Boolean;
-  refresh: Boolean;
-  search: Boolean;
-  select: Boolean;
-  simpleCreate: Boolean;
-  title: String;
-  description: String;
-}
-
-interface Show {
-  actions: Boolean;
-  actionDefaults: Boolean;
-  active: Boolean;
-  header: Boolean;
-  loading: Boolean;
-  toolbar: Boolean;
-  refresh: Boolean;
-  select: Boolean;
-}
-
-interface Options {
-  sortDesc: Boolean;
-  sortField: String;
-}
 
 interface Form {
   data: Object;
@@ -332,6 +171,7 @@ export default defineComponent({
   name: "AdvDataTable",
   components: {
     ActionColumn,
+    AdvToolbar,
     CreateUpdateDialog,
   },
   props: {
@@ -350,12 +190,8 @@ export default defineComponent({
       }),
     },
     options: {
-      type: Object as PropType<Options>,
+      type: Object as PropType<TableOptions>,
       required: false,
-      default: () => ({
-        sortField: "id",
-        sortDesc: true,
-      }),
     },
     params: {
       type: Object,
@@ -370,22 +206,9 @@ export default defineComponent({
     routeId: {
       type: String,
     },
-    show: {
-      type: Object as PropType<Show>,
-      required: false,
-      default: () => ({
-        actions: true,
-        actionDefaults: true,
-        active: false,
-        header: true,
-        loading: true,
-        refresh: true,
-        select: false,
-        toolbar: true,
-      }),
-    },
     toolbar: {
-      type: Object as PropType<DataTableToolbar>,
+      type: Object as () => ToolbarOptions,
+      required: true,
     },
   },
   inheritAttrs: false,
@@ -455,12 +278,14 @@ export default defineComponent({
     });
     const { canAction } = props.resource;
 
-    const onLocalRowExpand = (event) => {
-      const resource = resourceData.value.find(
-        (item) => item.id == event.data.id
-      );
-      expandedRows.value = [resource];
-    };
+    /**
+     * Active filters
+     */
+    const activeOptions = [
+      { label: "All", value: null },
+      { label: "Active", value: true },
+      { label: "Inactive", value: false },
+    ];
 
     /**
      * Change active
@@ -487,13 +312,12 @@ export default defineComponent({
     };
 
     /**
-     * Active filters
+     * Clear search
      */
-    const activeOptions = [
-      { label: "All", value: null },
-      { label: "Active", value: true },
-      { label: "Inactive", value: false },
-    ];
+    const clearSearch = () => {
+      filters.value.global.value = null;
+      getResourceData();
+    };
 
     /**
      * Emit live data
@@ -501,6 +325,14 @@ export default defineComponent({
      */
     const emitLiveData = (data: any) => {
       emit("liveData", data);
+    };
+
+    /**
+     * Is row selectable
+     * @param rowData
+     */
+    const isRowSelectable = (rowData: any) => {
+      return !rowData.locked;
     };
 
     /**
@@ -523,11 +355,15 @@ export default defineComponent({
     };
 
     /**
-     * Is row selectable
-     * @param rowData
+     * On local row expand
+     * @param event
+     * @returns {void}
      */
-    const isRowSelectable = (rowData: any) => {
-      return !rowData.locked;
+    const onLocalRowExpand = (event) => {
+      const resource = resourceData.value.find(
+        (item) => item.id == event.data.id
+      );
+      expandedRows.value = [resource];
     };
 
     /**
@@ -563,7 +399,7 @@ export default defineComponent({
         modalData.value = { ...props.form.data, ...modalData.value };
       }
 
-      if (props.show.active) {
+      if (props.options?.columns?.actions) {
         // add active filter
         Object.assign(filters.value, {
           active: { value: true, matchMode: FilterMatchMode.EQUALS },
@@ -612,6 +448,7 @@ export default defineComponent({
       canAction,
       changeActive,
       changeLock,
+      clearSearch,
       debounce,
       dtOptions,
       emitLiveData,
