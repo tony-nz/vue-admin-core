@@ -65,15 +65,22 @@
     <Button
       v-if="toolbar?.buttons?.refresh"
       @click="refreshData"
+      class="px-4"
       icon="pi pi-refresh"
       severity="info"
     />
     <Button
-      v-if="toolbar?.buttons?.bulkDelete && canAction('delete')"
+      v-if="
+        toolbar?.buttons?.bulkDelete &&
+        canAction('delete') &&
+        selectedResources &&
+        selectedResources.length > 0
+      "
       @click="showDeletePopup({ $event, selectedResources })"
       :disabled="selectedResources?.length === 0 || !selectedResources"
       :label="translate('va.actions.bulkDelete') + ' ' + resource.label"
-      icon="pi pi-plus"
+      class="whitespace-nowrap overflow-visible"
+      icon="pi pi-delete"
       severity="danger"
     />
     <Button
@@ -88,6 +95,7 @@
         ' ' +
         (resource.singularName ? resource.singularName : resource.label)
       "
+      class="whitespace-nowrap overflow-visible"
       icon="pi pi-plus"
       severity="info"
     />
@@ -105,6 +113,7 @@
           ' ' +
           (resource.singularName ? resource.singularName : resource.label)
         "
+        class="whitespace-nowrap overflow-visible"
         icon="pi pi-plus"
         severity="info"
       />
