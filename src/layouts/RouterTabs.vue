@@ -29,10 +29,10 @@
       <!-- Close button for each tab -->
       <button
         @click="handleClose(item, index)"
-        class="p-2 bg-gray-200 hover:bg-red-500"
+        class="p-2 bg-gray-200 group hover:bg-red-500"
       >
         <svg
-          class="fill-black hover:fill-white w-3 h-3"
+          class="fill-black group-hover:fill-white w-3 h-3"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 320 512"
         >
