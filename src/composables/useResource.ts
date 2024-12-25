@@ -1,21 +1,15 @@
-import { useRoute } from "vue-router";
+import { Ref, ref } from "vue";
+import { Constraint, Filter } from "../core/types/FilterTypes";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
-import { computed, Ref, ref } from "vue";
+import { useRoute } from "vue-router";
 import ResourceType from "../core/types/ResourceConfigTypes";
 import useResourceStore from "../store/resource";
-
-interface Options {
-  dtOptions?: object;
-  dataFilters?: object;
-  params?: object | any;
-}
 
 export default function useResource(
   resource: ResourceType,
   dtFilters: Ref<any>,
-  dtProps: any,
-  options?: Options | undefined
+  dtProps: any
 ) {
   const apiUrl = ref();
   const confirmDelete = useConfirm();
@@ -41,29 +35,22 @@ export default function useResource(
    */
   const searchableColumns = ref(
     props.searchableColumns || resource?.datatable?.globalFilterFields || []
-    // props.searchableColumns || extractIds(resource?.fields)
   );
 
   /**
-   * Extract ids from fields
-   * @param obj
-   * @returns string[]
+   * Filter data
+   * @returns void
    */
-  function extractIds(fields: any): string[] {
-    let ids: string[] = [];
-    fields.forEach((field) => {
-      if (field.id) {
-        ids.push(field.id);
-      }
-      if (field.fields) {
-        ids = [...ids, ...extractIds(field.fields)];
-      }
-      if (field.children) {
-        ids = [...ids, ...extractIds(field.children)];
-      }
-    });
-    return ids;
-  }
+  const onFilter = () => {
+    if (resource?.lazy) {
+      // set filters
+      lazyParams.value.filters = filters.value;
+      // reset pagination first
+      lazyParams.value.originalEvent = { first: 0, page: 0 };
+      // call onPage to get data
+      onPage(lazyParams.value);
+    }
+  };
 
   /**
    * Get data on page change
@@ -88,19 +75,28 @@ export default function useResource(
   };
 
   /**
-   * Filter data
-   * @returns void
+   * Bulk remove resources
+   * @param data
+   * @param dataId
+   * @returns Promise<void>
    */
-  const onFilter = () => {
-    if (resource?.lazy) {
-      // set filters
-      lazyParams.value.filters = filters.value;
-      // reset pagination first
-      lazyParams.value.originalEvent = { first: 0, page: 0 };
-      // call onPage to get data
-      onPage(lazyParams.value);
+  async function bulkRemove(data: any, dataId?: number): Promise<void> {
+    if (data && resourceName) {
+      try {
+        await resourceStore.deleteMany({
+          resourceName,
+          payload: {
+            params: { data },
+            routeId: dataId ? dataId : routeId.value,
+            apiUrl: apiUrl.value,
+          },
+        });
+      } catch (e) {
+        console.error("Error bulk removing resources:", e);
+        throw e;
+      }
     }
-  };
+  }
 
   /**
    * Create a new resource
@@ -132,271 +128,6 @@ export default function useResource(
         console.error("Error creating resource:", e);
         throw e; // Re-throw the error to maintain the promise chain's error state
       }
-    }
-  }
-
-  /**
-   * Update a resource
-   * @param params
-   * @param id
-   * @param dataId
-   * @returns Promise<void>
-   */
-  async function update(params: any, id: any, dataId?: number): Promise<void> {
-    if (params && id && resourceName) {
-      params.id = id;
-      try {
-        await resourceStore.update({
-          resourceName,
-          payload: {
-            params,
-            routeId: dataId ? dataId : routeId.value,
-            apiUrl: apiUrl.value,
-          },
-        });
-      } catch (e) {
-        console.error("Error updating resource:", e);
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * Lock a resource
-   * @param id
-   * @returns Promise<void>
-   */
-  async function lock(id: any): Promise<void> {
-    if (id && resourceName) {
-      try {
-        await resourceStore.lock({
-          resourceName,
-          payload: {
-            params: { id },
-          },
-        });
-      } catch (e) {
-        console.error("Error locking resource:", e);
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * Unlock a resource
-   * @param id
-   * @returns Promise<void>
-   */
-  async function unlock(id: any): Promise<void> {
-    if (id && resourceName) {
-      try {
-        await resourceStore.unlock({
-          resourceName,
-          payload: {
-            params: { id },
-          },
-        });
-      } catch (e) {
-        console.error("Error unlocking resource:", e);
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * Remove a resource
-   * @param id
-   * @param dataId
-   * @returns Promise<void>
-   */
-  async function remove(id: any, dataId?: number): Promise<void> {
-    if (id && resourceName) {
-      try {
-        await resourceStore.delete({
-          resourceName,
-          payload: {
-            params: { id },
-            routeId: dataId ? dataId : routeId.value,
-            apiUrl: apiUrl.value,
-          },
-        });
-      } catch (e) {
-        console.error("Error removing resource:", e);
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * Bulk remove resources
-   * @param data
-   * @param dataId
-   * @returns Promise<void>
-   */
-  async function bulkRemove(data: any, dataId?: number): Promise<void> {
-    if (data && resourceName) {
-      try {
-        await resourceStore.deleteMany({
-          resourceName,
-          payload: {
-            params: { data },
-            routeId: dataId ? dataId : routeId.value,
-            apiUrl: apiUrl.value,
-          },
-        });
-      } catch (e) {
-        console.error("Error bulk removing resources:", e);
-        throw e;
-      }
-    }
-  }
-
-  /**
-   * Show delete popup
-   * @param params
-   * @returns void
-   */
-  function showDeletePopup(params) {
-    if (resource && resource.name && params.$event) {
-      confirmDelete.require({
-        group: "DT_" + upperCaseFirst(resource.name),
-        target: params.$event.currentTarget,
-        message: "Are you sure you want to proceed?",
-        acceptClass: "bg-primary-500",
-        icon: "pi pi-exclamation-triangle",
-        accept: () => {
-          if (params.data?.id) {
-            remove(params.data.id, params?.id ? params.id : null);
-          } else {
-            bulkRemove(params.selectedResources, params?.id ? params.id : null);
-          }
-        },
-        reject: () => {
-          //
-        },
-      });
-    }
-  }
-
-  /**
-   * Show create/edit modal
-   * @param display
-   * @param type
-   * @param data
-   * @returns void
-   */
-  function showCreateEdit(display, type, data = []) {
-    modalType.value = type;
-    modalData.value = data;
-
-    if (display === "dialog") {
-      showModal.value = true;
-    }
-  }
-
-  /**
-   * Get resource fields
-   * @param fields
-   * @returns any
-   */
-  function getResourceFields(fields: any) {
-    let allFields: any = [];
-
-    function traverse(fields) {
-      fields.forEach((field: any) => {
-        if (field.fields) {
-          traverse(field.fields);
-        } else {
-          allFields.push(field);
-        }
-      });
-    }
-
-    traverse(fields);
-    return allFields;
-  }
-
-  interface Constraint {
-    value: string | null;
-    matchMode: string;
-  }
-
-  interface Filter {
-    value: string | null;
-    matchMode?: string;
-    operator?: string;
-    constraints?: Constraint[];
-  }
-
-  /**
-   * Clean filters
-   * @param filters
-   * @returns { [key: string]: Filter }
-   */
-  /**
-   * Clean filters
-   * @param filters - An object of filters to clean
-   * @returns An object of cleaned filters where only filters with non-null and non-undefined values are included
-   */
-  function cleanFilters(filters: { [key: string]: Filter }): {
-    [key: string]: Filter;
-  } {
-    const cleanedFilters: { [key: string]: Filter } = {};
-
-    for (const [key, filter] of Object.entries(filters)) {
-      // Check if value exists
-      if (
-        "value" in filter &&
-        filter.value !== null &&
-        filter.value !== undefined
-      ) {
-        if (Array.isArray(filter.constraints)) {
-          // Clean constraints array
-          const cleanedConstraints = (
-            filter.constraints as Constraint[]
-          ).filter(
-            (constraint) =>
-              constraint.value !== null && constraint.value !== undefined
-          );
-
-          if (cleanedConstraints.length > 0 || filter.operator) {
-            cleanedFilters[key] = {
-              ...filter,
-              constraints: cleanedConstraints,
-            };
-          }
-        } else {
-          cleanedFilters[key] = filter;
-        }
-      } else if (Array.isArray(filter.constraints)) {
-        // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
-        const cleanedConstraints = (filter.constraints as Constraint[]).filter(
-          (constraint) =>
-            constraint.value !== null && constraint.value !== undefined
-        );
-        if (cleanedConstraints.length > 0 || filter.operator) {
-          cleanedFilters[key] = {
-            ...filter,
-            constraints: cleanedConstraints,
-          };
-        }
-      }
-    }
-
-    return cleanedFilters;
-  }
-
-  /**
-   * Add searchable columns
-   * @returns string
-   */
-  function addSearchableColumns() {
-    // check to see if cleanFilters(filters.value) has global filter
-    const cleanedFilters = cleanFilters(filters.value);
-    if (cleanedFilters.global) {
-      return true;
-    } else {
-      return false;
     }
   }
 
@@ -466,6 +197,188 @@ export default function useResource(
     }
   }
 
+  /**
+   * Remove a resource
+   * @param id
+   * @param dataId
+   * @returns Promise<void>
+   */
+  async function remove(id: any, dataId?: number): Promise<void> {
+    if (id && resourceName) {
+      try {
+        await resourceStore.delete({
+          resourceName,
+          payload: {
+            params: { id },
+            routeId: dataId ? dataId : routeId.value,
+            apiUrl: apiUrl.value,
+          },
+        });
+      } catch (e) {
+        console.error("Error removing resource:", e);
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Update a resource
+   * @param params
+   * @param id
+   * @param dataId
+   * @returns Promise<void>
+   */
+  async function update(params: any, id: any, dataId?: number): Promise<void> {
+    if (params && id && resourceName) {
+      params.id = id;
+      try {
+        await resourceStore.update({
+          resourceName,
+          payload: {
+            params,
+            routeId: dataId ? dataId : routeId.value,
+            apiUrl: apiUrl.value,
+          },
+        });
+      } catch (e) {
+        console.error("Error updating resource:", e);
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Add searchable columns
+   * @returns string
+   */
+  function addSearchableColumns() {
+    // check to see if cleanFilters(filters.value) has global filter
+    const cleanedFilters = cleanFilters(filters.value);
+    if (cleanedFilters.global) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Clean filters
+   * @param filters
+   * @returns { [key: string]: Filter }
+   */
+  function cleanFilters(filters: { [key: string]: Filter }): {
+    [key: string]: Filter;
+  } {
+    const cleanedFilters: { [key: string]: Filter } = {};
+
+    for (const [key, filter] of Object.entries(filters)) {
+      // Check if value exists
+      if (
+        "value" in filter &&
+        filter.value !== null &&
+        filter.value !== undefined
+      ) {
+        if (Array.isArray(filter.constraints)) {
+          // Clean constraints array
+          const cleanedConstraints = (
+            filter.constraints as Constraint[]
+          ).filter(
+            (constraint) =>
+              constraint.value !== null && constraint.value !== undefined
+          );
+
+          if (cleanedConstraints.length > 0 || filter.operator) {
+            cleanedFilters[key] = {
+              ...filter,
+              constraints: cleanedConstraints,
+            };
+          }
+        } else {
+          cleanedFilters[key] = filter;
+        }
+      } else if (Array.isArray(filter.constraints)) {
+        // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
+        const cleanedConstraints = (filter.constraints as Constraint[]).filter(
+          (constraint) =>
+            constraint.value !== null && constraint.value !== undefined
+        );
+        if (cleanedConstraints.length > 0 || filter.operator) {
+          cleanedFilters[key] = {
+            ...filter,
+            constraints: cleanedConstraints,
+          };
+        }
+      }
+    }
+
+    return cleanedFilters;
+  }
+
+  /**
+   * Get resource fields
+   * @param fields
+   * @returns any
+   */
+  function getResourceFields(fields: any) {
+    let allFields: any = [];
+
+    function traverse(fields) {
+      fields.forEach((field: any) => {
+        if (field.fields) {
+          traverse(field.fields);
+        } else {
+          allFields.push(field);
+        }
+      });
+    }
+
+    traverse(fields);
+    return allFields;
+  }
+
+  /**
+   * Show create/edit modal
+   * @param display
+   * @param type
+   * @param data
+   * @returns void
+   */
+  function showCreateEdit(display, type, data = []) {
+    modalType.value = type;
+    modalData.value = data;
+
+    if (display === "dialog") {
+      showModal.value = true;
+    }
+  }
+
+  /**
+   * Show delete popup
+   * @param params
+   * @returns void
+   */
+  function showDeletePopup(params) {
+    if (resource && resource.name && params.$event) {
+      confirmDelete.require({
+        group: "DT_" + upperCaseFirst(resource.name),
+        target: params.$event.currentTarget,
+        message: "Are you sure you want to proceed?",
+        acceptClass: "bg-primary-500",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => {
+          if (params.data?.id) {
+            remove(params.data.id, params?.id ? params.id : null);
+          } else {
+            bulkRemove(params.selectedResources, params?.id ? params.id : null);
+          }
+        },
+        reject: () => {
+          //
+        },
+      });
+    }
+  }
+
   return {
     apiUrl,
     bulkRemove,
@@ -474,7 +387,6 @@ export default function useResource(
     getResourceFields,
     isLoading,
     lazyParams,
-    lock,
     modalData,
     modalType,
     onFilter,
@@ -489,7 +401,6 @@ export default function useResource(
     showDeletePopup,
     showModal,
     totalRecords,
-    unlock,
     update,
   };
 }

@@ -17,6 +17,7 @@ interface Permissions {
   role?: string;
   actions?: Array<string>;
 }
+
 interface Notifications {
   all?: boolean;
   error?: boolean;

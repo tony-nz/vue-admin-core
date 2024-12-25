@@ -9,7 +9,6 @@
     @onRowExpand="onLocalRowExpand"
     @sort="onSort"
     :loading="options?.loading ? isLoading : false"
-    :row-class="rowClass"
     :totalRecords="totalRecords"
     :value="resourceData"
   >
@@ -32,7 +31,6 @@
       v-model:selection="selectedResources"
       selectionMode="multiple"
       headerStyle="width: 3em"
-      :selectable="isRowSelectable"
     />
     <slot name="columns">
       <div
@@ -238,7 +236,6 @@ export default defineComponent({
       getResourceFields,
       isLoading,
       lazyParams,
-      lock,
       modalData,
       modalType,
       onFilter,
@@ -249,27 +246,8 @@ export default defineComponent({
       showDeletePopup,
       showModal,
       totalRecords,
-      unlock,
-      update,
-    } = useResource(props.resource, filters, props, {
-      params: props.params,
-      dtOptions: dtOptions,
-    });
+    } = useResource(props.resource, filters, props);
     const { canAction } = props.resource;
-
-    /**
-     * Change lock
-     * @param event
-     */
-    const changeLock = async (event: any) => {
-      if (event && event.id) {
-        if (event.locked) {
-          await unlock(event.id);
-        } else {
-          await lock(event.id);
-        }
-      }
-    };
 
     /**
      * Clear search
@@ -285,14 +263,6 @@ export default defineComponent({
      */
     const emitLiveData = (data: any) => {
       emit("liveData", data);
-    };
-
-    /**
-     * Is row selectable
-     * @param rowData
-     */
-    const isRowSelectable = (rowData: any) => {
-      return !rowData.locked;
     };
 
     /**
@@ -326,46 +296,24 @@ export default defineComponent({
       expandedRows.value = [resource];
     };
 
-    /**
-     * rowClass
-     * @param rowData
-     */
-    const rowClass = (rowData: any) => {
-      return {
-        // "bg-red-100": rowData.locked,
-        locked: rowData.locked,
-      };
-    };
-
     onMounted(async () => {
-      /**
-       * Check for props apiUrl
-       */
+      // Set apiUrl if provided
       if (props.apiUrl) {
         apiUrl.value = props.apiUrl;
       }
-
-      /**
-       * Set route id of current route
-       */
+      // Set routeId if provided
       if (props.routeId) {
         routeId.value = props.routeId;
       }
-
-      /**
-       * Merge prop form data with modal data
-       */
+      // Merge form data if available
       if (props.form?.data) {
         modalData.value = { ...props.form.data, ...modalData.value };
       }
-
-      /**
-       * Check resource.lazy and lazy load data
-       */
+      // Lazy load if resource is set to lazy
       if (props.resource.lazy) {
         lazyLoad();
       }
-
+      // Fetch resource data after all conditions are checked
       getResourceData();
     });
 
@@ -407,7 +355,6 @@ export default defineComponent({
       getResourceData,
       getResourceFields,
       isLoading,
-      isRowSelectable,
       modalData,
       modalType,
       onFilter,
@@ -415,7 +362,6 @@ export default defineComponent({
       onPage,
       onSort,
       resourceData,
-      rowClass,
       selectedResources,
       showCreateEdit,
       showDeletePopup,

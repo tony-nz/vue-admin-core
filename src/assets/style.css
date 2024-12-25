@@ -62,8 +62,3 @@ body {
 .p-highlight {
   font-weight: normal;
 }
-
-/* datatable locked feature */
-.locked * {
-  @apply text-slate-300 !important;
-}
