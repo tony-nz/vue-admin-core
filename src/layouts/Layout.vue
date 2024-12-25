@@ -26,10 +26,22 @@
         class="flex flex-col flex-1 mx-auto overflow-y-auto"
       >
         <router-view v-slot="{ Component, route }">
-          <component v-if="route" :is="Component" />
+          <template v-if="route && route.meta && route.meta.isCache">
+            <keep-alive>
+              <component :is="Component" :key="viewKey" />
+            </keep-alive>
+          </template>
+          <template v-else>
+            <component :is="Component" :key="viewKey" />
+          </template>
         </router-view>
       </div>
     </main>
+    <footer
+      class="w-full p-2 bg-gray-300 dark:bg-slate-900 fixed left-0 bottom-0 flex justify-left items-left shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]"
+    >
+      <RouterTabs />
+    </footer>
     <button
       @click="scrollToTop"
       class="fixed bottom-18 right-2 p-2 rounded-md bg-emerald-500 text-white hover:bg-emerald-700 focus:bg-emerald-700 transition-colors duration-300"
@@ -54,7 +66,6 @@
 
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, onMounted, ref } from "vue";
-import { useLoading } from "vue-loading-overlay";
 import { useRoute } from "vue-router";
 import {
   contentWidth,
@@ -65,6 +76,7 @@ import AppBar from "./header/AppBar.vue";
 import TopMenu from "./header/TopMenu.vue";
 import SecondaryMenu from "./header/SecondaryMenu.vue";
 import LayoutService from "../core/services/LayoutService";
+import RouterTabs from "./RouterTabs.vue";
 import Toast from "primevue/toast";
 import useAppStore from "../store/app";
 
@@ -73,16 +85,14 @@ export default defineComponent({
   components: {
     AppBar,
     SecondaryMenu,
+    RouterTabs,
     Toast,
     TopMenu,
   },
   setup() {
     const activeTab = ref(0);
     const appStore = useAppStore();
-    const cacheArr = [];
     const currentRoute = useRoute();
-    const loading = useLoading({});
-    let loader;
 
     const breadcrumbs = computed(() => {
       return appStore.pageBreadcrumbPath;
@@ -113,30 +123,15 @@ export default defineComponent({
 
     onBeforeMount(() => {
       LayoutService.init();
-      if (displayLoader) {
-        loader = loading.show({
-          // container: false,
-          color: "#00ab00",
-          backgroundColor: "#ffffff",
-          height: 64,
-          width: 64,
-          loader: "spinner",
-        });
-      }
     });
 
     onMounted(() => {
-      if (displayLoader) {
-        setTimeout(() => {
-          loader.hide();
-        }, 1000);
-      }
+      //
     });
 
     return {
       activeTab,
       breadcrumbs,
-      cacheArr,
       contentWidth,
       currentPage,
       displayToolbar,
