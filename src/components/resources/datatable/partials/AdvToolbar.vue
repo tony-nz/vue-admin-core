@@ -52,15 +52,6 @@
         </button>
       </span>
     </div>
-    <Select
-      v-if="toolbar?.visible"
-      v-model="filters['active'].value"
-      :options="activeOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Filter by activity"
-      class="w-48"
-    />
     <slot name="toolbar"></slot>
     <Button
       v-if="toolbar?.buttons?.refresh"
@@ -160,15 +151,6 @@ export default defineComponent({
     const { canAction } = _props.resource;
 
     /**
-     * Active filters
-     */
-    const activeOptions = [
-      { label: "All", value: null },
-      { label: "Active", value: true },
-      { label: "Inactive", value: false },
-    ];
-
-    /**
      * Clear search
      */
     const clearSearch = () => {
@@ -193,7 +175,6 @@ export default defineComponent({
     };
 
     return {
-      activeOptions,
       canAction,
       clearSearch,
       debounce,

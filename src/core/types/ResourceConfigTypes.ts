@@ -11,7 +11,6 @@ interface List {
 interface ModalPage {
   modal?: boolean;
   page?: boolean;
-  sideBar?: boolean;
 }
 
 interface Permissions {
@@ -34,30 +33,30 @@ interface Notifications {
 }
 
 interface ResourceConfig {
-  name: string;
-  label: string;
-  url?: string;
   apiUrl?: string;
-  userApiUrl?: string;
-  primaryKey?: string;
-  roles?: Array<string>;
-  permissions?: Array<Permissions>;
-  fields?: Array<FieldTypes>;
   create?: ModalPage;
-  show?: ModalPage;
+  datatable?: any;
   delete?: boolean;
   edit?: ModalPage;
-  routes?: Array<string>;
-  lists?: Array<List>;
-  notifications?: Notifications;
+  fields?: Array<FieldTypes>;
+  label: string;
   lazy?: boolean;
-  datatable?: any;
-  getName?: (count: number) => string;
+  lists?: Array<List>;
+  name: string;
   nameKey?: string;
-  singularName?: string;
+  notifications?: Notifications;
+  permissions?: Array<Permissions>;
   pluralName?: string;
-  getTitle?: (action: string, item?: any) => string;
+  primaryKey?: string;
+  roles?: Array<string>;
+  routes?: Array<string>;
+  show?: ModalPage;
+  singularName?: string;
+  url?: string;
+  userApiUrl?: string;
   canAction: (action: string) => boolean;
+  getTitle?: (action: string, item?: any) => string;
+  getName?: (count: number) => string;
 }
 
 export default ResourceConfig;

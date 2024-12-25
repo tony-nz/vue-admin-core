@@ -34,32 +34,12 @@
       headerStyle="width: 3em"
       :selectable="isRowSelectable"
     />
-    <Column
-      v-if="options?.columns?.active"
-      :exportable="false"
-      :sortable="true"
-      field="active"
-      headerStyle="width: 2rem"
-    >
-      <template #body="{ data }">
-        <ToggleSwitch
-          v-model="data.active"
-          @update:modelValue="changeActive(data)"
-          :disabled="data.locked"
-        />
-      </template>
-    </Column>
     <slot name="columns">
       <div
         v-for="field in getResourceFields(resource.fields)"
         v-bind:key="field.id"
       >
-        <Column
-          v-if="field.id !== 'active'"
-          :field="field.id"
-          :header="field.label"
-          :sortable="true"
-        />
+        <Column :field="field.id" :header="field.label" :sortable="true" />
       </div>
     </slot>
     <Column v-if="options?.columns?.actions" :exportable="false" class="w-24">
@@ -70,7 +50,6 @@
           :resource="resource"
           :showDefaults="options.actions?.enabled"
           @deletePopup="showDeletePopup"
-          @changeLock="changeLock"
           @showCreateEdit="showCreateEdit"
         >
           <template v-slot:actionCol="slotProps">
@@ -279,25 +258,6 @@ export default defineComponent({
     const { canAction } = props.resource;
 
     /**
-     * Active filters
-     */
-    const activeOptions = [
-      { label: "All", value: null },
-      { label: "Active", value: true },
-      { label: "Inactive", value: false },
-    ];
-
-    /**
-     * Change active
-     * @param event
-     */
-    const changeActive = async (event: any) => {
-      if (event && event.id) {
-        await update(event, event.id);
-      }
-    };
-
-    /**
      * Change lock
      * @param event
      */
@@ -399,13 +359,6 @@ export default defineComponent({
         modalData.value = { ...props.form.data, ...modalData.value };
       }
 
-      if (props.options?.columns?.actions) {
-        // add active filter
-        Object.assign(filters.value, {
-          active: { value: true, matchMode: FilterMatchMode.EQUALS },
-        });
-      }
-
       /**
        * Check resource.lazy and lazy load data
        */
@@ -444,10 +397,7 @@ export default defineComponent({
     );
 
     return {
-      activeOptions,
       canAction,
-      changeActive,
-      changeLock,
       clearSearch,
       debounce,
       dtOptions,

@@ -1,6 +1,6 @@
 <template>
   <Card>
-    <DataTable :resource="resource" :showActive="true">
+    <DataTable :resource="resource">
       <template v-slot:toolbar></template>
     </DataTable>
   </Card>
@@ -25,7 +25,7 @@ export default defineComponent({
     Card,
     DataTable,
   },
-  setup(props) {
+  setup() {
     const isMounted = ref(false);
 
     onMounted(async () => {
