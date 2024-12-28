@@ -1,8 +1,14 @@
 <template>
   <header class="sticky top-0 z-10">
-    <TopMenu :tab="activeTab" @changeTab="switchTab" />
+    <TopMenu
+      :tab="activeTab"
+      @changeTab="switchTab"
+      @openCanvas="showCanvas = true"
+      @closeCanvas="showCanvas = false"
+    />
     <SecondaryMenu :tab="activeTab" />
   </header>
+  <OffCanvas v-model="showCanvas" @close="showCanvas = false" />
 </template>
 
 <script lang="ts">
@@ -16,25 +22,22 @@ export default defineComponent({
     SecondaryMenu,
     TopMenu,
   },
-  methods: {
-    switchTab(tab) {
-      this.activeTab = tab;
-    },
-  },
   setup() {
     const activeTab = ref(0);
+    const showCanvas = ref(false);
+
+    /**
+     * Switch the active tab
+     */
+    const switchTab = (tab) => {
+      activeTab.value = tab;
+    };
+
     return {
       activeTab,
+      showCanvas,
+      switchTab,
     };
   },
 });
 </script>
-
-<style scoped>
-/* TODO move to css file */
-.p-menubar {
-  padding: 1rem 0;
-  background: none;
-  border: none;
-}
-</style>

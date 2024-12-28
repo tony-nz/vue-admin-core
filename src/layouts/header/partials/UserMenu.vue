@@ -233,16 +233,16 @@ export default defineComponent({
 
         if (element) {
           localStorageConfig[id] = {};
-          if (element.classList.contains("container-fluid")) {
+          if (element.classList.contains("w-full")) {
             element.classList.add("container");
-            element.classList.remove("container-fluid");
+            element.classList.remove("w-full");
             localStorageConfig[id] = Object.assign(
               { width: "fixed" },
               localStorageConfig[id]
             );
             isFluid.value = false;
           } else {
-            element.classList.add("container-fluid");
+            element.classList.add("w-full");
             element.classList.remove("container");
             localStorageConfig[id] = Object.assign(
               { width: "fluid" },

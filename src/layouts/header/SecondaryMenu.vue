@@ -1,5 +1,4 @@
 <template>
-  <!-- SecondaryMenu starts -->
   <div
     v-if="hasChild"
     class="w-full mx-auto bg-white dark:bg-slate-800 shadow relative z-10 hidden lg:flex shadow-md"
@@ -7,13 +6,12 @@
     <div
       id="vueadmin-secondaryMenu"
       :class="{
-        'container-fluid': layoutWidth == 'fluid',
+        'w-full': layoutWidth == 'fluid',
         container: layoutWidth == 'fixed',
       }"
       class="justify-between px-4 py-6 h-14 flex items-center lg:items-stretch mx-auto"
     >
       <div class="flex items-center">
-        <!-- go back button -->
         <button
           @click="goBack"
           class="transition duration-150 ease-in-out btn bg-primary-500 border-gray-800 rounded-lg fill-gray-400 disabled:hover:fill-gray-400 hover:bg-primary-600 disabled:hover:bg-gray-100 dark:bg-slate-900 hover:fill-white p-2 shadow mr-2"

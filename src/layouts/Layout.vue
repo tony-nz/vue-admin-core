@@ -5,7 +5,12 @@
     class="flex flex-col w-full max-h-full overflow-hidden bg-gray-200 dark:bg-slate-700"
   >
     <header class="sticky top-0 z-10">
-      <TopMenu :tab="activeTab" @changeTab="switchTab">
+      <TopMenu
+        :tab="activeTab"
+        @changeTab="switchTab"
+        @openCanvas="showCanvas = true"
+        @closeCanvas="showCanvas = false"
+      >
         <template v-slot:appBar>
           <AppBar>
             <template v-slot:content>
@@ -14,13 +19,14 @@
           </AppBar>
         </template>
       </TopMenu>
+      <OffCanvas v-model="showCanvas" @close="showCanvas = false" />
       <SecondaryMenu :tab="activeTab" />
     </header>
     <main class="relative flex flex-col flex-1 overflow-auto h-full z-0">
       <div
         id="vueadmin-content"
         :class="{
-          'container-fluid': contentWidth == 'fluid',
+          'w-full': contentWidth == 'fluid',
           container: contentWidth == 'fixed',
         }"
         class="flex flex-col flex-1 mx-auto overflow-y-auto"
@@ -50,24 +56,27 @@ import { computed, defineComponent, onBeforeMount, ref } from "vue";
 import { useRoute } from "vue-router";
 import { contentWidth, displayToolbar } from "../core/helpers/app";
 import AppBar from "./header/AppBar.vue";
-import TopMenu from "./header/TopMenu.vue";
-import SecondaryMenu from "./header/SecondaryMenu.vue";
 import LayoutService from "../core/services/LayoutService";
+import OffCanvas from "./offcanvas/OffCanvas.vue";
 import RouterTabs from "./RouterTabs.vue";
+import SecondaryMenu from "./header/SecondaryMenu.vue";
 import Toast from "primevue/toast";
+import TopMenu from "./header/TopMenu.vue";
 
 export default defineComponent({
   name: "VueAdmin",
   components: {
     AppBar,
-    SecondaryMenu,
+    OffCanvas,
     RouterTabs,
+    SecondaryMenu,
     Toast,
     TopMenu,
   },
   setup() {
     const activeTab = ref(0);
     const currentRoute = useRoute();
+    const showCanvas = ref(false);
 
     /**
      * Switch the active tab
@@ -93,6 +102,7 @@ export default defineComponent({
       activeTab,
       contentWidth,
       displayToolbar,
+      showCanvas,
       switchTab,
       viewKey,
     };

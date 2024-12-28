@@ -7,7 +7,7 @@
       v-if="displayToolbar"
       id="vueadmin-toolbar"
       :class="{
-        'container-fluid': contentWidth == 'fluid',
+        'w-full': contentWidth == 'fluid',
         container: contentWidth == 'fixed',
       }"
       class="px-6 mx-auto flex flex-row items-start lg:items-center justify-between"

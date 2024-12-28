@@ -9,17 +9,24 @@
       >
         <template v-for="(item, i) in mainMenuConfig" :key="i">
           <VaTab
-            :class="'p-1.5 inline-block focus:outline-nones transition-colors duration-200 rounded-lg dark:fill-gray-400 dark:hover:bg-gray-800 hover:bg-gray-100 hover:fill-gray-500'"
+            :class="'p-1.5 group inline-block focus:outline-nones transition-colors duration-200 rounded-lg dark:fill-gray-400 dark:hover:bg-gray-800 hover:bg-gray-100 hover:fill-gray-500 hover:cursor-pointer'"
             :activeClass="'bg-white dark:bg-slate-600 dark:fill-white fill-gray-800 menu-active'"
             :inActiveClass="'bg-black/10 hover:bg-white hover:bg-opacity-100 hover:fill-gray-800 fill-white fill-opacity-70'"
             :isRoute="item.items ? false : true"
             @click="changeBackground(item)"
           >
-            <inline-svg
-              v-if="item.icon && item.icon['path']"
-              :src="item.icon['path']"
-              class="group-hover:fill-primary-600 h-6 w-6"
-            />
+            <template v-slot:item="{ isActive }">
+              <template v-if="item.icon && item.icon['path']">
+                <inline-svg
+                  :src="item.icon['path']"
+                  class="group-hover:fill-primary-600 h-6 w-6"
+                  :class="{
+                    'fill-white': !isActive,
+                    'fill-primary-600': isActive,
+                  }"
+                />
+              </template>
+            </template>
           </VaTab>
         </template>
       </VaTabs>

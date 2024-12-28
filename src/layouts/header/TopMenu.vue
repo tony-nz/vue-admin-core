@@ -6,7 +6,7 @@
     <div
       id="vueadmin-topMenu"
       :class="{
-        'container-fluid': layoutWidth == 'fluid',
+        'w-full': layoutWidth == 'fluid',
         container: layoutWidth == 'fixed',
       }"
       class="px-4 pt-2 flex items-center lg:items-stretch mx-auto min-h-[52px]"
@@ -16,7 +16,21 @@
           :class="{ '-mt-[4px]': !hasChild }"
           class="z-30 pr-32 lg:hidden items-center h-full w-full"
         >
-          <OffCanvas />
+          <button
+            @click="openCanvas"
+            class="relative -top-1 p-1 rounded-lg hover:bg-white/30"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              class="h-6 w-6"
+            >
+              <path
+                class="fill-white"
+                d="M4 18q-.425 0-.712-.288T3 17t.288-.712T4 16h16q.425 0 .713.288T21 17t-.288.713T20 18zm0-5q-.425 0-.712-.288T3 12t.288-.712T4 11h16q.425 0 .713.288T21 12t-.288.713T20 13zm0-5q-.425 0-.712-.288T3 7t.288-.712T4 6h16q.425 0 .713.288T21 7t-.288.713T20 8z"
+              />
+            </svg>
+          </button>
         </div>
         <ul
           :class="{ '-mt-[4px]': !hasChild }"
@@ -114,41 +128,34 @@ import useAppStore from "../../store/app";
 export default defineComponent({
   name: "TopMenu",
   props: ["tab"],
-  methods: {
-    changeTab(tab) {
-      this.$emit("switchTabs", tab);
-    },
-  },
   components: {
     InlineSvg,
     OffCanvas,
     Tabs,
     Tab,
   },
+  methods: {
+    changeTab(tab) {
+      this.$emit("switchTabs", tab);
+    },
+  },
   watch: {
     activeTab(tab) {
       this.$emit("changeTab", tab);
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const activeTab = ref(props.tab);
     const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
     const router = useRouter();
     const slugBackground = ref();
 
-    const changeBackground = (menuItem) => {
-      // if (menuItem.slug) {
-      slugBackground.value = menuItem.backgroundColor;
-      // }
-    };
-
-    const tabClick = (item) => {
-      if (!item.items || item.to) {
-        router.push({ path: item.to });
-      }
-      changeBackground(item);
-    };
-
+    /**
+     * Active route
+     * @param url
+     * @param config
+     * @returns number
+     */
     const activeRoute = (url, config) => {
       for (let i = 0; i < config.length; i++) {
         const parent = config[i];
@@ -172,10 +179,39 @@ export default defineComponent({
     };
 
     /**
+     * Change background color
+     * @param menuItem
+     * @returns void
+     */
+    const changeBackground = (menuItem) => {
+      slugBackground.value = menuItem.backgroundColor;
+    };
+
+    /**
      * Check to see if mainMenuConfig children have them items property
      * @returns boolean
      */
     const hasChild = mainMenuConfig.some((item) => item.items);
+
+    /**
+     * Open canvas
+     * @returns void
+     */
+    const openCanvas = () => {
+      emit("openCanvas");
+    };
+
+    /**
+     * Tab click
+     * @param item
+     * @returns void
+     */
+    const tabClick = (item) => {
+      if (!item.items || item.to) {
+        router.push({ path: item.to });
+      }
+      changeBackground(item);
+    };
 
     onMounted(() => {
       const active = activeRoute(
@@ -184,7 +220,6 @@ export default defineComponent({
       );
       if (active > -1) {
         activeTab.value = active;
-        // changeBackground(mainMenuConfig[active]);
       }
     });
 
@@ -198,7 +233,6 @@ export default defineComponent({
         const active = activeRoute(to.path, mainMenuConfig);
         if (active > -1) {
           activeTab.value = active;
-          // changeBackground(mainMenuConfig[active]);
         }
       }
     );
@@ -212,6 +246,7 @@ export default defineComponent({
       logoAlt,
       logoClass,
       mainMenuConfig,
+      openCanvas,
       slugBackground,
       logoDark,
       logoLight,

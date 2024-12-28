@@ -1,46 +1,25 @@
 <template>
-  <div @click="isVisible = !isVisible" class="z-30 lg:hidden absolute">
-    <svg
-      class="w-6 h-6"
-      fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      stroke="white"
-      viewBox="0 0 24 24"
-    >
-      <path v-if="!isVisible" d="M4 6h16M4 12h16M4 18h16"></path>
-      <path v-else d="M6 18L18 6M6 6l12 12"></path>
-    </svg>
-  </div>
-  <transition
-    enter-from-class="-translate-x-[150%] opacity-0"
-    enter-active-class="transition duration-700"
-  >
-    <div
-      v-if="isVisible"
-      class="fixed top-0 left-0 z-10 backdrop-blur-sm w-full h-full"
-      tabindex="-1"
-      id="offcanvasTop"
-      aria-labelledby="offcanvasTopLabel"
-      data-te-offcanvas-init
-    >
-      <aside class="flex h-full pt-[52px]">
-        <TopMenu :tab="activeTab" @changeTab="switchTab" />
-        <SecondaryMenu :tab="activeTab" @closeOffCanvas="close" />
-      </aside>
-    </div>
-  </transition>
+  <Drawer v-model:visible="showCanvas">
+    <template #container="{ closeCallback }">
+      <div class="flex flex-row h-full">
+        <TopMenu
+          :tab="activeTab"
+          @changeTab="switchTab"
+          @close="closeCallback"
+        />
+        <SecondaryMenu :tab="activeTab" @close="closeCallback" />
+      </div>
+    </template>
+  </Drawer>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-// import { onBeforeRouteUpdate } from "vue-router";
+import { defineComponent, ref, watch } from "vue";
 import { translate } from "../../core/helpers/functions";
 import Content from "./Content.vue";
 import Header from "./Header.vue";
-import TopMenu from "./TopMenu.vue";
 import SecondaryMenu from "./SecondaryMenu.vue";
+import TopMenu from "./TopMenu.vue";
 
 export default defineComponent({
   name: "OffCanvas",
@@ -50,38 +29,38 @@ export default defineComponent({
     SecondaryMenu,
     TopMenu,
   },
-  methods: {
-    switchTab(tab) {
-      this.activeTab = tab;
-    },
-  },
   props: {
-    show: {
+    modelValue: {
       type: Boolean,
-      default: false,
+      required: true,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const activeTab = ref(0);
-    const isVisible = ref(props.show);
+    const showCanvas = ref(props.modelValue);
 
-    const close = () => {
-      isVisible.value = false;
+    /**
+     * Switch the active tab
+     */
+    const switchTab = (tab) => {
+      activeTab.value = tab;
     };
 
-    const open = () => {
-      isVisible.value = true;
-    };
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        showCanvas.value = newValue;
+      }
+    );
 
-    // onBeforeRouteUpdate((to, from, next) => {
-    //   close();
-    //   next();
-    // });
+    watch(showCanvas, (newValue) => {
+      emit("update:modelValue", newValue);
+    });
 
     return {
       activeTab,
-      close,
-      isVisible,
+      showCanvas,
+      switchTab,
       translate,
     };
   },

@@ -21,7 +21,7 @@
                     v-if="item.to && item.items"
                     :class="[
                       {
-                        'bg-red-200 bg-opacity-70 text-blue-300': checkRoute(
+                        'bg-red-200 bg-opacity-70 text-primary-500': checkRoute(
                           item.to
                         ),
                         'bg-red-400': isActive,
@@ -36,10 +36,15 @@
                   <button
                     v-else
                     :href="href"
-                    @click="navigate"
+                    @click="
+                      (event) => {
+                        navigate();
+                        emitCloseOffCanvas(event);
+                      }
+                    "
                     :class="[
                       {
-                        'bg-gray-200 bg-opacity-70 text-blue-300 dark:text-white dark:bg-opacity-10':
+                        'bg-gray-200 bg-opacity-70 text-primary-500 dark:text-white dark:bg-opacity-10':
                           checkRoute(item.to),
                         'bg-gray-200': isActive && !item.items,
                         'bg-gray-200 ':
@@ -52,7 +57,7 @@
                     {{ translate(item.label) }}
                   </button>
                   <template v-if="item.items">
-                    <ul id="dropdown-example" class="py-2 space-y-2">
+                    <ul class="py-2 space-y-2">
                       <li
                         v-for="(childMenu, childIndex) in item.items"
                         :key="childIndex"
@@ -64,7 +69,12 @@
                           v-slot="{ href, navigate }"
                         >
                           <button
-                            @click="navigate"
+                            @click="
+                              (event) => {
+                                navigate();
+                                emitCloseOffCanvas(event);
+                              }
+                            "
                             :href="href"
                             class="flex items-center w-full p-2 text-base font-normal text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8 truncate"
                           >
@@ -81,58 +91,6 @@
         </template>
       </VaTabPanels>
     </nav>
-    <div class="w-56 self-end">
-      <!-- <div class="flex items-center justify-between">
-        <h2 class="text-base font-semibold text-gray-800 dark:text-white">
-          Projects
-        </h2>
-
-        <button
-          class="p-0.5 hover:bg-gray-100 duration-200 transition-colors text-gray-500 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 border rounded-lg"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
-          </svg>
-        </button>
-      </div> -->
-
-      <!-- <nav class="mt-4 -mx-3 space-y-3">
-        <button
-          class="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-gray-600 transition-colors duration-300 transform rounded-lg dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-gray-200 hover:text-gray-700"
-        >
-          <div class="flex items-center gap-x-2">
-            <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
-            <span>Support</span>
-          </div>
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-4 h-4 rtl:rotate-180"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-        </button>
-      </nav> -->
-    </div>
   </div>
 </template>
 
@@ -154,18 +112,15 @@ export default defineComponent({
   setup(props, { emit }) {
     const activeTab = ref(props.tab);
     const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
-    const routeActiveClass = ref("text-blue-600");
+    const routeActiveClass = ref("text-primary-500");
     const routeClass = ref(
-      "text-left hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2 dark:text-white"
+      "text-left hover:text-primary-500 shadow-none rounded-lg px-3 py-2 mr-2 dark:text-white"
     );
-    const checkRoute = (to) => {
-      if (window.location.href.indexOf(to) > -1) {
-        return true;
-      }
-      return false;
-    };
 
-    // loop through all the child items and check if any of them is active
+    /**
+     * Check if the child route is active
+     * @param item
+     */
     const checkChild = (item) => {
       let active = false;
       item.items.forEach((child) => {
@@ -176,10 +131,34 @@ export default defineComponent({
       return active;
     };
 
+    /**
+     * Check if the route is active
+     * @param to
+     */
+    const checkRoute = (to) => {
+      if (window.location.href.indexOf(to) > -1) {
+        return true;
+      }
+      return false;
+    };
+
+    /**
+     * Emit close off canvas event
+     * @param event
+     */
+    const emitCloseOffCanvas = (event: Event) => {
+      // Prevent default action if it's a link click
+      if (event.target instanceof HTMLAnchorElement) {
+        event.preventDefault();
+      }
+      emit("closeOffCanvas");
+    };
+
     return {
       activeTab,
       checkChild,
       checkRoute,
+      emitCloseOffCanvas,
       mainMenuConfig,
       routeActiveClass,
       routeClass,
