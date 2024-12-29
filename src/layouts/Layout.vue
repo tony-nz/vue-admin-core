@@ -22,7 +22,9 @@
       <OffCanvas v-model="showCanvas" @close="showCanvas = false" />
       <SecondaryMenu :tab="activeTab" />
     </header>
-    <main class="relative flex flex-col flex-1 overflow-auto h-full z-0">
+    <main
+      class="relative pb-[50px] flex flex-col flex-1 overflow-auto h-full z-0"
+    >
       <div
         id="vueadmin-content"
         :class="{
@@ -33,9 +35,7 @@
       >
         <router-view v-slot="{ Component, route }">
           <template v-if="route && route.meta && route.meta.isCache">
-            <keep-alive>
-              <component :is="Component" :key="viewKey" />
-            </keep-alive>
+            <RouterAlive :Component="Component" :viewKey="viewKey" />
           </template>
           <template v-else>
             <component :is="Component" :key="viewKey" />
@@ -58,6 +58,7 @@ import { contentWidth, displayToolbar } from "../core/helpers/app";
 import AppBar from "./header/AppBar.vue";
 import LayoutService from "../core/services/LayoutService";
 import OffCanvas from "./offcanvas/OffCanvas.vue";
+import RouterAlive from "../components/router-alive/RouterAlive.vue";
 import RouterTabs from "./RouterTabs.vue";
 import SecondaryMenu from "./header/SecondaryMenu.vue";
 import Toast from "primevue/toast";
@@ -68,6 +69,7 @@ export default defineComponent({
   components: {
     AppBar,
     OffCanvas,
+    RouterAlive,
     RouterTabs,
     SecondaryMenu,
     Toast,
@@ -91,7 +93,8 @@ export default defineComponent({
      * when the route changes
      */
     const viewKey = computed(() => {
-      return currentRoute.path || Date.now();
+      const key = currentRoute.path || Date.now();
+      return typeof key === "number" ? key.toString() : key;
     });
 
     onBeforeMount(() => {

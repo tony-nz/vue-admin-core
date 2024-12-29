@@ -96,7 +96,8 @@ export const useResourceRoutes = function (resource) {
                 // resourceStore.setItem(resource.name, response.data);
 
                 if (to.params.id) {
-                  setTitle(to, action, response.data);
+                  console.log("Setting title", to, action, response);
+                  setTitle(to, action, response);
                   return next();
                 }
               } catch (error: any) {
@@ -122,6 +123,7 @@ export const useResourceRoutes = function (resource) {
                 return next();
               }
             }
+            setTitle(to, action);
             next();
           },
           beforeRouteLeave(to, from, next) {

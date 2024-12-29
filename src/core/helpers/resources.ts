@@ -150,6 +150,10 @@ const buildResourceConfig = (resource: any): any => {
     singularName: getName(1),
     pluralName: getName(10),
     getTitle: (action: string, item: any = null) => {
+      // check if the resource has a label function
+      if (typeof resource.label === "function") {
+        return resource.label(item, action);
+      }
       const titleKey = `resources.${resource.name}.titles.${action}`;
       const label =
         typeof resource.label === "function"

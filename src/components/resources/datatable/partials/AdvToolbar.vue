@@ -20,7 +20,7 @@
   >
     <div
       v-if="toolbar?.search?.enabled != false"
-      class="flex w-full justify-end hidden md:block"
+      class="flex w-full justify-end hidden xl:block"
     >
       <span class="flex w-full relative">
         <i
@@ -167,6 +167,7 @@ export default defineComponent({
     };
 
     const showCreateEdit = (type, data, modalData) => {
+      console.log("showCreateEdit", type, data, modalData);
       emit("createEdit", { type, data, modalData });
     };
 
