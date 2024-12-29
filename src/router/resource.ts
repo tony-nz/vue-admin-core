@@ -96,7 +96,6 @@ export const useResourceRoutes = function (resource) {
                 // resourceStore.setItem(resource.name, response.data);
 
                 if (to.params.id) {
-                  console.log("Setting title", to, action, response);
                   setTitle(to, action, response);
                   return next();
                 }
