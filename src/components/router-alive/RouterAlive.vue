@@ -188,8 +188,8 @@ export default defineComponent({
     /** Current route */
     const route = useRoute();
     /** Current page component cache key */
-    // const currentKey = computed(() => route.fullPath);
-    const currentKey = computed(() => props.viewKey || route.fullPath);
+    const currentKey = computed(() => route.fullPath);
+    // const currentKey = computed(() => props.viewKey || route.fullPath);
 
     /** Cache control */
     const cache = useCache(currentKey, props.max);

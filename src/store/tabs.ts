@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 
 export interface ITabsItem {
-  name: string;
-  path: string;
-  icon: string;
+  name?: string;
+  path?: string;
+  icon?: string;
   activePath?: string;
-  title: string;
+  title?: string;
   query?: {
     [key: string]: any;
   };
@@ -39,13 +39,13 @@ export const useTabsStore = defineStore({
         return (
           index ===
           self.findIndex((t) => {
-            return t.name === tab.name;
+            return t.path === tab.path;
           })
         );
       });
       window.sessionStorage.setItem("tabs", JSON.stringify(this.tabs));
     },
-    handleAddRoute(route: any) {
+    async handleAddRoute(route: any) {
       if (!route.name) return;
       if (NO_PUSH_ROUTES.includes(route.name)) return;
       this.tabs.push({
@@ -57,6 +57,7 @@ export const useTabsStore = defineStore({
         query: route.query,
         params: route.params,
       });
+      console.log("Tabs", this.tabs);
       this.setStorage();
     },
     handleClose(index: number) {
