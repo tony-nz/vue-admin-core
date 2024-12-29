@@ -30,21 +30,9 @@ const HOME_PAGE = {
 export const useTabsStore = defineStore({
   id: "TabStore",
   state: (): IState => ({
-    tabs: JSON.parse(window.sessionStorage.getItem("tabs") as string) || [],
+    tabs: [HOME_PAGE],
   }),
   actions: {
-    setStorage() {
-      // prevent double ups
-      this.tabs = this.tabs.filter((tab, index, self) => {
-        return (
-          index ===
-          self.findIndex((t) => {
-            return t.path === tab.path;
-          })
-        );
-      });
-      window.sessionStorage.setItem("tabs", JSON.stringify(this.tabs));
-    },
     handleAddRoute(route: any) {
       if (!route.name) return;
       if (NO_PUSH_ROUTES.includes(route.name)) return;
@@ -57,20 +45,21 @@ export const useTabsStore = defineStore({
         query: route.query,
         params: route.params,
       });
-      this.setStorage();
     },
     handleClose(index: number) {
       this.tabs.splice(index, 1);
-      this.setStorage();
     },
     handleCloseOther(index: number) {
       const obj = JSON.parse(JSON.stringify(this.tabs[index]));
       this.tabs = obj.name === "Home" ? [HOME_PAGE] : [HOME_PAGE, obj];
-      this.setStorage();
     },
     handleCloseAll() {
       this.tabs = [HOME_PAGE];
-      this.setStorage();
     },
   },
+  getters: {
+    getTabs: (state) => state.tabs,
+  },
 });
+
+export default useTabsStore;

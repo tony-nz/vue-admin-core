@@ -3,6 +3,7 @@ import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
 import i18n from "../core/plugins/i18n";
 import useAppStore from "../store/app";
 import useResourceStore from "../store/resource";
+import useTabsStore from "../store/tabs";
 import roles from "./middleware/roles";
 
 export const useResourceRoutes = function (resource) {
@@ -73,6 +74,18 @@ export const useResourceRoutes = function (resource) {
             );
           },
           async beforeRouteEnter(to, from, next) {
+            const tabsStore = useTabsStore();
+
+            // Check if the route or its data is cached
+            const cachedTab = tabsStore.getTabs.find(
+              (tab) => tab.path === to.fullPath
+            );
+
+            // If the tab is cached, return next
+            if (cachedTab) {
+              return next();
+            }
+
             /**
              * Initialize from query if available
              */
