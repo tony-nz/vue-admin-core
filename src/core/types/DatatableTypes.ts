@@ -18,6 +18,7 @@ interface ToolbarOptions {
     refresh?: boolean;
     create?: boolean;
     bulkDelete?: boolean;
+    search?: boolean;
   };
   search?: {
     enabled: boolean;

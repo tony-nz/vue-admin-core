@@ -1,27 +1,92 @@
 <template>
-  <div class="px-2 py-1">
-    <h3
-      class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
-    >
-      {{ toolbar?.title ? toolbar.title : resource.label }}
-    </h3>
-    <p
-      class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
-    >
-      {{
-        toolbar?.description
-          ? toolbar.description
-          : `List of ${resource.label.toLowerCase()}`
-      }}
-    </p>
-  </div>
-  <div
-    class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
-  >
-    <div
-      v-if="toolbar?.search?.enabled != false"
-      class="flex w-full justify-end hidden xl:block"
-    >
+  <div class="flex flex-col w-full">
+    <div class="flex flex-row w-full">
+      <div class="px-2 py-1 w-full">
+        <h3
+          class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
+        >
+          {{ toolbar?.title ? toolbar.title : resource.label }}
+        </h3>
+        <p
+          class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
+        >
+          {{
+            toolbar?.description
+              ? toolbar.description
+              : `List of ${resource.label.toLowerCase()}`
+          }}
+        </p>
+      </div>
+      <div
+        class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
+      >
+        <slot name="toolbar"></slot>
+        <Button
+          v-if="toolbar?.buttons?.search"
+          @click="toggleSearch"
+          class="px-4"
+          icon="pi pi-search"
+          severity="info"
+        />
+        <Button
+          v-if="toolbar?.buttons?.refresh"
+          @click="refreshData"
+          class="px-4"
+          icon="pi pi-refresh"
+          severity="info"
+        />
+        <Button
+          v-if="
+            toolbar?.buttons?.bulkDelete &&
+            canAction('delete') &&
+            selectedResources &&
+            selectedResources.length > 0
+          "
+          @click="showDeletePopup({ $event, selectedResources })"
+          :disabled="selectedResources?.length === 0 || !selectedResources"
+          :label="translate('va.actions.bulkDelete') + ' ' + resource.label"
+          class="whitespace-nowrap overflow-visible"
+          icon="pi pi-delete"
+          severity="danger"
+        />
+        <Button
+          v-if="
+            resource?.create?.modal &&
+            toolbar?.buttons?.create &&
+            canAction('create')
+          "
+          @click="showCreateEdit('dialog', 'create', modalData)"
+          :label="
+            translate('va.actions.create') +
+            ' ' +
+            (resource.singularName ? resource.singularName : resource.label)
+          "
+          class="whitespace-nowrap overflow-visible"
+          icon="pi pi-plus"
+          severity="info"
+        />
+        <router-link
+          v-else-if="
+            resource?.create?.page &&
+            toolbar?.buttons?.create &&
+            canAction('create')
+          "
+          :to="resource.url + '/create'"
+        >
+          <Button
+            :label="
+              translate('va.actions.create') +
+              ' ' +
+              (resource.singularName ? resource.singularName : resource.label)
+            "
+            class="whitespace-nowrap overflow-visible"
+            icon="pi pi-plus"
+            severity="info"
+          />
+        </router-link>
+      </div>
+    </div>
+    <div v-if="showSearch" class="flex w-full justify-end p-1.5">
       <span class="flex w-full relative">
         <i
           class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"
@@ -52,68 +117,11 @@
         </button>
       </span>
     </div>
-    <slot name="toolbar"></slot>
-    <Button
-      v-if="toolbar?.buttons?.refresh"
-      @click="refreshData"
-      class="px-4"
-      icon="pi pi-refresh"
-      severity="info"
-    />
-    <Button
-      v-if="
-        toolbar?.buttons?.bulkDelete &&
-        canAction('delete') &&
-        selectedResources &&
-        selectedResources.length > 0
-      "
-      @click="showDeletePopup({ $event, selectedResources })"
-      :disabled="selectedResources?.length === 0 || !selectedResources"
-      :label="translate('va.actions.bulkDelete') + ' ' + resource.label"
-      class="whitespace-nowrap overflow-visible"
-      icon="pi pi-delete"
-      severity="danger"
-    />
-    <Button
-      v-if="
-        resource?.create?.modal &&
-        toolbar?.buttons?.create &&
-        canAction('create')
-      "
-      @click="showCreateEdit('dialog', 'create', modalData)"
-      :label="
-        translate('va.actions.create') +
-        ' ' +
-        (resource.singularName ? resource.singularName : resource.label)
-      "
-      class="whitespace-nowrap overflow-visible"
-      icon="pi pi-plus"
-      severity="info"
-    />
-    <router-link
-      v-else-if="
-        resource?.create?.page &&
-        toolbar?.buttons?.create &&
-        canAction('create')
-      "
-      :to="resource.url + '/create'"
-    >
-      <Button
-        :label="
-          translate('va.actions.create') +
-          ' ' +
-          (resource.singularName ? resource.singularName : resource.label)
-        "
-        class="whitespace-nowrap overflow-visible"
-        icon="pi pi-plus"
-        severity="info"
-      />
-    </router-link>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 import { ToolbarOptions } from "../../../../core/types/DatatableTypes";
 import { translate } from "../../../../core/helpers/functions";
 import { useDebounce } from "../../../../composables/useDebounce";
@@ -148,6 +156,7 @@ export default defineComponent({
   },
   setup(_props, { emit }) {
     const debounce = useDebounce();
+    const showSearch = ref(false);
     const { canAction } = _props.resource;
 
     /**
@@ -166,13 +175,29 @@ export default defineComponent({
       emit("refresh");
     };
 
+    /**
+     * Show create/edit modal
+     * @param {string} type
+     * @param {Object} data
+     * @param {Object} modalData
+     */
     const showCreateEdit = (type, data, modalData) => {
-      console.log("showCreateEdit", type, data, modalData);
-      emit("createEdit", { type, data, modalData });
+      emit("createEdit", type, data, modalData);
     };
 
+    /**
+     * Show delete popup
+     * @param {Event} event
+     */
     const showDeletePopup = (event) => {
       emit("delete", event);
+    };
+
+    /**
+     * Toggle search
+     */
+    const toggleSearch = () => {
+      showSearch.value = !showSearch.value;
     };
 
     return {
@@ -182,6 +207,8 @@ export default defineComponent({
       refreshData,
       showCreateEdit,
       showDeletePopup,
+      showSearch,
+      toggleSearch,
       translate,
     };
   },

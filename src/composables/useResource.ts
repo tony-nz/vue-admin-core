@@ -344,14 +344,12 @@ export default function useResource(
    * @returns void
    */
   function showCreateEdit(display, type, data = []) {
-    console.log("showCreateEdit", display, type, data);
     modalType.value = type;
     modalData.value = data;
 
     if (display === "dialog") {
       showModal.value = true;
     }
-    console.log("showModal", showModal.value);
   }
 
   /**
