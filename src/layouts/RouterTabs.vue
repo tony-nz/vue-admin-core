@@ -226,12 +226,9 @@ export default defineComponent({
     // Watches for route changes to add new routes to tabs if not already present
     watch(
       () => route.path,
-      async () => {
-        console.log("Route changed", route);
-        console.log("Tabs", tabs.value);
+      () => {
         const index = tabs.value.findIndex((item) => item.path === route.path);
-        console.log("Index", index);
-        if (index < 0) await store.handleAddRoute(route);
+        if (index < 0) store.handleAddRoute(route);
       },
       { immediate: true }
     );

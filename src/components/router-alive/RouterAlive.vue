@@ -1,14 +1,12 @@
 <template>
-  <transition v-bind="pageTransition" appear>
-    <KeepAlive v-if="!resetting" :include="cache.keys" :max="max">
-      <Component
-        :is="resolveComponent(Component)"
-        v-if="!refreshing"
-        ref="current"
-        :key="currentKey"
-      />
-    </KeepAlive>
-  </transition>
+  <KeepAlive v-if="!resetting" :include="cache.keys" :max="max">
+    <Component
+      :is="resolveComponent(Component)"
+      v-if="!refreshing"
+      ref="current"
+      :key="currentKey"
+    />
+  </KeepAlive>
 </template>
 
 <script lang="ts">
