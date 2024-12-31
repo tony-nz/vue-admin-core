@@ -55,9 +55,9 @@ const cleanDate = (isoDate) => {
  * @param {string} text
  */
 function translate(text, vars = {}) {
-  const { t, te, tc } = i18n.global;
+  const { t, te } = i18n.global;
   if (te(text) && text) {
-    return tc(text, vars);
+    return t(text, vars);
   } else {
     return text;
   }

@@ -139,7 +139,7 @@ import ResourceType from "../../../core/types/ResourceConfigTypes";
 import useResource from "../../../composables/useResource";
 import useResourceStore from "../../../store/resource";
 
-interface Form {
+export interface Form {
   data: Object;
   hidden: Array<string>;
 }

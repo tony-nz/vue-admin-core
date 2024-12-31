@@ -99,7 +99,7 @@ import DropdownMenu from "./partials/DropdownMenu.vue";
 import InlineSvg from "vue-inline-svg";
 import TabPanels from "../../components/ui/tabs/TabPanels.vue";
 import TabPanelCustom from "../../components/ui/tabs/TabPanel.vue";
-import useAppStore from "../../store/app";
+import useLayoutStore from "../../store/layout";
 
 export default defineComponent({
   name: "SecondaryMenu",
@@ -117,7 +117,7 @@ export default defineComponent({
   },
   setup(props) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: MainMenu[] = useAppStore().getMainMenu;
+    const mainMenuConfig: MainMenu[] = useLayoutStore().getMainMenu;
     const routeClass = ref(
       "hover:text-blue-600 shadow-none rounded-lg px-3 py-2 mr-2"
     );
@@ -145,7 +145,6 @@ export default defineComponent({
      */
     const hasChild = mainMenuConfig.some((item) => item.items);
 
-    const store = useAppStore();
     const activeClass = ref(
       "text-gray-900 bg-gray-200 dark:bg-gray-600 dark:bg-opacity-40"
     );
@@ -157,7 +156,6 @@ export default defineComponent({
       activeClass,
       defaultClass,
       hasChild,
-      store,
       activeTab,
       checkChild,
       checkRoute,

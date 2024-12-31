@@ -114,9 +114,10 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { translate } from "../../../core/helpers/functions";
-
 import Duotone from "../../../components/ui/icons/Duotone.vue";
 import useAppStore from "../../../store/app";
+import useAuthStore from "../../../store/auth";
+import useLayoutStore from "../../../store/layout";
 
 export default defineComponent({
   name: "UserApps",
@@ -131,8 +132,10 @@ export default defineComponent({
     const isFullscreen = ref(false);
     const isVisible = ref(false);
     const menuItems = ref([]);
-    const store = useAppStore();
-    const userAppsConfig = useAppStore().getAppMenu;
+    const appStore = useAppStore();
+    const authStore = useAuthStore();
+    const layoutStore = useLayoutStore();
+    const userAppsConfig = layoutStore.getAppMenu;
 
     /**
      * Change the locale of the current user
@@ -140,7 +143,7 @@ export default defineComponent({
      */
     const changeLocale = (locale) => {
       if (locale) {
-        store.setLocale(locale);
+        appStore.setLocale(locale);
       }
     };
 
@@ -255,7 +258,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      currentUser.value = await store.getUser;
+      currentUser.value = await authStore.getUser;
     });
 
     return {

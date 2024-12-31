@@ -1,6 +1,6 @@
-import LayoutConfigTypes from "../types/LayoutConfigTypes";
+import { DefaultLayout } from "../types/LayoutTypes";
 
-const config: LayoutConfigTypes = {
+const config: DefaultLayout = {
   theme: {
     name: "VueAdminDefault",
     version: "1.0.0",

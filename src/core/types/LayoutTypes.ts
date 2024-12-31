@@ -1,3 +1,7 @@
+import UserMenu from "./UserMenuTypes";
+import UserAppMenu from "./UserAppsMenuTypes";
+import type MainMenu from "./MainMenuTypes";
+
 interface Theme {
   name?: string;
   version?: string;
@@ -78,7 +82,7 @@ interface Content {
   width?: "fixed" | "fluid";
 }
 
-interface LayoutConfig {
+interface DefaultLayout {
   theme?: Theme;
   logo?: Logo;
   loader?: Loader;
@@ -88,6 +92,16 @@ interface LayoutConfig {
   breadcrumbs?: Breadcrumb;
   toolbar?: Toolbar;
   content?: Content;
+}
+
+interface LayoutConfig {
+  initial: DefaultLayout;
+  layout: DefaultLayout;
+  menu: {
+    apps: UserAppMenu;
+    user: UserMenu;
+    main: MainMenu[];
+  };
 }
 
 export default LayoutConfig;
@@ -101,5 +115,6 @@ export type {
   Menu,
   Toolbar,
   Content,
+  DefaultLayout,
   LayoutConfig,
 };

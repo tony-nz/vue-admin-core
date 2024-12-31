@@ -163,6 +163,8 @@ import {
 } from "../../../core/helpers/app";
 import { translate } from "../../../core/helpers/functions";
 import useAppStore from "../../../store/app";
+import useAuthStore from "../../../store/auth";
+import useLayoutStore from "../../../store/layout";
 
 export default defineComponent({
   name: "UserMenu",
@@ -184,8 +186,9 @@ export default defineComponent({
     const isMounted = ref(false);
     const isVisible = ref(false);
     const focusedIndex = ref(0);
-    const store = useAppStore();
-    const userMenuConfig = useAppStore().getUserMenu;
+    const appStore = useAppStore();
+    const authStore = useAuthStore();
+    const userMenuConfig = useLayoutStore().getUserMenu;
 
     /**
      * Toggle app to full screen
@@ -207,7 +210,7 @@ export default defineComponent({
      */
     const changeLocale = (locale) => {
       if (locale) {
-        store.setLocale(locale);
+        appStore.setLocale(locale);
       }
     };
 
@@ -273,7 +276,7 @@ export default defineComponent({
      * @returns object
      */
     const getUser = computed(() => {
-      return store.getUser;
+      return authStore.getUser;
     });
 
     /**

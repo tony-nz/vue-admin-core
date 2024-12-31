@@ -1,16 +1,12 @@
 import { buildResourceConfig } from "../helpers/resources";
 import { useResourceRoutes } from "../../router/resource";
-import useAppStore from "../../store/app";
 import useResourceStore from "../../store/resource";
 
 /**
  * Initialize resource stores
  * @param router
  */
-export const initResources = async function (router) {
-  const appStore = useAppStore();
-  const resources = appStore.config.resources;
-
+export const initResources = async function (router, resources) {
   /**
    * Install resources
    */

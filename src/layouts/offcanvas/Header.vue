@@ -46,12 +46,12 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import useAppStore from "../../store/app";
+import useAuthStore from "../../store/auth";
 
 export default defineComponent({
   name: "Header",
   setup() {
-    const store = useAppStore();
+    const store = useAuthStore();
 
     const getTimeOfDay = computed(() => {
       const hour = new Date().getHours();

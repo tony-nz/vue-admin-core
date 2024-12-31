@@ -1,29 +1,32 @@
-import { App, Breadcrumb } from "../core/types/AppTypes";
 import { defineStore } from "pinia";
 import { toast, type ToastOptions } from "vue3-toastify";
 import { version } from "../../package.json";
-import ApiService from "../core/services/ApiService";
-import getAppConfig from "../core/config/AppConfig";
+import AppConfig from "../core/types/AppTypes";
+import getConfig from "../core/config/AppConfig";
 import i18n from "../core/plugins/i18n";
 import objectPath from "object-path";
-import UserMenu from "../core/types/UserMenuTypes";
-import UserAppMenu from "../core/types/UserAppsMenuTypes";
-import type MainMenu from "../core/types/MainMenuTypes";
+import ResourceConfig from "../core/types/ResourceConfigTypes";
 
-const useAppStore = defineStore({
-  id: "AppStore",
-  state: (): App => ({
+interface IState {
+  api: {
+    loading: boolean;
+    refresh: boolean;
+  };
+  appVersion: string;
+  config: AppConfig;
+  errors: Array<string>;
+  notifications: any;
+}
+
+const useAppStore = defineStore("AppStore", {
+  state: (): IState => ({
     api: {
       loading: false,
       refresh: false,
     },
     appVersion: version || "0",
-    breadcrumbs: {} as Breadcrumb,
     errors: [],
-    config: getAppConfig,
-    locale: window.localStorage.getItem("locale") || "en",
-    isAuthenticated: false,
-    permissions: [],
+    config: getConfig,
     notifications: {
       api: [],
       error: [],
@@ -31,386 +34,12 @@ const useAppStore = defineStore({
       success: [],
       echo: null,
     },
-    roles: [],
-    settings:
-      JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
-    user: [],
   }),
   actions: {
     /**
-     * Login user
-     * @param credentials
-     * @param router
-     * @returns Promise<void>
-     */
-    async login(credentials, router) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.getAppConfig("api.csrfCookie"))
-          .then(() => {
-            ApiService.post(this.getAppConfig("api.login"), credentials)
-              .then(({ data }) => {
-                this.verifyAuth(router)
-                  .then(() => {
-                    resolve(data);
-                  })
-                  .catch(({ response }) => {
-                    reject(response);
-                  });
-              })
-              .catch(({ response }) => {
-                this.setErrors(response.data.error);
-                this.showToast({
-                  summary: "Error",
-                  message: "Failed to login user",
-                  severity: "error",
-                });
-                reject(response);
-              });
-          })
-          .catch(({ error }) => {
-            this.showToast({
-              summary: "Error",
-              message: "Failed to obtain CSRF token",
-              severity: "error",
-            });
-            reject(error);
-          });
-      });
-    },
-    /**
-     * Login with OAuth
-     * @returns Promise<void>
-     */
-    loginOauth() {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.getAppConfig("api.csrfCookie"))
-          .then(() => {
-            ApiService.get(this.getAppConfig("oauth.login"))
-              .then(({ data }) => {
-                window.location.href = data.url;
-              })
-              .catch(({ response }) => {
-                this.setErrors(response.data.errors);
-                this.showToast({
-                  summary: "Error",
-                  message: "Failed to login with OAuth",
-                  severity: "error",
-                });
-                reject();
-              });
-          })
-          .catch(({ error }) => {
-            this.showToast({
-              summary: "Error",
-              message: "Failed to obtain CSRF token",
-              severity: "error",
-            });
-            reject(error);
-          });
-      });
-    },
-    /**
-     * Login with OAuth callback
+     * Add log
      * @param payload
-     * @param router
-     * @returns Promise<void>
      */
-    loginOauthCallback(payload, router) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.getAppConfig("api.csrfCookie"))
-          .then(() => {
-            ApiService.post(this.getAppConfig("oauth.callback"), payload)
-              .then(({ data }) => {
-                this.verifyAuth(router);
-                resolve(data);
-              })
-              .catch(({ response }) => {
-                this.setErrors(response.data.errors);
-                this.showToast({
-                  summary: "Error",
-                  message: "Failed to login with OAuth",
-                  severity: "error",
-                });
-                reject();
-              });
-          })
-          .catch(({ error }) => {
-            this.showToast({
-              summary: "Error",
-              message: "Failed to obtain CSRF token",
-              severity: "error",
-            });
-            reject(error);
-          });
-      });
-    },
-    /**
-     * Logout user
-     * @returns Promise<void>
-     */
-    logout() {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.getAppConfig("api.logout"), {})
-          .then(({ data }) => {
-            this.purgeAuth();
-            resolve(data);
-          })
-          .catch(({ response }) => {
-            this.setErrors(response.data.errors);
-            this.showToast({
-              summary: "Error",
-              message: "Failed to logout user",
-              severity: "error",
-            });
-            reject(response);
-          });
-      });
-    },
-    /**
-     * Register user
-     * @param credentials
-     * @param router
-     * @returns Promise<void>
-     */
-    register(credentials, router) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.getAppConfig("api.register"), credentials)
-          .then(({ data }) => {
-            this.setAuth(data, router);
-            resolve(data);
-          })
-          .catch(({ response }) => {
-            this.setErrors(response.data.errors);
-            this.showToast({
-              summary: "Error",
-              message: "Failed to register user",
-              severity: "error",
-            });
-            reject(response);
-          });
-      });
-    },
-    /**
-     * Forgot password
-     * @param payload
-     * @param router
-     * @returns Promise<void>
-     */
-    forgotPassword(payload, router) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.post(this.getAppConfig("api.forgotPassword"), payload)
-          .then(({ data }) => {
-            this.setAuth(data, router);
-            resolve();
-          })
-          .catch(({ response }) => {
-            this.setErrors(response.data.errors);
-            this.showToast({
-              summary: "Error",
-              message: "Failed to send password reset email",
-              severity: "error",
-            });
-            reject(response);
-          });
-      });
-    },
-    /**
-     * Verify user authentication
-     * @param router
-     * @returns Promise<void>
-     */
-    async verifyAuth(router) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.get(this.getAppConfig("api.verify"))
-          .then(({ data }) => {
-            this.setAuth(data.data, router);
-            this.getApiSettings();
-            resolve();
-          })
-          .catch(({ response }) => {
-            this.purgeAuth();
-            if (response) {
-              this.setErrors(response.message);
-            }
-            this.purgeAuth();
-            this.showToast({
-              summary: "Error",
-              message: "Failed to verify authentication",
-              severity: "error",
-            });
-            reject(response);
-          });
-      });
-    },
-    /** SETTERS **/
-    setApiLoading(loading) {
-      this.api.loading = loading;
-      if (!loading) {
-        this.api.refresh = false;
-      }
-    },
-    setApiRefresh(refresh) {
-      this.api.refresh = refresh;
-    },
-    setBreadcrumb(payload) {
-      this.breadcrumbs = payload;
-    },
-    setErrors(errors) {
-      this.errors = errors;
-    },
-    setConfig(payload) {
-      if (payload) {
-        /**
-         * Initialize API Config
-         */
-        if (payload.auth.api) {
-          this.config.api = payload.auth.api;
-        }
-        if (payload.auth.oauth) {
-          this.config.oauth = payload.auth.oauth;
-        }
-
-        /**
-         * Initialize Layout Config
-         */
-        if (payload.layout) {
-          this.config.layout = payload.layout;
-        }
-
-        /**
-         * Initialize Menu Config
-         */
-        if (payload.menu) {
-          if (payload.menu.apps) {
-            this.config.menu.apps = payload.menu.apps;
-          }
-          if (payload.menu.main) {
-            this.config.menu.main = payload.menu.main;
-          }
-          if (payload.menu.user) {
-            this.config.menu.user = payload.menu.user;
-          }
-        }
-
-        /**
-         * Initialize OAuth Config
-         */
-        if (payload.oauth) {
-          this.config.oauth = { ...this.config.oauth, ...payload.oauth };
-        }
-
-        /**
-         * Initialize Resources Config
-         */
-        if (payload.resources) {
-          this.config.resources = {
-            ...this.config.resources,
-            ...payload.resources,
-          };
-        }
-
-        /**
-         * Initialize Locale
-         */
-        if (payload.locale) {
-          this.config.locale = payload.locale;
-        }
-      }
-    },
-    setLocale(locale) {
-      this.locale = locale;
-      i18n.global.locale = locale;
-    },
-    setIsAuthenticated(isAuthenticated) {
-      this.isAuthenticated = isAuthenticated;
-    },
-    setPermissions(permissions) {
-      this.permissions = permissions;
-    },
-    setRoles(roles) {
-      this.roles = roles;
-    },
-    setSettings(settings: any) {
-      this.settings = settings;
-      window.sessionStorage.setItem("settings", JSON.stringify(this.settings));
-    },
-    setUser(user) {
-      this.user = user;
-    },
-    /**
-     * Update settings
-     * @param payload
-     * @returns Promise<void>
-     */
-    updateSettings(payload) {
-      return new Promise<void>((resolve, reject) => {
-        ApiService.put(this.getAppConfig("api.settings"), payload)
-          .then(({ data }) => {
-            this.setSettings(data.data);
-            this.showToast({
-              summary: "Success",
-              message: "Settings saved successfully",
-              severity: "success",
-            });
-            resolve(data);
-          })
-          .catch(({ response }) => {
-            this.showToast({
-              summary: "Error",
-              message: "Failed to update settings",
-              severity: "error",
-            });
-            this.setErrors(response.data.errors);
-          });
-      });
-    },
-    /**
-     * Get api settings
-     * @returns Promise<void>
-     */
-    async getApiSettings() {
-      try {
-        const response = await ApiService.get(
-          this.getAppConfig("api.settings")
-        );
-        this.setSettings(
-          response.data.data ? response.data.data : response.data
-        );
-      } catch (e) {
-        this.showToast({
-          summary: "Error",
-          message: "Failed to retrieve settings",
-          severity: "error",
-        });
-      }
-
-      return this.settings;
-    },
-    /**
-     * Set user authentication
-     * @param data
-     * @param router
-     */
-    setAuth(data, router) {
-      this.setErrors([]);
-      this.setIsAuthenticated(true);
-      this.setPermissions(data.permissions);
-      this.setRoles(data.roles);
-      this.setUser(data.user);
-      // Load CRUD Resources
-      // initResources(router);
-    },
-    /**
-     * Purge user authentication
-     * @returns void
-     */
-    purgeAuth() {
-      this.setErrors([]);
-      this.setIsAuthenticated(false);
-      this.setPermissions([]);
-      this.setRoles([]);
-      this.setUser([]);
-    },
     addLog(payload) {
       if (payload.log === "error") {
         this.notifications.error.push(payload.message);
@@ -422,6 +51,10 @@ const useAppStore = defineStore({
         this.notifications.success.push(payload.message);
       }
     },
+    /**
+     * Clear log
+     * @param log
+     */
     clearLog(log) {
       if (log === "error") {
         this.notifications.error.splice(0);
@@ -432,6 +65,85 @@ const useAppStore = defineStore({
       } else if (log === "success") {
         this.notifications.success.splice(0);
       }
+    },
+    /**
+     * Find resource
+     * @param payload
+     * @returns any
+     */
+    findResource(resourceName: string): any[] {
+      try {
+        if (!this.config.resources) return [];
+        for (const [key, value] of Object.entries(this.config.resources)) {
+          const foundResource = value as { name: string } | any;
+          if (foundResource?.name === resourceName) {
+            return foundResource;
+          }
+        }
+      } catch (e) {
+        this.showToast({
+          summary: "Error",
+          message: "Failed to find resource",
+          severity: "error",
+        });
+      }
+      return [];
+    },
+    /**
+     * Set api loading state
+     * @param loading
+     * @returns void
+     */
+    setApiLoading(loading: boolean) {
+      this.api.loading = loading;
+      if (!loading) {
+        this.api.refresh = false;
+      }
+    },
+    /**
+     * Set api refresh state
+     * @param refresh
+     */
+    setApiRefresh(refresh: boolean) {
+      this.api.refresh = refresh;
+    },
+    /**
+     * Set config
+     * @param payload
+     */
+    setConfig(payload) {
+      if (payload) {
+        /**
+         * Initialize Resources Config
+         */
+        if (payload.resources) {
+          this.config.resources = {
+            ...this.config.resources,
+            ...payload.resources,
+          };
+        }
+        /**
+         * Initialize Locale
+         */
+        if (payload.locale) {
+          this.config.locale = payload.locale;
+        }
+      }
+    },
+    /**
+     * Set errors
+     * @param errors
+     */
+    setErrors(errors) {
+      this.errors = errors;
+    },
+    /**
+     * Set locale
+     * @param locale
+     */
+    setLocale(locale) {
+      this.config.locale = locale;
+      i18n.global.locale = locale;
     },
     /**
      * Show toast notification
@@ -468,182 +180,16 @@ const useAppStore = defineStore({
         toast(message, options);
       }
     },
-    toggleDarkMode(): void {
-      const element = document.body;
-
-      if (this.config.layout.theme) {
-        this.config.layout.theme.darkMode = !this.config.layout.theme?.darkMode;
-      }
-
-      const localStorageConfig = Object.assign(
-        {},
-        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
-      );
-      if (element) {
-        if (this.config.layout.theme?.darkMode) {
-          localStorageConfig["darkMode"] = true;
-          element.classList.add("dark");
-        } else {
-          localStorageConfig["darkMode"] = false;
-          element.classList.remove("dark");
-        }
-      }
-      if (localStorageConfig) {
-        localStorage.setItem(
-          "layoutConfig",
-          JSON.stringify(localStorageConfig)
-        );
-      }
-    },
-    toggleToolbar(): void {
-      const localStorageConfig = Object.assign(
-        {},
-        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
-      );
-      if (this.config.layout.toolbar?.display) {
-        localStorageConfig["toolbar"] = {
-          ...localStorageConfig["toolbar"],
-          display: false,
-        };
-        this.config.layout.toolbar.display = false;
-      } else if (this.config.layout.toolbar?.display === false) {
-        localStorageConfig["toolbar"] = {
-          ...localStorageConfig["toolbar"],
-          display: true,
-        };
-        this.config.layout.toolbar.display = true;
-      }
-      if (localStorageConfig) {
-        localStorage.setItem(
-          "layoutConfig",
-          JSON.stringify(localStorageConfig)
-        );
-      }
-    },
-    updateResource(resource): void {
+    /**
+     * Update resource
+     * @param resource
+     */
+    updateResource(resource: ResourceConfig): void {
+      if (!this.config.resources) return;
       this.config.resources[resource.name] = resource;
-    },
-    findResource(payload: any): any[] {
-      try {
-        for (const [key, value] of Object.entries(this.config.resources)) {
-          const foundResource = value as { name: string } | any;
-          if (foundResource?.name === payload) {
-            return foundResource;
-          }
-        }
-      } catch (e) {
-        this.showToast({
-          summary: "Error",
-          message: "Failed to find resource",
-          severity: "error",
-        });
-      }
-      return [];
     },
   },
   getters: {
-    /**
-     * Get app version
-     */
-    getAppVersion(): string {
-      return this.appVersion;
-    },
-    /**
-     * Get config from app config
-     * @returns {function(path, defaultValue): *}
-     */
-    getAppConfig() {
-      return (path, defaultValue?) => {
-        return objectPath.get(this.config, path, defaultValue);
-      };
-    },
-    /**
-     * Auth user
-     * @returns object
-     */
-    authUser(): any {
-      return this.user;
-    },
-    /**
-     * Get authentification errors
-     * @returns array
-     */
-    getErrors(): Array<string> {
-      return this.errors;
-    },
-    /**
-     * Return the user's locale
-     * @returns boolean
-     */
-    getLocale(): string {
-      return this.locale;
-    },
-    /**
-     * User's roles
-     * @returns array
-     */
-    getPermissions(): Array<string> {
-      return this.permissions;
-    },
-    /**
-     * User's roles
-     * @returns array
-     */
-    getRoles(): Array<string> {
-      return this.roles;
-    },
-    /**
-     * Get setting from settings
-     * @returns {function(setting): *}
-     */
-    getSetting(): any {
-      return (setting) => {
-        // if setting is "true" or "false" return boolean
-        if (
-          objectPath.get(this.settings, setting) === "true" ||
-          objectPath.get(this.settings, setting) === "false"
-        ) {
-          return objectPath.get(this.settings, setting) == "true";
-        }
-
-        return objectPath.get(this.settings, setting);
-      };
-    },
-    /**
-     * Return current user object
-     * @returns User
-     */
-    getUser(): Array<string> {
-      return this.user;
-    },
-    /**
-     * Site settings
-     * @returns array
-     */
-    getSettings(): any {
-      Object.keys(this.settings).forEach((key) => {
-        // convert "true" and "false" to boolean
-        if (this.settings[key] === "true" || this.settings[key] === "false") {
-          this.settings[key] = this.settings[key] == "true";
-        }
-        // convert all string integers
-        if (
-          typeof this.settings[key] === "string" &&
-          /^\d+$/.test(this.settings[key])
-        ) {
-          this.settings[key] = parseInt(this.settings[key]);
-        }
-      });
-
-      return this.settings;
-    },
-    /**
-     * Verify user authentication
-     * @returns boolean
-     */
-    isUserAuthenticated(): boolean {
-      return this.isAuthenticated;
-    },
     /**
      * Get api loading state
      * @returns object
@@ -659,66 +205,40 @@ const useAppStore = defineStore({
       return this.api.refresh;
     },
     /**
-     * breadcrumb object for current page
-     * @returns object
+     * Get config from app config
+     * @returns {function(path, defaultValue): *}
      */
-    getBreadcrumbs(): Breadcrumb {
-      return this.breadcrumbs;
-    },
-    /**
-     * breadcrumb array for current page
-     * @returns object
-     */
-    pageBreadcrumbPath(): Array<string> {
-      return this.breadcrumbs.pageBreadcrumbPath;
-    },
-    /**
-     * current page title
-     * @returns string
-     */
-    pageTitle(): string {
-      return this.breadcrumbs.title;
-    },
-    /**
-     * current page title
-     * @returns string
-     */
-    currentPage(): string {
-      return this.breadcrumbs.page;
-    },
-    resetLayoutConfig() {
-      this.config.layout = Object.assign({}, this.config.initial);
-    },
-    overrideLayoutConfig(): void {
-      this.config.layout = this.config.initial = Object.assign(
-        {},
-        this.config.initial,
-        JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
-      );
-    },
-    getDarkMode(): boolean {
-      return this.config.layout.theme?.darkMode
-        ? this.config.layout.theme?.darkMode
-        : false;
-    },
-    getLayoutConfig(): any {
+    getConfig() {
       return (path, defaultValue?) => {
-        return objectPath.get(this.config.layout, path, defaultValue);
+        return objectPath.get(this.config, path, defaultValue);
       };
     },
-    getLayout(): any {
-      return this.config.layout;
+    /**
+     * Get app version
+     */
+    getAppVersion(): string {
+      return this.appVersion;
     },
-    getAppMenu(): UserAppMenu {
-      return this.config.menu.apps;
+    /**
+     * Get authentification errors
+     * @returns array
+     */
+    getErrors(): Array<string> {
+      return this.errors;
     },
-    getMainMenu(): MainMenu[] {
-      return this.config.menu.main;
+    /**
+     * Return the app's locale
+     * @returns boolean
+     */
+    getLocale(): string {
+      return this.config.locale;
     },
-    getUserMenu(): UserMenu {
-      return this.config.menu.user;
-    },
-    getResources(): any[] {
+    /**
+     * Get resources
+     * @returns object
+     */
+    getResources(): ResourceConfig[] {
+      if (!this.config.resources) return [];
       return this.config.resources;
     },
   },

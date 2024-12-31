@@ -38,7 +38,7 @@
 import { defineComponent, ref } from "vue";
 import InlineSvg from "vue-inline-svg";
 import MainMenu from "../../core/types/MainMenuTypes";
-import useAppStore from "../../store/app";
+import useLayoutStore from "../../store/layout";
 
 export default defineComponent({
   name: "TopMenu",
@@ -58,7 +58,7 @@ export default defineComponent({
   },
   setup(props) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
+    const mainMenuConfig: Array<MainMenu> = useLayoutStore().getMainMenu;
     const slugBackground = ref();
     const changeBackground = (menuItem) => {
       // if (menuItem.slug) {

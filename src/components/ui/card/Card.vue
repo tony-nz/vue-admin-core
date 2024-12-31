@@ -17,15 +17,6 @@
         <div v-if="isHeaderLeftVisible" class="grow">
           <slot name="header_left"></slot>
         </div>
-        <!-- Right slot with dropdown menu -->
-        <div v-if="isHeaderRightVisible" class="relative flex items-center">
-          <slot name="header_right"></slot>
-          <Select
-            v-if="menuItems.length > 0"
-            :menuItems="menuItems"
-            class="ml-4"
-          />
-        </div>
       </div>
 
       <!-- Content section -->
@@ -45,10 +36,10 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import Dropdown from "./partials/Dropdown.vue";
 import Loading from "./partials/Loading.vue";
 
-interface Class {
+// Export the interfaces so they can be used in other components
+export interface Class {
   base?: Array<string>;
   card?: Array<string>;
   content?: string[];
@@ -59,15 +50,9 @@ interface Class {
   title?: Array<string>;
 }
 
-interface MenuItem {
-  action: () => void;
-  label: string;
-}
-
 export default defineComponent({
   name: "Card",
   components: {
-    Dropdown,
     Loading,
   },
   props: {
@@ -88,10 +73,6 @@ export default defineComponent({
     isLoading: {
       type: Boolean,
       default: false,
-    },
-    menuItems: {
-      type: Array as () => MenuItem[],
-      default: () => [],
     },
   },
   setup(props, { slots }) {
@@ -177,7 +158,6 @@ export default defineComponent({
       for (const key in props.classes) {
         if (merged[key] && Array.isArray(props.classes[key])) {
           merged[key] = [...merged[key], ...props.classes[key]];
-          // merged[key] = [...props.classes[key], ...merged[key]];
         }
       }
 
@@ -206,7 +186,7 @@ export default defineComponent({
     });
 
     const isHeaderRightVisible = computed(() => {
-      return hasSlot("header_right") || props.menuItems.length > 0;
+      return hasSlot("header_right");
     });
 
     const isIconVisible = computed(() => {

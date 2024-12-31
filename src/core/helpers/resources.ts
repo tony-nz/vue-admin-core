@@ -1,6 +1,7 @@
 import { formatKebabCase, upperCaseFirst } from "./functions";
 import i18n from "../plugins/i18n";
 import useAppStore from "../../store/app";
+import useAuthStore from "../../store/auth";
 
 /**
  * Checks if a value is empty
@@ -20,9 +21,9 @@ const isEmpty = (value: any): boolean => {
  * @returns {boolean} - True if the user has the permission, false otherwise
  */
 const can = (permission: string): boolean => {
-  const appStore = useAppStore();
+  const authStore = useAuthStore();
   if (!permission) return false;
-  return appStore.getPermissions.includes(permission);
+  return authStore.getPermissions.includes(permission);
 };
 
 /**
@@ -32,6 +33,7 @@ const can = (permission: string): boolean => {
  */
 const getResource = (name: string): any => {
   const appStore = useAppStore();
+  if (!appStore.config.resources) return false;
   return appStore.config.resources.find(
     (resource: any) => resource.name === name
   );
@@ -132,11 +134,11 @@ const buildResourceConfig = (resource: any): any => {
   });
 
   const nameKey = `resources.${resource.name}.name`;
-  const { t, te, tc } = i18n.global;
+  const { t, te } = i18n.global;
 
   const getName = (count: number): string => {
     return te(nameKey)
-      ? tc(nameKey, count)
+      ? t(nameKey)
       : formatKebabCase(upperCaseFirst(resource.name));
   };
 
@@ -163,8 +165,8 @@ const buildResourceConfig = (resource: any): any => {
       if (item) {
         return `${
           te(titleKey)
-            ? tc(titleKey, item)
-            : tc(`va.pages.${action}`, {
+            ? t(titleKey, item)
+            : t(`va.pages.${action}`, {
                 resource: getName(1).toLowerCase(),
                 label,
               })
@@ -172,7 +174,7 @@ const buildResourceConfig = (resource: any): any => {
       }
       return te(titleKey)
         ? t(titleKey)
-        : tc(`va.pages.${action}`, {
+        : t(`va.pages.${action}`, {
             resource: getName(action === "list" ? 10 : 1).toLowerCase(),
           });
     },
@@ -180,7 +182,7 @@ const buildResourceConfig = (resource: any): any => {
       if (!actions.includes(action)) return false;
       if (!resource.permissions) return true;
 
-      const { getRoles } = useAppStore();
+      const { getRoles } = useAuthStore();
       return (
         resource.permissions?.some(
           (perm) =>

@@ -123,7 +123,7 @@ import OffCanvas from "../offcanvas/OffCanvas.vue";
 import InlineSvg from "vue-inline-svg";
 import Tabs from "../../components/ui/tabs/Tabs.vue";
 import Tab from "../../components/ui/tabs/Tab.vue";
-import useAppStore from "../../store/app";
+import useLayoutStore from "../../store/layout";
 
 export default defineComponent({
   name: "TopMenu",
@@ -146,7 +146,7 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
+    const mainMenuConfig: Array<MainMenu> = useLayoutStore().getMainMenu;
     const router = useRouter();
     const slugBackground = ref();
 

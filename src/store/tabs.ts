@@ -27,10 +27,9 @@ const HOME_PAGE = {
   icon: "",
 };
 
-export const useTabsStore = defineStore({
-  id: "TabStore",
+export const useTabsStore = defineStore("TabStore", {
   state: (): IState => ({
-    tabs: [HOME_PAGE],
+    tabs: [],
   }),
   actions: {
     handleAddRoute(route: any) {

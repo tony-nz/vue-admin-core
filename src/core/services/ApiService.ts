@@ -2,6 +2,7 @@ import { App } from "vue";
 import { AxiosResponse, AxiosRequestConfig } from "axios";
 import axios from "axios";
 import useAppStore from "../../store/app";
+import useAuthStore from "../../store/auth";
 import VueAxios from "vue-axios";
 
 const BASE_URL = "http://localhost:8000";
@@ -20,14 +21,17 @@ class ApiService {
    */
   public static init(app: App<Element>) {
     const appStore = useAppStore();
+    const authStore = useAuthStore();
+
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
-    ApiService.vueInstance.axios.defaults.baseURL = appStore.getAppConfig(
+    ApiService.vueInstance.axios.defaults.baseURL = authStore.getConfig(
       "api.baseURL"
     )
-      ? appStore.getAppConfig("api.baseURL")
+      ? authStore.getConfig("api.baseURL")
       : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
+    ApiService.vueInstance.axios.defaults.withXSRFToken = true;
 
     // interceptors
     ApiService.vueInstance.axios.interceptors.response.use(
@@ -46,9 +50,9 @@ class ApiService {
         if (
           error.response &&
           [401, 419].includes(error.response.status) &&
-          appStore.authUser
+          authStore.getUser
         ) {
-          appStore.purgeAuth();
+          authStore.purgeAuth();
         }
         return Promise.reject(error);
       }

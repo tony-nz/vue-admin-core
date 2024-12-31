@@ -1,11 +1,11 @@
-import useAppStore from "../../store/app";
+import useAuthStore from "../../store/auth";
 
 /**
  * Check user role
  * @param roles
  */
 function checkUserRole(roles) {
-  const store = useAppStore();
+  const store = useAuthStore();
   const userRoles = JSON.parse(JSON.stringify(store.getRoles));
 
   return new Promise<void>((resolve, reject) => {

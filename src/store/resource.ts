@@ -185,8 +185,7 @@ async function handleApiCall(
   }
 }
 
-const useResourceStore = defineStore({
-  id: "ResourceStore",
+const useResourceStore = defineStore("ResourceStore", {
   state: () => ({
     resources: {} as { [key: string]: IState },
   }),

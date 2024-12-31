@@ -20,7 +20,6 @@ import Button from "primevue/button";
 import Breadcrumb from "primevue/breadcrumb";
 import DatePicker from "primevue/datepicker"; // Changed from Calendar
 import Card from "primevue/card";
-import Chart from "primevue/chart";
 import CascadeSelect from "primevue/cascadeselect";
 import Carousel from "primevue/carousel";
 import Checkbox from "primevue/checkbox";
@@ -39,7 +38,6 @@ import Dialog from "primevue/dialog";
 import Divider from "primevue/divider";
 import Dock from "primevue/dock";
 import Select from "primevue/select"; // Changed from Dropdown
-import Editor from "primevue/editor";
 import Fieldset from "primevue/fieldset";
 import FileUpload from "primevue/fileupload";
 import Galleria from "primevue/galleria";
@@ -129,7 +127,6 @@ export function initPrimeVue(app: App<Element>) {
   app.component("Breadcrumb", Breadcrumb);
   app.component("DatePicker", DatePicker);
   app.component("Card", Card);
-  app.component("Chart", Chart);
   app.component("CascadeSelect", CascadeSelect);
   app.component("Carousel", Carousel);
   app.component("Checkbox", Checkbox);
@@ -148,7 +145,6 @@ export function initPrimeVue(app: App<Element>) {
   app.component("Divider", Divider);
   app.component("Dock", Dock);
   app.component("Select", Select);
-  app.component("Editor", Editor);
   app.component("Fieldset", Fieldset);
   app.component("FileUpload", FileUpload);
   app.component("Galleria", Galleria);

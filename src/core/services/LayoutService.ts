@@ -1,4 +1,4 @@
-import useAppStore from "../../store/app";
+import useLayoutStore from "../../store/layout";
 
 class LayoutService {
   /**
@@ -12,7 +12,7 @@ class LayoutService {
    * @description init layout
    */
   public static initLayout(): void {
-    const appStore = useAppStore();
+    const layoutStore = useLayoutStore();
     const localStorageConfig = Object.assign(
       {},
       JSON.parse(window.localStorage.getItem("config") || "{}")
@@ -23,7 +23,7 @@ class LayoutService {
      * TODO:: this bugs out and overwrites user defined layoutconfig
      */
     if (localStorageConfig || !localStorageConfig.layout) {
-      // appStore.overrideLayoutConfig();
+      // layoutStore.overrideLayoutConfig();
     }
   }
 }

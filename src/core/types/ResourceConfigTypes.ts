@@ -40,7 +40,7 @@ interface ResourceConfig {
   delete?: boolean;
   edit?: ModalPage;
   fields?: Array<FieldTypes>;
-  label: string;
+  label: string | Function;
   lazy?: boolean;
   lists?: Array<List>;
   name: string;
@@ -62,4 +62,4 @@ interface ResourceConfig {
 
 export default ResourceConfig;
 
-export type { List, ModalPage, Permissions, ResourceConfig };
+export type { List, ModalPage, Notifications, Permissions, ResourceConfig };

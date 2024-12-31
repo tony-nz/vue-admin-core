@@ -29,12 +29,16 @@ import ApiService from "./core/services/ApiService";
  * Stores
  */
 import useAppStore from "./store/app";
+import useAuthStore from "./store/auth";
+import useLayoutStore from "./store/layout";
 import useResourceStore from "./store/resource";
+import useTabStore from "./store/tabs";
 
 /**
  * Types
  */
-import { App } from "./core/types/AppTypes";
+import { AppConfig } from "./core/types/AppTypes";
+import { AuthConfig } from "./core/types/AuthTypes";
 import { Item, ChildField, Field } from "./core/types/FieldTypes";
 import {
   Theme,
@@ -45,8 +49,9 @@ import {
   Menu,
   Toolbar,
   Content,
+  DefaultLayout,
   LayoutConfig,
-} from "./core/types/LayoutConfigTypes";
+} from "./core/types/LayoutTypes";
 import { MainMenu } from "./core/types/MainMenuTypes";
 import {
   List,
@@ -118,7 +123,8 @@ const VueAdminPlugin = {
  * Types
  */
 export type {
-  App,
+  AppConfig,
+  AuthConfig,
   Item,
   ChildField,
   Field,
@@ -130,6 +136,7 @@ export type {
   Menu,
   Content,
   Toolbar,
+  DefaultLayout,
   LayoutConfig,
   MainMenu,
   List,
@@ -171,7 +178,10 @@ export {
    * Stores
    */
   useAppStore,
+  useAuthStore,
+  useLayoutStore,
   useResourceStore,
+  useTabStore,
 };
 
 export default VueAdminPlugin;

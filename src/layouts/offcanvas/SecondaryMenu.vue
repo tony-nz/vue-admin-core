@@ -97,7 +97,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { translate } from "../../core/helpers/functions";
-import useAppStore from "../../store/app";
+import useLayoutStore from "../../store/layout";
 import MainMenu from "../../core/types/MainMenuTypes";
 
 export default defineComponent({
@@ -111,7 +111,7 @@ export default defineComponent({
   emits: ["closeOffCanvas"],
   setup(props, { emit }) {
     const activeTab = ref(props.tab);
-    const mainMenuConfig: Array<MainMenu> = useAppStore().getMainMenu;
+    const mainMenuConfig: Array<MainMenu> = useLayoutStore().getMainMenu;
     const routeActiveClass = ref("text-primary-500");
     const routeClass = ref(
       "text-left hover:text-primary-500 shadow-none rounded-lg px-3 py-2 mr-2 dark:text-white"

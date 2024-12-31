@@ -8,7 +8,7 @@ import roles from "./middleware/roles";
 
 export const useResourceRoutes = function (resource) {
   const { name, routes, translatable, getTitle, pluralName } = resource;
-  const { t, te, tc } = i18n.global;
+  const { t, te } = i18n.global;
 
   const setTitle = (to, action, item = null) => {
     return (to.meta.title = getTitle(action, item));
@@ -125,7 +125,7 @@ export const useResourceRoutes = function (resource) {
                   summary: message,
                   message:
                     status === 404
-                      ? tc("va.pages.notFound", {
+                      ? t("va.pages.notFound", {
                           resource: resource.singularName,
                           id,
                         })
