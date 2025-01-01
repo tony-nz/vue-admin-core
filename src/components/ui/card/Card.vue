@@ -17,6 +17,9 @@
         <div v-if="isHeaderLeftVisible" class="grow">
           <slot name="header_left"></slot>
         </div>
+        <div v-if="isHeaderRightVisible" class="relative flex items-center">
+          <slot name="header_right"></slot>
+        </div>
       </div>
 
       <!-- Content section -->
