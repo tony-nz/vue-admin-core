@@ -11,6 +11,8 @@
     :loading="options?.loading ? isLoading : false"
     :totalRecords="totalRecords"
     :value="resourceData"
+    :state-key="stateKey"
+    state-storage="session"
   >
     <template v-if="toolbar?.visible" #header>
       <AdvToolbar
@@ -89,7 +91,6 @@
       <div v-else>No records found</div>
     </template>
   </DataTable>
-  <!-- Start:Delete popup -->
   <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
     <template #message="slotProps">
       <div class="flex p-4">
@@ -110,9 +111,9 @@
     :resource="resource"
     :subId="params?.id ? params.id : null"
   />
-  <div v-if="!resource">
+  <template v-if="!resource">
     <span>Missing resource prop</span>
-  </div>
+  </template>
 </template>
 
 <script lang="ts">
@@ -200,7 +201,15 @@ export default defineComponent({
     /**
      * Reactive resource data
      */
-    const resourceData = computed(() => store.getDataList(props.resource.name));
+    const resourceData = computed(() => {
+      const dataList: any = store.getDataList(props.resource.name);
+
+      if (props.resource.lazy) {
+        return dataList.data;
+      }
+
+      return dataList;
+    });
 
     /**
      * Filters

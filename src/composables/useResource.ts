@@ -172,7 +172,13 @@ export default function useResource(
             },
           });
 
-          totalRecords.value = response.length;
+          if (response.total) {
+            totalRecords.value = response.total;
+          } else if (response.data) {
+            totalRecords.value = response.data.length;
+          } else if (response.length) {
+            totalRecords.value = response.length;
+          }
         } catch (e) {
           totalRecords.value = 0;
           console.error("Error fetching resource list:", e);

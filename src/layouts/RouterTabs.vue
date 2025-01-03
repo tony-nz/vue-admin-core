@@ -1,7 +1,5 @@
 <template>
-  <!-- Container for desktop view -->
   <div class="hidden lg:flex lg:flex-nowrap lg:overflow-x-auto">
-    <!-- Iterates over tabs to create tab items -->
     <div
       v-for="(item, index) in tabs"
       :key="item.name"
@@ -9,7 +7,6 @@
       @contextmenu.prevent="(e) => handleOpenContext(e, item, index)"
       class="flex mr-1 text-gray-500 bg-white hover:bg-gray-500 hover:text-white dark:bg-gray-800 dark:text-gray-400 border border-gray-400 dark:border-gray-600"
     >
-      <!-- Router link for navigation -->
       <router-link
         :to="{ name: item.name, params: item.params, query: item.query }"
         v-slot="{ isExactActive }"
@@ -25,8 +22,6 @@
           {{ item.title }}
         </div>
       </router-link>
-
-      <!-- Close button for each tab -->
       <button
         @click="handleClose(item, index)"
         class="p-2 bg-gray-200 group hover:bg-red-500"
@@ -42,8 +37,6 @@
         </svg>
       </button>
     </div>
-
-    <!-- Button to close all tabs -->
     <div
       class="flex absolute right-0 justify-between mr-2 text-gray-500 bg-white hover:bg-gray-400 hover:text-white shadow-lg rounded-lg dark:bg-gray-800 dark:text-gray-400"
     >
@@ -62,8 +55,6 @@
         </svg>
       </button>
     </div>
-
-    <!-- Context menu for tab operations -->
     <div
       v-if="contentVisible"
       id="dropdownDivider"
@@ -83,8 +74,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Dropdown for mobile view -->
   <div class="lg:hidden w-full">
     <select
       v-on:change="changeRoute"

@@ -137,7 +137,6 @@
           >
             <div :class="listClass">
               <slot name="item" v-bind="{ item, index }" class="p-4">
-                <!-- Default content if no slot is provided -->
                 <div>{{ item }}</div>
               </slot>
               <div class="p-2 content-center">
@@ -169,7 +168,6 @@
           >
             <div :class="gridClass">
               <slot name="item" v-bind="{ item, index }" class="p-4">
-                <!-- Default content if no slot is provided -->
                 <div>{{ item }}</div>
               </slot>
               <div class="bg-gray-100 p-2">
@@ -200,7 +198,6 @@
                 @click="showCreateEdit('dialog', 'create', modalData)"
               >
                 <slot name="gridCreate">
-                  <!-- Default content if no slot is provided -->
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 448 512"
@@ -259,8 +256,7 @@
       <div v-else>No records found</div>
     </template>
   </DataView>
-  <!-- Start:Delete popup -->
-  <div v-if="resource">
+  <template v-if="resource">
     <ConfirmPopup :group="'DT_' + upperCaseFirst(resource.name)">
       <template #message="slotProps">
         <div class="flex p-4">
@@ -269,7 +265,7 @@
         </div>
       </template>
     </ConfirmPopup>
-  </div>
+  </template>
   <CreateUpdateDialog
     v-if="showModal && resource"
     @close="showModal = false"
@@ -281,9 +277,9 @@
     :resource="resource"
     :subId="params?.id ? params.id : null"
   />
-  <div v-if="!resource">
+  <template v-if="!resource">
     <span>Missing resource prop</span>
-  </div>
+  </template>
 </template>
 
 <script lang="ts">

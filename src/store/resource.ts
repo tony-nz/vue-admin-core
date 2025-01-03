@@ -171,8 +171,7 @@ async function handleApiCall(
         action === GET_ONE ? {} : params
       );
     }
-
-    const data = response.data?.data?.data || response.data.data;
+    const data = response.data.data;
 
     processStoreData(this, resourceName, action, payload, data);
 

@@ -12,14 +12,12 @@
       }"
       class="px-6 mx-auto flex flex-row items-start lg:items-center justify-between"
     >
-      <!-- Breadcrumbs starts -->
       <Breadcrumb
         v-if="displayBreadcrumbs"
         :title="title"
         :breadcrumbs="breadcrumbs"
         :currentPage="currentPage"
       />
-      <!-- Breadcrumbs ends -->
       <div class="flex justify-end w-8/12 h-10 mt-auto">
         <div id="toolbar-actions" class="inline-flex" />
         <button

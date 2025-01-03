@@ -2,34 +2,32 @@
   <div :class="mergedClass.base">
     <div :class="mergedClass.card">
       <div v-if="isHeaderVisible" :class="mergedClass.header">
-        <div class="flex items-center mr-4">
-          <!-- Icon -->
-          <div v-if="isIconVisible" :class="mergedClass.icon">
-            <slot name="icon"></slot>
+        <div class="flex justify-between w-full">
+          <div class="flex items-center gap-2">
+            <div v-if="isIconVisible" :class="mergedClass.icon">
+              <slot name="icon"></slot>
+            </div>
+            <div v-if="title || description">
+              <h3 v-if="title" :class="mergedClass.title">{{ title }}</h3>
+              <p v-if="description" :class="mergedClass.description">
+                {{ description }}
+              </p>
+            </div>
           </div>
-
-          <!-- Title and description -->
-          <div>
-            <h3 :class="mergedClass.title">{{ title }}</h3>
-            <p :class="mergedClass.description">{{ description }}</p>
+          <div v-if="isHeaderLeftVisible" class="grow">
+            <slot name="header_left"></slot>
+          </div>
+          <div v-if="isHeaderRightVisible" class="relative flex items-center">
+            <slot name="header_right"></slot>
           </div>
         </div>
-        <div v-if="isHeaderLeftVisible" class="grow">
-          <slot name="header_left"></slot>
-        </div>
-        <div v-if="isHeaderRightVisible" class="relative flex items-center">
-          <slot name="header_right"></slot>
-        </div>
+        <slot name="header_extend"></slot>
       </div>
-
-      <!-- Content section -->
       <div :class="mergedClass.content">
         <Loading v-if="isLoading" />
         <slot />
         <slot name="content"></slot>
       </div>
-
-      <!-- Footer with 3 columns -->
       <div v-if="isFooterVisible" :class="mergedClass.footer">
         <slot name="footer"></slot>
       </div>

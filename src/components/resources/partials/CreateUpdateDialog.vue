@@ -26,7 +26,7 @@
           :submit="submit"
         />
       </div>
-      <div v-if="errors.length > 0">
+      <template v-if="errors.length > 0">
         <div class="bg-red-100 border-red-600 p-4">
           <ul class="mb-0">
             <li v-for="(error, key) in errors" :key="key">
@@ -38,7 +38,7 @@
             </li>
           </ul>
         </div>
-      </div>
+      </template>
       <template #footer>
         <Button
           @click="close"
