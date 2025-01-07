@@ -55,18 +55,36 @@ function processStoreData(
 
   switch (action) {
     case CREATE:
-      state.data.list.push(data);
+      if (state.data.list.data) {
+        state.data.list.data.push(data);
+      } else {
+        state.data.list.push(data);
+      }
       break;
 
     case DELETE:
-      state.data.list = state.data.list.filter((item) => item.id !== params.id);
+      if (state.data.list.data) {
+        state.data.list.data = state.data.list.data.filter(
+          (item) => item.id !== params.id
+        );
+      } else {
+        state.data.list = state.data.list.filter(
+          (item) => item.id !== params.id
+        );
+      }
       break;
 
     case DELETE_MANY:
       if (params.values) {
-        state.data.list = state.data.list.filter(
-          (item) => !params.values.includes(item.id)
-        );
+        if (state.data.list.data) {
+          state.data.list.data = state.data.list.data.filter(
+            (item) => !params.values.includes(item.id)
+          );
+        } else {
+          state.data.list = state.data.list.filter(
+            (item) => !params.values.includes(item.id)
+          );
+        }
       }
       break;
 
@@ -81,23 +99,33 @@ function processStoreData(
       break;
 
     case UPDATE:
-      const itemIndex = state.data.list.findIndex(
-        (item) => item.id === params.id
-      );
-      if (itemIndex !== -1) {
-        state.data.list[itemIndex] = { ...state.data.list[itemIndex], ...data };
-        store.setItem(resourceName, data);
+      console.log("UPDATE", data);
+      console.log("params", params);
+      console.log("state.data.list", state.data.list);
+      if (state.data.list.data) {
+        const itemIndex = state.data.list.data.findIndex(
+          (item) => item.id === params.id
+        );
+        if (itemIndex !== -1) {
+          state.data.list.data[itemIndex] = {
+            ...state.data.list.data[itemIndex],
+            ...data,
+          };
+          store.setItem(resourceName, data);
+        }
+      } else {
+        const itemIndex = state.data.list.findIndex(
+          (item) => item.id === params.id
+        );
+        if (itemIndex !== -1) {
+          state.data.list[itemIndex] = {
+            ...state.data.list[itemIndex],
+            ...data,
+          };
+          store.setItem(resourceName, data);
+        }
       }
       break;
-
-    case LOCK:
-    case UNLOCK:
-      if (params.id) {
-        const item = state.data.list.find((item) => item.id === params.id);
-        if (item) item.locked = action === LOCK;
-      }
-      break;
-
     default:
       console.warn(`Unhandled action in processStoreData: ${action}`);
   }

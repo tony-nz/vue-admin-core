@@ -105,7 +105,7 @@
     @liveData="emitLiveData"
     :data="modalData"
     :hidden="form.hidden"
-    :fields="getResourceFields(resource.fields)"
+    :fields="resource.fields || []"
     :type="modalType"
     :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
     :resource="resource"

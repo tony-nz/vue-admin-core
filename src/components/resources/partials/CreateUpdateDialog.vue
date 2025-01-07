@@ -1,29 +1,20 @@
 <template>
-  <div>
+  <div v-if="isMounted">
     <Dialog
-      :header="
-        type == 'create'
-          ? 'Create ' + resource.label
-          : 'Update ' + resource.label
-      "
+      :header="getTitle()"
       v-model:visible="showModal"
       :closeOnEscape="true"
       :modal="true"
       :style="{ width: '50rem' }"
-      @hide="close"
+      @hide="onClose"
     >
-      <div class="m-0">
-        <VueFormGenerator
-          @updateData="updateData"
-          @validated="validated"
-          @onChange="onChange"
-          :allowedFields="allowedFields"
-          :data="modalData"
-          :fetchData="fetchData"
-          :form="fields"
-          :hiddenFields="hidden"
-          :type="'form'"
-          :submit="submit"
+      <div class="mb-4">
+        <Vueform
+          v-bind="getFormProps()"
+          v-model="modalData"
+          :endpoint="submitForm"
+          sync
+          ref="vueForm"
         />
       </div>
       <template v-if="errors.length > 0">
@@ -41,14 +32,13 @@
       </template>
       <template #footer>
         <Button
-          @click="close"
+          @click="onClose"
           label="Close"
           icon="pi pi-times"
           severity="secondary"
         />
         <Button
           @click="onSubmit"
-          :disabled="submit"
           :label="type === 'create' ? 'Create' : 'Save'"
           :icon="type === 'create' ? 'pi pi-plus' : 'pi pi-save'"
           severity="success"
@@ -59,31 +49,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, onMounted, PropType, ref, watch } from "vue";
+import { FilterMatchMode } from "@primevue/core/api";
+import ResourceType from "../../../core/types/ResourceConfigTypes";
 import useResource from "../../../composables/useResource";
-import { defineComponent, onMounted, ref, watch } from "vue";
-import ApiService from "../../../core/services/ApiService";
-import useAppStore from "../../../store/app";
-import useResourceStore from "../../../store/resource";
 
 export default defineComponent({
   name: "CreateUpdateDialog",
-  methods: {
-    close() {
-      this.$emit("close");
-    },
-    onSubmit() {
-      this.submit = true;
-    },
-    updateData(data) {
-      this.modalData = data;
-    },
-  },
   props: {
-    allowedFields: {
-      type: Array,
-      required: false,
-    },
     data: {
       type: Object,
       required: true,
@@ -91,14 +65,6 @@ export default defineComponent({
     fields: {
       type: Object,
       required: true,
-    },
-    fieldFilters: {
-      type: Object,
-      required: false,
-    },
-    fieldValues: {
-      type: Object,
-      required: false,
     },
     hidden: {
       type: Array,
@@ -111,7 +77,7 @@ export default defineComponent({
       default: "id",
     },
     resource: {
-      type: Object,
+      type: Object as PropType<ResourceType>,
       required: true,
     },
     subId: {
@@ -121,101 +87,151 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const dataId = ref();
-    const fieldValues = ref();
+    const errors: any = ref([]);
+    const isMounted = ref(false);
     const modalData = ref();
     const modalType = ref(props.type);
     const showModal = ref(false);
     const submit = ref(false);
-    const errors = ref([]);
-    const { create, update, routeId } = useResource(props.resource);
+    const vueForm: any = ref();
 
-    const validated = async (valid, data = null) => {
-      modalData.value = data;
+    /**
+     * Filters
+     * @type {Ref<Record<string, { value: any; matchMode: FilterMatchMode }>>}
+     */
+    const filters = ref({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      ...props.resource.datatable?.filters,
+    });
+
+    /**
+     * Use resource
+     */
+    const { create, update, routeId } = useResource(
+      props.resource,
+      filters.value,
+      props
+    );
+
+    /**
+     * Get Form props
+     * @returns {Object}
+     */
+    const getFormProps = () => {
+      const fields = props.fields;
+      const data = props.data;
+
+      // Deep search through the schema to find 'items' keys
+      const replaceInSchema = (schema) => {
+        for (let key in schema) {
+          if (typeof schema[key] === "object" && schema[key] !== null) {
+            if (schema[key].items) {
+              let items = schema[key].items;
+              if (typeof items === "string") {
+                const regex = /\{(\w+)\}/g;
+                let match;
+                while ((match = regex.exec(items)) !== null) {
+                  const variableName = match[1];
+                  if (data[variableName]) {
+                    items = items.replace(
+                      `{${variableName}}`,
+                      data[variableName]
+                    );
+                  }
+                }
+                schema[key].items = items;
+              }
+            }
+            // Recursively check nested objects
+            if (schema[key].schema) {
+              replaceInSchema(schema[key].schema);
+            }
+          }
+        }
+      };
+
+      // Apply the replacement logic to the main schema
+      replaceInSchema(fields.schema);
+
+      return fields;
+    };
+
+    /**
+     * Get title
+     * @returns {string}
+     */
+    const getTitle = () => {
+      // check to see if props.resource.label is a function or string
+      if (typeof props.resource.label === "function") {
+        return props.resource.label();
+      }
+
+      return modalType.value == "create"
+        ? "Create " + props.resource.label
+        : "Update " + props.resource.label;
+    };
+
+    /**
+     * Submit form
+     */
+    const submitForm = async (FormData, form$) => {
+      // update modalData
+      modalData.value = form$.data;
       // clear errors
       errors.value = [];
 
-      if (valid) {
-        if (fieldValues.value) {
-          // add fieldValues to modalData
-          modalData.value = { ...modalData.value, ...fieldValues.value };
-        }
-
-        if (modalType.value == "create") {
-          await create(modalData.value, dataId.value)
-            .then((repsonse) => {
-              emit("close");
-            })
-            .catch((e) => {
-              if (e.response.errors) {
-                Object.keys(e.response.data.errors).forEach((key, index) => {
-                  errors.value[index] = e.response.data.errors[key][0];
-                });
-              } else if (e.message) {
-                errors.value[0] = e.message;
-              }
-              submit.value = false;
-            });
-        } else if (modalType.value == "update") {
-          await update(modalData.value, dataId.value)
-            .then((repsonse) => {
-              emit("close");
-            })
-            .catch((e) => {
-              if (e.response.errors) {
-                Object.keys(e.response.data.errors).forEach((key, index) => {
-                  errors.value[index] = e.response.data.errors[key][0];
-                });
-              } else if (e.message) {
-                errors.value[0] = e.message;
-              }
-              submit.value = false;
-            });
-        }
-        // this.$emit("close");
+      if (modalType.value == "create") {
+        await create(modalData.value, dataId.value)
+          .then((repsonse) => {
+            emit("close");
+          })
+          .catch((e) => {
+            if (e.response.errors) {
+              Object.keys(e.response.data.errors).forEach((key, index) => {
+                errors.value[index] = e.response.data.errors[key][0];
+              });
+            } else if (e.message) {
+              errors.value[0] = e.message;
+            }
+            submit.value = false;
+          });
+      } else if (modalType.value == "update") {
+        await update(modalData.value, dataId.value)
+          .then((repsonse) => {
+            emit("close");
+          })
+          .catch((e) => {
+            if (e.response.errors) {
+              Object.keys(e.response.data.errors).forEach((key, index) => {
+                errors.value[index] = e.response.data.errors[key][0];
+              });
+            } else if (e.message) {
+              errors.value[0] = e.message;
+            }
+            submit.value = false;
+          });
       }
-      submit.value = false;
     };
 
-    async function fetchData(params) {
-      const appStore = useAppStore();
-      const resources = appStore.getResources;
-      const foundResource = ref();
-
-      if (params.resource) {
-        try {
-          for (const [key, value] of Object.entries(resources)) {
-            if (value.name == params.resource.name) {
-              foundResource.value = value;
-            }
-          }
-          const store = useResourceStore();
-          const response = await store.getList({
-            resourceName: foundResource.value.name,
-            payload: {
-              subId: props.subId,
-            },
-          });
-
-          return response;
-        } catch (e) {
-          appStore.showToast({
-            severity: "error",
-            summary: "Error",
-            message: e.message ? e.message : "An error occurred",
-          });
-        }
-      }
-      return ApiService.get(params.url).then((res) => {
-        return res.data.data;
-      });
-    }
+    /**
+     * On close
+     * @returns {void}
+     */
+    const onClose = () => {
+      emit("close");
+    };
 
     /**
-     * Emit liveData event
-     * @param data
+     * On submit
+     * @returns {void}
      */
-    const onChange = (data) => {
-      emit("liveData", data);
+    const onSubmit = () => {
+      submit.value = true;
+      console.log("vueForm", vueForm.value);
+      if (!vueForm.value) {
+        return;
+      }
+      vueForm.value.submit();
     };
 
     /**
@@ -229,24 +245,29 @@ export default defineComponent({
       { deep: true }
     );
 
-    onMounted(() => {
+    onMounted(async () => {
       dataId.value = props.data[props.primaryKey];
-      fieldValues.value = props.fieldValues;
       modalData.value = props.data;
-      routeId.value = props.subId;
+      if (props.subId) {
+        routeId.value = props.subId.toString();
+      }
       showModal.value = true;
+      isMounted.value = true;
     });
 
     return {
-      dataId,
       errors,
-      fetchData,
+      getFormProps,
+      getTitle,
+      isMounted,
       modalData,
       modalType,
-      onChange,
+      onClose,
+      onSubmit,
       showModal,
       submit,
-      validated,
+      submitForm,
+      vueForm,
     };
   },
 });
