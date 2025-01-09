@@ -22,11 +22,14 @@
         @delete="showDeletePopup"
         :filters="filters"
         :modalData="modalData"
+        :formData="form.data"
         :onFilter="onFilter"
         :resource="resource"
         :selectedResources="selectedResources"
         :toolbar="toolbar"
-      />
+      >
+        <slot name="header" />
+      </AdvToolbar>
     </template>
     <Column
       v-if="options?.columns?.select"
@@ -99,18 +102,20 @@
       </div>
     </template>
   </ConfirmPopup>
-  <CreateUpdateDialog
-    v-if="showModal && resource"
-    @close="showModal = false"
-    @liveData="emitLiveData"
-    :data="modalData"
-    :hidden="form.hidden"
-    :fields="resource.fields || []"
-    :type="modalType"
-    :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
-    :resource="resource"
-    :subId="params?.id ? params.id : null"
-  />
+  <template v-if="showModal">
+    <CreateUpdateDialog
+      v-if="showModal && resource"
+      @close="showModal = false"
+      @liveData="emitLiveData"
+      :data="modalData"
+      :hidden="form.hidden"
+      :fields="resource.fields || []"
+      :type="modalType"
+      :primaryKey="resource.primaryKey ? resource.primaryKey : 'id'"
+      :resource="resource"
+      :subId="params?.id ? params.id : null"
+    />
+  </template>
   <template v-if="!resource">
     <span>Missing resource prop</span>
   </template>

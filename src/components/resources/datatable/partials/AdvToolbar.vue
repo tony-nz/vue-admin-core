@@ -18,9 +18,9 @@
         </p>
       </div>
       <div
-        class="flex flex-column md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
+        class="flex flex-column w-full justify-end md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
       >
-        <slot name="toolbar"></slot>
+        <slot></slot>
         <Button
           v-if="toolbar?.buttons?.search"
           @click="toggleSearch"
@@ -55,7 +55,7 @@
             toolbar?.buttons?.create &&
             canAction('create')
           "
-          @click="showCreateEdit('dialog', 'create', modalData)"
+          @click="showCreateEdit('dialog', 'create', formData)"
           :label="
             translate('va.actions.create') +
             ' ' +
@@ -132,6 +132,10 @@ export default defineComponent({
     filters: {
       type: Object,
       required: true,
+    },
+    formData: {
+      type: Object,
+      required: false,
     },
     modalData: {
       type: Object,

@@ -8,7 +8,7 @@
       :style="{ width: '50rem' }"
       @hide="onClose"
     >
-      <div class="mb-4">
+      <div class="p-4 mb-4 bg-gray-100 rounded-lg">
         <Vueform
           v-bind="getFormProps()"
           v-model="modalData"
@@ -41,7 +41,7 @@
           @click="onSubmit"
           :label="type === 'create' ? 'Create' : 'Save'"
           :icon="type === 'create' ? 'pi pi-plus' : 'pi pi-save'"
-          severity="success"
+          severity="info"
           autofocus
         />
       </template>
@@ -50,7 +50,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, PropType, ref, watch } from "vue";
+import {
+  defineComponent,
+  onActivated,
+  onMounted,
+  PropType,
+  ref,
+  watch,
+} from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import ResourceType from "../../../core/types/ResourceConfigTypes";
 import useResource from "../../../composables/useResource";
@@ -227,11 +234,25 @@ export default defineComponent({
      */
     const onSubmit = () => {
       submit.value = true;
-      console.log("vueForm", vueForm.value);
       if (!vueForm.value) {
         return;
       }
       vueForm.value.submit();
+    };
+
+    const setup = async () => {
+      // Set dataId
+      dataId.value = props.data[props.primaryKey];
+      // Reset errors
+      modalData.value = {};
+      // Set modalData if provided
+      if (props.data) {
+        modalData.value = props.data;
+      }
+      // Set routeId if provided
+      if (props.subId) {
+        routeId.value = props.subId.toString();
+      }
     };
 
     /**
@@ -245,12 +266,12 @@ export default defineComponent({
       { deep: true }
     );
 
+    onActivated(async () => {
+      await setup();
+    });
+
     onMounted(async () => {
-      dataId.value = props.data[props.primaryKey];
-      modalData.value = props.data;
-      if (props.subId) {
-        routeId.value = props.subId.toString();
-      }
+      await setup();
       showModal.value = true;
       isMounted.value = true;
     });

@@ -99,9 +99,6 @@ function processStoreData(
       break;
 
     case UPDATE:
-      console.log("UPDATE", data);
-      console.log("params", params);
-      console.log("state.data.list", state.data.list);
       if (state.data.list.data) {
         const itemIndex = state.data.list.data.findIndex(
           (item) => item.id === params.id
