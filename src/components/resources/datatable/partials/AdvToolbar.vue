@@ -53,6 +53,23 @@
           v-if="
             resource?.create?.modal &&
             toolbar?.buttons?.create &&
+            canAction('create') &&
+            typeof resource.create === 'function'
+          "
+          @click="resource.create(formData)"
+          :label="
+            translate('va.actions.create') +
+            ' ' +
+            (resource.singularName ? resource.singularName : resource.label)
+          "
+          class="whitespace-nowrap overflow-visible"
+          icon="pi pi-plus"
+          severity="info"
+        />
+        <Button
+          v-if="
+            resource?.create?.modal &&
+            toolbar?.buttons?.create &&
             canAction('create')
           "
           @click="showCreateEdit('dialog', 'create', formData)"

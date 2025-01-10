@@ -246,6 +246,7 @@ export default defineComponent({
      */
     const {
       apiUrl,
+      formData,
       getResourceData,
       getResourceFields,
       isLoading,
@@ -321,7 +322,8 @@ export default defineComponent({
       }
       // Merge form data if available
       if (props.form?.data) {
-        modalData.value = { ...props.form.data, ...modalData.value };
+        formData.value = props.form.data;
+        // modalData.value = { ...props.form.data, ...modalData.value };
       }
       // Lazy load if resource is set to lazy
       if (props.resource.lazy) {

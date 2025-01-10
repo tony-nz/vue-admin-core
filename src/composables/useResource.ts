@@ -14,6 +14,7 @@ export default function useResource(
   const apiUrl = ref();
   const confirmDelete = useConfirm();
   const filters = ref(dtFilters);
+  const formData = ref();
   const isLoading = ref(true);
   const lazyParams: Ref<any> = ref({});
   const modalData = ref([]);
@@ -351,7 +352,12 @@ export default function useResource(
    */
   function showCreateEdit(display, type, data = []) {
     modalType.value = type;
-    modalData.value = data;
+    if (type === "update") {
+      modalData.value = { ...formData.value, ...data };
+    } else {
+      // reset for create dialog
+      modalData.value = { ...formData.value };
+    }
 
     if (display === "dialog") {
       showModal.value = true;
@@ -389,6 +395,7 @@ export default function useResource(
     apiUrl,
     bulkRemove,
     create,
+    formData,
     getResourceData,
     getResourceFields,
     isLoading,
