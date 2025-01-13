@@ -20,8 +20,7 @@ const useAuthStore = defineStore("AuthStore", {
     isAuthenticated: false,
     permissions: [],
     roles: [],
-    settings:
-      JSON.parse(window.sessionStorage.getItem("settings") as string) || {},
+    settings: {},
     user: [],
   }),
   actions: {
@@ -325,7 +324,6 @@ const useAuthStore = defineStore("AuthStore", {
      */
     setSettings(settings: any) {
       this.settings = settings;
-      window.sessionStorage.setItem("settings", JSON.stringify(this.settings));
     },
     /**
      * Set user
@@ -410,20 +408,6 @@ const useAuthStore = defineStore("AuthStore", {
      * @returns array
      */
     getSettings(): any {
-      Object.keys(this.settings).forEach((key) => {
-        // convert "true" and "false" to boolean
-        if (this.settings[key] === "true" || this.settings[key] === "false") {
-          this.settings[key] = this.settings[key] == "true";
-        }
-        // convert all string integers
-        if (
-          typeof this.settings[key] === "string" &&
-          /^\d+$/.test(this.settings[key])
-        ) {
-          this.settings[key] = parseInt(this.settings[key]);
-        }
-      });
-
       return this.settings;
     },
     /**
