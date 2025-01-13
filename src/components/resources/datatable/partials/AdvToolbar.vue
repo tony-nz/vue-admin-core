@@ -18,7 +18,7 @@
         </p>
       </div>
       <div
-        class="flex flex-column w-full justify-end md:flex-row md:justiify-content-between p-2 gap-2 dark:bg-transparent"
+        class="flex flex-column items-center w-full justify-end md:flex-row md:justiify-content-between gap-2 dark:bg-transparent"
       >
         <slot></slot>
         <Button
