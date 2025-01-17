@@ -28,6 +28,7 @@ interface IState {
   };
   loading: boolean;
   resource: ResourceConfig;
+  lastUpdated: number; // Timestamp in milliseconds
 }
 
 // Helper for URL manipulation
@@ -148,9 +149,24 @@ async function handleApiCall(
   payload: any
 ) {
   const appStore = useAppStore();
+  const cacheValidity = 1 * 60 * 1000; // 1 minute
   const resource = this.resources[resourceName];
   const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
 
+  // Check if we should use cached data
+  if (loadingActions.includes(action) && resource.resource.cache === true) {
+    if (
+      resource.lastUpdated &&
+      Date.now() - resource.lastUpdated < cacheValidity
+    ) {
+      if (action === GET_ONE) {
+        return resource.data.item;
+      } else {
+        return resource.data.list;
+      }
+    }
+  }
+  // carry on with the API call
   try {
     let params = payload?.params || {};
     if (action === UPDATE && !params.id) params.id = resource.data.item.id;
@@ -200,6 +216,9 @@ async function handleApiCall(
 
     processStoreData(this, resourceName, action, payload, data);
 
+    if (loadingActions.includes(action)) {
+      resource.lastUpdated = Date.now();
+    }
     appStore.setApiLoading(false);
     this.showSuccess(resource, { action, params, data });
 
@@ -220,6 +239,7 @@ const useResourceStore = defineStore("ResourceStore", {
           data: { item: {}, list: [] },
           loading: false,
           resource: resourceConfig,
+          lastUpdated: 0,
         };
       }
     },
@@ -237,7 +257,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, CREATE, resourceName, payload);
+      return await handleApiCall.call(this, CREATE, resourceName, payload);
     },
     async delete({
       resourceName,
@@ -246,7 +266,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, DELETE, resourceName, payload);
+      return await handleApiCall.call(this, DELETE, resourceName, payload);
     },
     async deleteMany({
       resourceName,
@@ -255,7 +275,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, DELETE_MANY, resourceName, payload);
+      return await handleApiCall.call(this, DELETE_MANY, resourceName, payload);
     },
     async get({
       resourceName,
@@ -264,7 +284,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, GET, resourceName, payload);
+      return await handleApiCall.call(this, GET, resourceName, payload);
     },
     async getList({
       resourceName,
@@ -273,7 +293,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, GET_LIST, resourceName, payload);
+      return await handleApiCall.call(this, GET_LIST, resourceName, payload);
     },
     async getNodes({
       resourceName,
@@ -282,7 +302,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, GET_NODES, resourceName, payload);
+      return await handleApiCall.call(this, GET_NODES, resourceName, payload);
     },
     async getOne({
       resourceName,
@@ -291,7 +311,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, GET_ONE, resourceName, payload);
+      return await handleApiCall.call(this, GET_ONE, resourceName, payload);
     },
     async getTree({
       resourceName,
@@ -300,7 +320,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, GET_TREE, resourceName, payload);
+      return await handleApiCall.call(this, GET_TREE, resourceName, payload);
     },
     async lock({
       resourceName,
@@ -309,7 +329,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, LOCK, resourceName, payload);
+      return await handleApiCall.call(this, LOCK, resourceName, payload);
     },
     async unlock({
       resourceName,
@@ -318,7 +338,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, UNLOCK, resourceName, payload);
+      return await handleApiCall.call(this, UNLOCK, resourceName, payload);
     },
     async moveNode({
       resourceName,
@@ -327,7 +347,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, MOVE_NODE, resourceName, payload);
+      return await handleApiCall.call(this, MOVE_NODE, resourceName, payload);
     },
     async update({
       resourceName,
@@ -336,7 +356,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, UPDATE, resourceName, payload);
+      return await handleApiCall.call(this, UPDATE, resourceName, payload);
     },
     async updateMany({
       resourceName,
@@ -345,7 +365,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
-      return handleApiCall.call(this, UPDATE_MANY, resourceName, payload);
+      return await handleApiCall.call(this, UPDATE_MANY, resourceName, payload);
     },
     showSuccess(
       resource: IState,
@@ -424,16 +444,29 @@ const useResourceStore = defineStore("ResourceStore", {
     },
   },
   getters: {
-    getResourceData: (state) => (resourceName: string) =>
-      state.resources[resourceName],
     getDataItem: (state) => (resourceName: string) =>
       state.resources[resourceName]?.data.item,
     getDataList: (state) => (resourceName: string) =>
       state.resources[resourceName]?.data.list,
-    getResource: (state) => (resourceName: string) =>
-      state.resources[resourceName]?.resource,
     getLoading: (state) => (resourceName: string) =>
       state.resources[resourceName]?.loading,
+    getResource: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.resource,
+    getResourceData: (state) => (resourceName: string) =>
+      state.resources[resourceName],
+    getResourceList: (state) => (resource: string) => {
+      const r = Object.values(state.resources).find(
+        (r) => r.resource.name === resource
+      );
+      return r ? r.data.list : [];
+    },
+    getResourcesAsObject(): any {
+      const obj: any = {};
+      Object.entries(this.resources).forEach(([key, r]) => {
+        obj[key] = r.data.list;
+      });
+      return obj;
+    },
   },
 });
 

@@ -35,6 +35,7 @@ interface Notifications {
 
 interface ResourceConfig {
   apiUrl?: string;
+  cache?: boolean;
   create?: ModalPage;
   datatable?: any;
   delete?: boolean;
