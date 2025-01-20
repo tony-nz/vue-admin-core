@@ -157,7 +157,8 @@ async function handleApiCall(
   if (loadingActions.includes(action) && resource.resource.cache === true) {
     if (
       resource.lastUpdated &&
-      Date.now() - resource.lastUpdated < cacheValidity
+      Date.now() - resource.lastUpdated < cacheValidity &&
+      resource.data.list.length > 0
     ) {
       if (action === GET_ONE) {
         return resource.data.item;
