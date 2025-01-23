@@ -208,6 +208,15 @@ async function handleApiCall(
       );
     } else {
       // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
+
+      // TODO:: Fix this
+      // routeId and subId are being passed within params,
+      // we use them for url generation
+      // but they shouldn't be passed to the API
+
+      delete params.routeId;
+      delete params.subId;
+
       response = await ApiService.get(
         getApiUrl(apiUrl, action, params),
         action === GET_ONE ? {} : params
