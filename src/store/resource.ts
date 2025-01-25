@@ -214,12 +214,21 @@ async function handleApiCall(
       // we use them for url generation
       // but they shouldn't be passed to the API
 
-      delete params.routeId;
-      delete params.subId;
+      // delete params.routeId;
+      // delete params.subId;
+
+      const apiParams = action === GET_ONE ? {} : params;
+
+      // delete apiParams.routeId;
+      // delete apiParams.subId;
+
+      // console.log("getApiUrl", getApiUrl(apiUrl, action, params));
+      // console.log("apiParams", apiParams);
+      // console.log("payload", payload);
 
       response = await ApiService.get(
         getApiUrl(apiUrl, action, params),
-        action === GET_ONE ? {} : params
+        apiParams
       );
     }
     const data = response.data.data;

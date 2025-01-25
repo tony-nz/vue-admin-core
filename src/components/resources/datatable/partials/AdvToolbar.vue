@@ -22,20 +22,6 @@
       >
         <slot></slot>
         <Button
-          v-if="toolbar?.buttons?.search"
-          @click="toggleSearch"
-          class="px-4"
-          icon="pi pi-search"
-          severity="info"
-        />
-        <Button
-          v-if="toolbar?.buttons?.refresh"
-          @click="refreshData"
-          class="px-4"
-          icon="pi pi-refresh"
-          severity="info"
-        />
-        <Button
           v-if="
             toolbar?.buttons?.bulkDelete &&
             canAction('delete') &&
@@ -60,7 +46,7 @@
           :label="
             translate('va.actions.create') +
             ' ' +
-            (resource.singularName ? resource.singularName : resource.label)
+            (resource.label ? resource.label : resource.singularName)
           "
           class="whitespace-nowrap overflow-visible"
           icon="pi pi-plus"
@@ -76,7 +62,7 @@
           :label="
             translate('va.actions.create') +
             ' ' +
-            (resource.singularName ? resource.singularName : resource.label)
+            (resource.label ? resource.label : resource.singularName)
           "
           class="whitespace-nowrap overflow-visible"
           icon="pi pi-plus"
@@ -101,6 +87,20 @@
             severity="info"
           />
         </router-link>
+        <Button
+          v-if="toolbar?.buttons?.search"
+          @click="toggleSearch"
+          class="px-4"
+          icon="pi pi-search"
+          severity="info"
+        />
+        <Button
+          v-if="toolbar?.buttons?.refresh"
+          @click="refreshData"
+          class="px-4"
+          icon="pi pi-refresh"
+          severity="info"
+        />
       </div>
     </div>
     <div v-if="showSearch" class="flex w-full justify-end p-1.5">

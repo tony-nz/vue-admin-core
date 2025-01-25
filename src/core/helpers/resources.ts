@@ -133,13 +133,28 @@ const buildResourceConfig = (resource: any): any => {
     );
   });
 
-  const nameKey = `resources.${resource.name}.name`;
+  const nameKey = `${resource.name}`;
   const { t, te } = i18n.global;
 
   const getName = (count: number): string => {
-    return te(nameKey)
-      ? t(nameKey)
-      : formatKebabCase(upperCaseFirst(resource.name));
+    // Check if there's a translation for the key
+    if (te(nameKey)) {
+      // Simply return the translated name without pluralization in keys
+      return t(nameKey);
+    } else {
+      // Fallback to original name with basic pluralization
+      let formattedName = resource.name;
+
+      // Use Intl.PluralRules for basic pluralization in fallback
+      const rules = new Intl.PluralRules(i18n.global.locale, {
+        type: "cardinal",
+      });
+      if (rules.select(count) !== "one") {
+        formattedName += "s"; // Simplistic pluralization, adjust as needed
+      }
+
+      return formattedName;
+    }
   };
 
   const resourceConfig = {
