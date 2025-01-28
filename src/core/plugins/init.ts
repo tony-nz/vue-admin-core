@@ -1,8 +1,9 @@
 import { App } from "vue";
+import { initErrorLog } from "./errorLog";
 import { initInlineSvg } from "./inline-svg";
 import { initPrimeVue } from "./primevue";
 import { initResources } from "./resources";
-import { initErrorLog } from "./errorLog";
+import { initVueform } from "./vueform";
 import { ObjectDirective } from "vue";
 import ApiService from "../services/ApiService";
 import i18n from "./i18n";
@@ -62,6 +63,9 @@ export const initPlugins = async function (app: App<Element>, router, options) {
 
   // Vue3 Inline SVG
   initInlineSvg(app);
+
+  // Vueform
+  initVueform(app);
 
   // PrimeVue
   initPrimeVue(app);

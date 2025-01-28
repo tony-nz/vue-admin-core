@@ -6,6 +6,7 @@ import ToastService from "primevue/toastservice";
 
 // directives
 import BadgeDirective from "primevue/badgedirective";
+import KeyFilter from "primevue/keyfilter";
 import Tooltip from "primevue/tooltip";
 
 // components
@@ -18,7 +19,7 @@ import Badge from "primevue/badge";
 import BlockUI from "primevue/blockui";
 import Button from "primevue/button";
 import Breadcrumb from "primevue/breadcrumb";
-import DatePicker from "primevue/datepicker"; // Changed from Calendar
+import DatePicker from "primevue/datepicker";
 import Card from "primevue/card";
 import CascadeSelect from "primevue/cascadeselect";
 import Carousel from "primevue/carousel";
@@ -37,13 +38,15 @@ import DeferredContent from "primevue/deferredcontent";
 import Dialog from "primevue/dialog";
 import Divider from "primevue/divider";
 import Dock from "primevue/dock";
-import Select from "primevue/select"; // Changed from Dropdown
+import Select from "primevue/select";
 import Fieldset from "primevue/fieldset";
 import FileUpload from "primevue/fileupload";
+import FloatLabel from "primevue/floatlabel";
 import Galleria from "primevue/galleria";
+import IftaLabel from "primevue/iftalabel";
 import Image from "primevue/image";
 import Inplace from "primevue/inplace";
-import ToggleSwitch from "primevue/toggleswitch"; // Changed from InputSwitch
+import ToggleSwitch from "primevue/toggleswitch";
 import InputText from "primevue/inputtext";
 import InputMask from "primevue/inputmask";
 import InputNumber from "primevue/inputnumber";
@@ -56,7 +59,7 @@ import Message from "primevue/message";
 import MultiSelect from "primevue/multiselect";
 import OrderList from "primevue/orderlist";
 import OrganizationChart from "primevue/organizationchart";
-import Popover from "primevue/popover"; // Changed from OverlayPanel
+import Popover from "primevue/popover";
 import Paginator from "primevue/paginator";
 import Panel from "primevue/panel";
 import PanelMenu from "primevue/panelmenu";
@@ -73,19 +76,19 @@ import ScrollPanel from "primevue/scrollpanel";
 import ScrollTop from "primevue/scrolltop";
 import Skeleton from "primevue/skeleton";
 import Slider from "primevue/slider";
-import Drawer from "primevue/drawer"; // Changed from Sidebar
+import Drawer from "primevue/drawer";
 import SpeedDial from "primevue/speeddial";
 import SplitButton from "primevue/splitbutton";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
-import Stepper from "primevue/stepper"; // New component, replaces Steps in some contexts
+import Stepper from "primevue/stepper";
 import StyleClass from "primevue/styleclass";
 import TabMenu from "primevue/tabmenu";
 import TieredMenu from "primevue/tieredmenu";
 import Textarea from "primevue/textarea";
 import Toast from "primevue/toast";
 import Toolbar from "primevue/toolbar";
-import Tabs from "primevue/tabs"; // Changed from TabView
+import Tabs from "primevue/tabs";
 import TabPanel from "primevue/tabpanel";
 import TabPanels from "primevue/tabpanels";
 import Tag from "primevue/tag";
@@ -114,6 +117,7 @@ export function initPrimeVue(app: App<Element>) {
   app.directive("badge", BadgeDirective);
   app.directive("ripple", Ripple);
   app.directive("styleclass", StyleClass);
+  app.directive("keyfilter", KeyFilter);
 
   // register components
   app.component("AutoComplete", AutoComplete);
@@ -144,10 +148,13 @@ export function initPrimeVue(app: App<Element>) {
   app.component("Dialog", Dialog);
   app.component("Divider", Divider);
   app.component("Dock", Dock);
+  app.component("Drawer", Drawer);
   app.component("Select", Select);
   app.component("Fieldset", Fieldset);
   app.component("FileUpload", FileUpload);
+  app.component("FloatLabel", FloatLabel);
   app.component("Galleria", Galleria);
+  app.component("IftaLabel", IftaLabel);
   app.component("Image", Image);
   app.component("Inplace", Inplace);
   app.component("ToggleSwitch", ToggleSwitch);
@@ -179,7 +186,6 @@ export function initPrimeVue(app: App<Element>) {
   app.component("ScrollTop", ScrollTop);
   app.component("Skeleton", Skeleton);
   app.component("Slider", Slider);
-  app.component("Drawer", Drawer);
   app.component("SpeedDial", SpeedDial);
   app.component("SplitButton", SplitButton);
   app.component("Splitter", Splitter);

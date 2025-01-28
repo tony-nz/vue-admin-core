@@ -90,6 +90,32 @@
           v-if="userMenuConfig.footer"
           class="flex justify-end p-2 bg-white dark:bg-slate-600 rounded-b-lg"
         >
+          <button @click="zoomOut()" :class="btnClass">
+            <span class="hover:fill-primary-400 fill-gray-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 32 32"
+                class="h-4 w-4"
+              >
+                <path
+                  d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-6 10v2h12v-2z"
+                />
+              </svg>
+            </span>
+          </button>
+          <button @click="zoomIn()" :class="btnClass">
+            <span class="hover:fill-primary-400 fill-gray-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 32 32"
+                class="h-4 w-4"
+              >
+                <path
+                  d="M16 3C8.832 3 3 8.832 3 16s5.832 13 13 13s13-5.832 13-13S23.168 3 16 3m0 2c6.087 0 11 4.913 11 11s-4.913 11-11 11S5 22.087 5 16S9.913 5 16 5m-1 5v5h-5v2h5v5h2v-5h5v-2h-5v-5z"
+                />
+              </svg>
+            </span>
+          </button>
           <button @click="toggleDarkMode()" :class="btnClass">
             <span class="hover:fill-primary-400 fill-gray-400">
               <svg
@@ -296,6 +322,22 @@ export default defineComponent({
       isVisible.value = true;
     };
 
+    /**
+     * Zoom in the app
+     * @returns void
+     */
+    const zoomIn = () => {
+      useLayoutStore().zoomIn();
+    };
+
+    /**
+     * Zoom out the app
+     * @returns void
+     */
+    const zoomOut = () => {
+      useLayoutStore().zoomOut();
+    };
+
     onMounted(async () => {
       isMounted.value = true;
     });
@@ -319,6 +361,8 @@ export default defineComponent({
       toggleToolbar,
       translate,
       userMenuConfig,
+      zoomIn,
+      zoomOut,
     };
   },
 });

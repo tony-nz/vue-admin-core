@@ -83,6 +83,7 @@ interface Content {
 }
 
 interface DefaultLayout {
+  zoom?: number;
   theme?: Theme;
   logo?: Logo;
   loader?: Loader;

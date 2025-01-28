@@ -2,8 +2,6 @@ import { initPlugins } from "./core/plugins/init";
 import { initRouter } from "./router";
 import { useAuthStore, useLayoutStore } from "./utils";
 import useAppStore from "./store/app";
-import Vueform from "@vueform/vueform";
-import vueformConfig from "./../vueform.config";
 
 export default class VueAdmin {
   constructor({ app, options }) {
@@ -24,12 +22,6 @@ export default class VueAdmin {
       }
       appStore.setConfig(options.config);
     }
-
-    /**
-     * Initialize Vueform
-     * @param app vue instance
-     */
-    app.use(Vueform, vueformConfig);
 
     /**
      * Initialize plugins

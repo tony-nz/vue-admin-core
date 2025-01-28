@@ -32,14 +32,43 @@ interface IState {
 }
 
 // Helper for URL manipulation
-function getApiUrl(apiUrl: string, action: string, params: any): string {
-  const replaceUrlId = (url: string, id: any) => url.replace(":id", id ?? "");
-  const id = params?.routeId ?? params?.subId ?? null;
-  apiUrl = replaceUrlId(apiUrl, id);
+// function getApiUrl(apiUrl: string, action: string, params: any): string {
+//   console.log("getApiUrl", apiUrl, action, params);
+//   const replaceUrlId = (url: string, id: any) => url.replace(":id", id ?? "");
+//   const id = params?.routeId ?? params?.subId ?? null;
+//   apiUrl = replaceUrlId(apiUrl, id);
 
-  if (action.toLowerCase() === "getone") {
-    return `${apiUrl}/${params.id ?? ""}`;
+//   if (action.toLowerCase() === "getone") {
+//     return `${apiUrl}/${params.id ?? ""}`;
+//   }
+//   return apiUrl;
+// }
+function getApiUrl(
+  apiUrl: string,
+  action: string,
+  params: Record<string, string | number | null>,
+  routeId: string | null
+): string {
+  // Replace :id in the URL if routeId is provided
+  if (routeId) {
+    apiUrl = apiUrl.replace(":id", routeId);
   }
+
+  // Loop through params to replace other dynamic parts of the URL
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== null) {
+      // Check if value is not null
+      apiUrl = apiUrl.replace(new RegExp(`:${key}(?=/|$)`), value.toString()); // Use regex to ensure full match
+    }
+  }
+
+  // Handle GETONE action
+  if (action.toLowerCase() === "getone") {
+    // Append the id to the URL if it exists in params
+    const id = params.id ? params.id.toString() : "";
+    return `${apiUrl}/${id}`;
+  }
+
   return apiUrl;
 }
 
@@ -173,9 +202,7 @@ async function handleApiCall(
     if (action === UPDATE && !params.id) params.id = resource.data.item.id;
 
     const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
-    // add routeId and subId to params
-    params.routeId = payload?.routeId;
-    params.subId = payload?.subId;
+    const routeId = payload?.routeId || null;
 
     const apiMethod = loadingActions.includes(action)
       ? "get"
@@ -190,44 +217,27 @@ async function handleApiCall(
     if (apiMethod === "delete") {
       // For DELETE, pass only the id or null if no id
       response = await ApiService.delete(
-        getApiUrl(apiUrl, action, params),
+        getApiUrl(apiUrl, action, params, routeId),
         params.id ? params.id : null
       );
     } else if (apiMethod === "create") {
       // For CREATE and UPDATE, pass the URL and params
       response = await ApiService[apiMethod](
-        getApiUrl(apiUrl, action, params),
+        getApiUrl(apiUrl, action, params, routeId),
         params
       );
     } else if (apiMethod === "update") {
       // For CREATE and UPDATE, pass the URL and params
       response = await ApiService[apiMethod](
-        getApiUrl(apiUrl, action, params),
+        getApiUrl(apiUrl, action, params, routeId),
         params.id ? params.id : null,
         params
       );
     } else {
       // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
-
-      // TODO:: Fix this
-      // routeId and subId are being passed within params,
-      // we use them for url generation
-      // but they shouldn't be passed to the API
-
-      // delete params.routeId;
-      // delete params.subId;
-
       const apiParams = action === GET_ONE ? {} : params;
-
-      // delete apiParams.routeId;
-      // delete apiParams.subId;
-
-      // console.log("getApiUrl", getApiUrl(apiUrl, action, params));
-      // console.log("apiParams", apiParams);
-      // console.log("payload", payload);
-
       response = await ApiService.get(
-        getApiUrl(apiUrl, action, params),
+        getApiUrl(apiUrl, action, params, routeId),
         apiParams
       );
     }

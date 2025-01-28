@@ -3,6 +3,7 @@
   <div
     id="vueadmin-app"
     class="flex flex-col w-full max-h-full overflow-hidden bg-gray-200 dark:bg-slate-700"
+    :style="{ zoom: getZoom }"
   >
     <header class="sticky top-0 z-10">
       <TopMenu
@@ -53,8 +54,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, onBeforeMount, ref } from "vue";
-import { useRoute } from "vue-router";
 import { contentWidth, displayToolbar } from "../core/helpers/app";
+import { useRoute } from "vue-router";
 import AppBar from "./header/AppBar.vue";
 import LayoutService from "../core/services/LayoutService";
 import OffCanvas from "./offcanvas/OffCanvas.vue";
@@ -63,6 +64,8 @@ import RouterTabs from "./RouterTabs.vue";
 import SecondaryMenu from "./header/SecondaryMenu.vue";
 import Toast from "primevue/toast";
 import TopMenu from "./header/TopMenu.vue";
+import useAuthStore from "../store/auth";
+import useLayoutStore from "../store/layout";
 
 export default defineComponent({
   name: "VueAdmin",
@@ -77,8 +80,17 @@ export default defineComponent({
   },
   setup() {
     const activeTab = ref(0);
+    const authStore = useAuthStore();
     const currentRoute = useRoute();
     const showCanvas = ref(false);
+
+    /**
+     * Get Zoom
+     * @returns {float}
+     */
+    const getZoom = computed(() => {
+      return useLayoutStore().getZoom;
+    });
 
     /**
      * Switch the active tab
@@ -105,6 +117,7 @@ export default defineComponent({
       activeTab,
       contentWidth,
       displayToolbar,
+      getZoom,
       showCanvas,
       switchTab,
       viewKey,

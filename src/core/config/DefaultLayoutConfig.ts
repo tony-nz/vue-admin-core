@@ -1,6 +1,7 @@
 import { DefaultLayout } from "../types/LayoutTypes";
 
 const config: DefaultLayout = {
+  zoom: 1,
   theme: {
     name: "VueAdminDefault",
     version: "1.0.0",

@@ -100,6 +100,16 @@ const useLayoutStore = defineStore("LayoutStore", {
         );
       }
     },
+    zoomIn(): void {
+      if (this.config.layout.zoom) {
+        this.config.layout.zoom = this.config.layout.zoom + 0.1;
+      }
+    },
+    zoomOut(): void {
+      if (this.config.layout.zoom) {
+        this.config.layout.zoom = this.config.layout.zoom - 0.1;
+      }
+    },
   },
   getters: {
     /**
@@ -134,12 +144,15 @@ const useLayoutStore = defineStore("LayoutStore", {
       this.config.layout = Object.assign({}, this.config.initial);
     },
     overrideLayoutConfig(): void {
-      // TODO bugged, causes pinia to free
-      // this.config.layout = this.config.initial = Object.assign(
-      //   {},
-      //   this.config.initial,
-      //   JSON.parse(window.localStorage.getItem("layoutConfig") || "{}")
-      // );
+      const storedConfig = JSON.parse(
+        window.localStorage.getItem("layoutConfig") || "{}"
+      );
+      // Preserve reactivity
+      Object.keys(storedConfig).forEach((key) => {
+        if (this.config.layout.hasOwnProperty(key)) {
+          this.config.layout[key] = storedConfig[key];
+        }
+      });
     },
     getDarkMode(): boolean {
       return this.config.layout.theme?.darkMode
@@ -162,6 +175,9 @@ const useLayoutStore = defineStore("LayoutStore", {
     },
     getUserMenu(): UserMenu {
       return this.config.menu.user;
+    },
+    getZoom(): number {
+      return this.config.layout.zoom || 1;
     },
   },
 });
