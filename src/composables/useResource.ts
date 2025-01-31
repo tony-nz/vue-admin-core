@@ -59,6 +59,7 @@ export default function useResource(
    */
   const onPage = (event) => {
     if (resource?.lazy) {
+      console.log("onPage", event);
       lazyParams.value = event;
       getResourceData();
     }
@@ -70,6 +71,7 @@ export default function useResource(
    */
   const onSort = (event) => {
     if (resource?.lazy) {
+      console.log("onSort", event);
       lazyParams.value = event;
       getResourceData();
     }
@@ -123,11 +125,8 @@ export default function useResource(
           resourceName,
           payload,
         });
-        // If you need to handle the response, you can do so here
       } catch (e) {
-        // Handle error appropriately
         console.error("Error creating resource:", e);
-        throw e; // Re-throw the error to maintain the promise chain's error state
       }
     }
   }
@@ -144,8 +143,10 @@ export default function useResource(
        * Check for resource.lazy
        */
       if (resource.lazy) {
-        lazyParams.value.filters = filters.value;
-        // lazyParams.value.filters = cleanFilters(filters.value);
+        console.log("lazyParams", lazyParams.value);
+
+        // lazyParams.value.filters = filters.value;
+        lazyParams.value.filters = cleanFilters(filters.value);
         if (!lazyParams.value.sortField) {
           lazyParams.value.sortField = props.sortField || "id";
         }
@@ -156,12 +157,14 @@ export default function useResource(
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
         };
+        console.log("params1", params);
 
         if (addSearchableColumns()) {
           params["searchable_columns"] = JSON.stringify(
             searchableColumns.value
           );
         }
+        console.log("params2", params);
 
         try {
           const response = await resourceStore.getList({
@@ -223,7 +226,6 @@ export default function useResource(
         });
       } catch (e) {
         console.error("Error removing resource:", e);
-        throw e;
       }
     }
   }
@@ -249,7 +251,6 @@ export default function useResource(
         });
       } catch (e) {
         console.error("Error updating resource:", e);
-        throw e;
       }
     }
   }
