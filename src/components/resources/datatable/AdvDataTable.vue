@@ -284,9 +284,9 @@ export default defineComponent({
      * Lazy load resource data
      */
     const lazyLoad = () => {
-      lazyParams.value = JSON.parse(
-        sessionStorage.getItem(stateKey.value as string) as string
-      );
+      // lazyParams.value = JSON.parse(
+      //   sessionStorage.getItem(stateKey.value as string) as string
+      // );
       if (!lazyParams.value) {
         lazyParams.value = {
           first: 0,
