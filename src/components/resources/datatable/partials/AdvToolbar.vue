@@ -103,7 +103,10 @@
         />
       </div>
     </div>
-    <div v-if="showSearch" class="flex w-full justify-end p-1.5">
+    <div
+      v-if="showSearch || filters['global'].value"
+      class="flex w-full justify-end p-1.5"
+    >
       <span class="flex w-full relative">
         <i
           class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 dark:text-surface-600"

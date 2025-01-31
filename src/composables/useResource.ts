@@ -59,7 +59,6 @@ export default function useResource(
    */
   const onPage = (event) => {
     if (resource?.lazy) {
-      console.log("onPage", event);
       lazyParams.value = event;
       getResourceData();
     }
@@ -71,7 +70,6 @@ export default function useResource(
    */
   const onSort = (event) => {
     if (resource?.lazy) {
-      console.log("onSort", event);
       lazyParams.value = event;
       getResourceData();
     }
@@ -142,14 +140,22 @@ export default function useResource(
        * Check for resource.lazy
        */
       if (resource.lazy) {
-        // lazyParams.value.filters = filters.value;
+        // remove filter items if they are empty
         lazyParams.value.filters = cleanFilters(filters.value);
+        // if filters is empty, remove filters
+        if (Object.keys(lazyParams.value.filters).length === 0) {
+          delete lazyParams.value.filters;
+        }
+        // sortField
         if (!lazyParams.value.sortField) {
           lazyParams.value.sortField = props.sortField || "id";
         }
+        // sortOrder
         if (![-1, 1].includes(lazyParams.value.sortOrder)) {
           lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
         }
+        // rows
+        lazyParams.value.rows = resource.datatable?.rows || 10;
         const params = {
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),

@@ -293,6 +293,7 @@ export default defineComponent({
           filters: filters.value,
           rows: dtOptions.rows || 10,
         };
+        console.log("!lazyParams.value", lazyParams.value);
       }
       lazyParams.value.page = Math.fround(
         parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows || 10)
