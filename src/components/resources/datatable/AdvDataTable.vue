@@ -232,7 +232,7 @@ export default defineComponent({
      */
     const dtOptions = {
       paginator: true,
-      rows: 10,
+      rows: props.resource?.datatable?.rows || 10,
       rowsPerPageOptions: [10, 25, 50, 100],
       paginatorTemplate:
         "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
@@ -284,9 +284,9 @@ export default defineComponent({
      * Lazy load resource data
      */
     const lazyLoad = () => {
-      // lazyParams.value = JSON.parse(
-      //   sessionStorage.getItem(stateKey.value as string) as string
-      // );
+      lazyParams.value = JSON.parse(
+        sessionStorage.getItem(stateKey.value as string) as string
+      );
       if (!lazyParams.value) {
         lazyParams.value = {
           first: 0,
@@ -294,12 +294,9 @@ export default defineComponent({
           rows: dtOptions.rows || 10,
         };
       }
-      console.log("DT - lazyParams1", lazyParams.value);
       lazyParams.value.page = Math.fround(
         parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows || 10)
       );
-      console.log("DT - lazyParams2", lazyParams.value);
-      console.log("DT - filters", filters.value);
     };
 
     /**
@@ -334,9 +331,6 @@ export default defineComponent({
       }
       // Fetch resource data after all conditions are checked
       getResourceData();
-
-      console.log("DT - onMounted props filters", props.filters);
-      console.log("DT - onMounted props resource", props.resource);
     });
 
     /**

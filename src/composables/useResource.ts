@@ -96,7 +96,6 @@ export default function useResource(
         });
       } catch (e) {
         console.error("Error bulk removing resources:", e);
-        throw e;
       }
     }
   }
@@ -143,8 +142,6 @@ export default function useResource(
        * Check for resource.lazy
        */
       if (resource.lazy) {
-        console.log("lazyParams", lazyParams.value);
-
         // lazyParams.value.filters = filters.value;
         lazyParams.value.filters = cleanFilters(filters.value);
         if (!lazyParams.value.sortField) {
@@ -157,14 +154,12 @@ export default function useResource(
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
         };
-        console.log("params1", params);
 
         if (addSearchableColumns()) {
           params["searchable_columns"] = JSON.stringify(
             searchableColumns.value
           );
         }
-        console.log("params2", params);
 
         try {
           const response = await resourceStore.getList({
@@ -280,47 +275,77 @@ export default function useResource(
     const cleanedFilters: { [key: string]: Filter } = {};
 
     for (const [key, filter] of Object.entries(filters)) {
-      // Check if value exists
+      let includeFilter = false;
       if (
         "value" in filter &&
         filter.value !== null &&
         filter.value !== undefined
       ) {
-        if (Array.isArray(filter.constraints)) {
-          // Clean constraints array
-          const cleanedConstraints = (
-            filter.constraints as Constraint[]
-          ).filter(
-            (constraint) =>
-              constraint.value !== null && constraint.value !== undefined
-          );
-
-          if (cleanedConstraints.length > 0 || filter.operator) {
-            cleanedFilters[key] = {
-              ...filter,
-              constraints: cleanedConstraints,
-            };
-          }
-        } else {
-          cleanedFilters[key] = filter;
-        }
+        includeFilter = true;
       } else if (Array.isArray(filter.constraints)) {
-        // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
         const cleanedConstraints = (filter.constraints as Constraint[]).filter(
           (constraint) =>
             constraint.value !== null && constraint.value !== undefined
         );
-        if (cleanedConstraints.length > 0 || filter.operator) {
-          cleanedFilters[key] = {
-            ...filter,
-            constraints: cleanedConstraints,
-          };
+        if (cleanedConstraints.length > 0) {
+          includeFilter = true;
+          cleanedFilters[key] = { ...filter, constraints: cleanedConstraints };
         }
+      }
+      if (includeFilter) {
+        cleanedFilters[key] = cleanedFilters[key] || filter;
       }
     }
 
     return cleanedFilters;
   }
+  // function cleanFilters(filters: { [key: string]: Filter }): {
+  //   [key: string]: Filter;
+  // } {
+  //   const cleanedFilters: { [key: string]: Filter } = {};
+
+  //   for (const [key, filter] of Object.entries(filters)) {
+  //     // Check if value exists
+  //     if (
+  //       "value" in filter &&
+  //       filter.value !== null &&
+  //       filter.value !== undefined
+  //     ) {
+  //       if (Array.isArray(filter.constraints)) {
+  //         // Clean constraints array
+  //         const cleanedConstraints = (
+  //           filter.constraints as Constraint[]
+  //         ).filter(
+  //           (constraint) =>
+  //             constraint.value !== null && constraint.value !== undefined
+  //         );
+
+  //         if (cleanedConstraints.length > 0 || filter.operator) {
+  //           cleanedFilters[key] = {
+  //             ...filter,
+  //             constraints: cleanedConstraints,
+  //           };
+  //         }
+  //       } else {
+  //         cleanedFilters[key] = filter;
+  //       }
+  //     } else if (Array.isArray(filter.constraints)) {
+  //       // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
+  //       const cleanedConstraints = (filter.constraints as Constraint[]).filter(
+  //         (constraint) =>
+  //           constraint.value !== null && constraint.value !== undefined
+  //       );
+  //       if (cleanedConstraints.length > 0 || filter.operator) {
+  //         cleanedFilters[key] = {
+  //           ...filter,
+  //           constraints: cleanedConstraints,
+  //         };
+  //       }
+  //     }
+  //   }
+
+  //   return cleanedFilters;
+  // }
 
   /**
    * Get resource fields
