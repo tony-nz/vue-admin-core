@@ -32,17 +32,6 @@ interface IState {
 }
 
 // Helper for URL manipulation
-// function getApiUrl(apiUrl: string, action: string, params: any): string {
-//   console.log("getApiUrl", apiUrl, action, params);
-//   const replaceUrlId = (url: string, id: any) => url.replace(":id", id ?? "");
-//   const id = params?.routeId ?? params?.subId ?? null;
-//   apiUrl = replaceUrlId(apiUrl, id);
-
-//   if (action.toLowerCase() === "getone") {
-//     return `${apiUrl}/${params.id ?? ""}`;
-//   }
-//   return apiUrl;
-// }
 function getApiUrl(
   apiUrl: string,
   action: string,
