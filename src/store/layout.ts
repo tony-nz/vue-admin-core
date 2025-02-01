@@ -101,11 +101,15 @@ const useLayoutStore = defineStore("LayoutStore", {
       }
     },
     zoomIn(): void {
+      console.log("zoomIn");
+      console.log(this.config);
       if (this.config.layout.zoom) {
         this.config.layout.zoom = this.config.layout.zoom + 0.1;
       }
     },
     zoomOut(): void {
+      console.log("zoomOut");
+      console.log(this.config);
       if (this.config.layout.zoom) {
         this.config.layout.zoom = this.config.layout.zoom - 0.1;
       }

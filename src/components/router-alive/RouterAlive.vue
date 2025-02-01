@@ -25,6 +25,7 @@ import {
   watch,
 } from "vue";
 import { useRoute } from "vue-router";
+import { useTabsStore } from "../../store/tabs";
 
 /**
  * Transition effect
@@ -201,6 +202,33 @@ export default defineComponent({
       { immediate: true }
     );
 
+    const tabsStore = useTabsStore();
+
+    watch(
+      () => structuredClone(tabsStore.getTabs),
+      (newTabs, oldTabs) => {
+        if (!oldTabs) return;
+        // Detect removed tabs
+        const removedTabs = oldTabs.filter(
+          (oldTab) => !newTabs.some((newTab) => newTab.path === oldTab.path)
+        );
+        // Remove cache for removed tabs
+        removedTabs.forEach((tab) => {
+          removeCache(tab.path);
+        });
+      },
+      { deep: true }
+    );
+
+    /**
+     * Remove cache for a specific route by its key
+     * @param {string} key - The cache key to remove
+     */
+    function removeCache(key: string) {
+      cache.remove(key);
+      componentMap.delete(key);
+    }
+
     /** Component collection */
     const componentMap: Map<string, ComponentInternalInstance> = new Map();
 
@@ -240,6 +268,9 @@ export default defineComponent({
 
       /** Page transition effect */
       pageTransition: computed(() => resolveTransition(props.transition)),
+
+      /** Remove cache */
+      removeCache,
     };
   },
 });

@@ -82,15 +82,14 @@ export default defineComponent({
     const activeTab = ref(0);
     const authStore = useAuthStore();
     const currentRoute = useRoute();
+    const layoutStore = useLayoutStore();
     const showCanvas = ref(false);
 
     /**
      * Get Zoom
      * @returns {float}
      */
-    const getZoom = computed(() => {
-      return useLayoutStore().getZoom;
-    });
+    const getZoom = computed(() => layoutStore.getZoom);
 
     /**
      * Switch the active tab

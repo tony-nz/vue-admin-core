@@ -214,6 +214,7 @@ export default defineComponent({
     const focusedIndex = ref(0);
     const appStore = useAppStore();
     const authStore = useAuthStore();
+    const layoutStore = useLayoutStore();
     const userMenuConfig = useLayoutStore().getUserMenu;
 
     /**
@@ -327,7 +328,7 @@ export default defineComponent({
      * @returns void
      */
     const zoomIn = () => {
-      useLayoutStore().zoomIn();
+      layoutStore.zoomIn();
     };
 
     /**
@@ -335,7 +336,7 @@ export default defineComponent({
      * @returns void
      */
     const zoomOut = () => {
-      useLayoutStore().zoomOut();
+      layoutStore.zoomOut();
     };
 
     onMounted(async () => {
