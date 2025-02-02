@@ -26,7 +26,10 @@
     </template>
     <template v-if="resource.show.page && showDefaults && canAction('update')">
       <router-link
-        :to="{ name: resource.label + 'Show', params: { id: data.id } }"
+        :to="{
+          name: upperCaseFirst(resource.name) + 'Show',
+          params: { id: data.id },
+        }"
         v-tooltip="'Open ' + resource.singularName.toLowerCase()"
       >
         <button :class="btnClass">
@@ -74,6 +77,7 @@
 
 <script>
 import { defineComponent, computed } from "vue";
+import { upperCaseFirst } from "../../../../core/helpers/functions";
 import ActionBtn from "../../../ui/button/ActionBtn.vue";
 
 export default defineComponent({
@@ -137,6 +141,7 @@ export default defineComponent({
       canAction,
       getData,
       getGridColLength,
+      upperCaseFirst,
     };
   },
 });

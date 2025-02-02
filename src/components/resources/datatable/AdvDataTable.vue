@@ -28,7 +28,16 @@
         :selectedResources="selectedResources"
         :toolbar="toolbar"
       >
+        <template #header_left>
+          <slot name="header_left" />
+        </template>
+        <template #header_icon>
+          <slot name="header_icon" />
+        </template>
         <slot name="header" />
+        <template #header_right>
+          <slot name="header_right" />
+        </template>
       </AdvToolbar>
     </template>
     <Column

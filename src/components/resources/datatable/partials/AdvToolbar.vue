@@ -1,11 +1,19 @@
 <template>
+  <slot name="header_left" />
   <div class="flex flex-col w-full bg-gray-300">
     <div class="flex flex-row w-full p-2 bg-primary-600">
+      <slot name="header_icon" />
       <div class="px-2 py-1 w-full">
         <h3
           class="text-lg leading-6 font-medium text-gray-900 dark:text-white transition ease-in-out duration-200 text-white"
         >
-          {{ toolbar?.title ? toolbar.title : resource.label }}
+          {{
+            toolbar?.title
+              ? toolbar.title
+              : typeof resource.label === "function"
+              ? resource.label({}, "list")
+              : resource.label || resource.singularName
+          }}
         </h3>
         <p
           class="mt-1 text-sm text-gray-500 dark:text-gray-600 transition ease-in-out duration-200 text-white text-opacity-60 dark:text-white"
@@ -13,7 +21,11 @@
           {{
             toolbar?.description
               ? toolbar.description
-              : `List of ${resource.label.toLowerCase()}`
+              : typeof resource.label === "function"
+              ? resource.label({}, "list").toLowerCase()
+              : `List of ${
+                  resource.label?.toLowerCase() || resource.singularName
+                }`
           }}
         </p>
       </div>
@@ -30,7 +42,12 @@
           "
           @click="showDeletePopup({ $event, selectedResources })"
           :disabled="selectedResources?.length === 0 || !selectedResources"
-          :label="translate('va.actions.bulkDelete') + ' ' + resource.label"
+          :label="
+            typeof resource.label === 'function'
+              ? resource.label({}, 'bulkDelete')
+              : translate('va.actions.bulkDelete') + ' ' + resource.label ||
+                resource.singularName
+          "
           class="whitespace-nowrap overflow-visible"
           icon="pi pi-delete"
           severity="danger"
@@ -44,9 +61,10 @@
           "
           @click="resource.create(formData)"
           :label="
-            translate('va.actions.create') +
-            ' ' +
-            (resource.label ? resource.label : resource.singularName)
+            typeof resource.label === 'function'
+              ? resource.label({}, 'create')
+              : translate('va.actions.create') + ' ' + resource.label ||
+                resource.singularName
           "
           class="whitespace-nowrap overflow-visible"
           icon="pi pi-plus"
@@ -60,9 +78,10 @@
           "
           @click="showCreateEdit('dialog', 'create', formData)"
           :label="
-            translate('va.actions.create') +
-            ' ' +
-            (resource.label ? resource.label : resource.singularName)
+            typeof resource.label === 'function'
+              ? resource.label({}, 'create')
+              : translate('va.actions.create') + ' ' + resource.label ||
+                resource.singularName
           "
           class="whitespace-nowrap overflow-visible"
           icon="pi pi-plus"
@@ -78,9 +97,10 @@
         >
           <Button
             :label="
-              translate('va.actions.create') +
-              ' ' +
-              (resource.singularName ? resource.singularName : resource.label)
+              typeof resource.label === 'function'
+                ? resource.label({}, 'create')
+                : translate('va.actions.create') + ' ' + resource.label ||
+                  resource.singularName
             "
             class="whitespace-nowrap overflow-visible"
             icon="pi pi-plus"
@@ -138,6 +158,7 @@
       </span>
     </div>
   </div>
+  <slot name="header_right" />
 </template>
 
 <script lang="ts">

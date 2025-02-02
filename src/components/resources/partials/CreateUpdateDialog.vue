@@ -170,7 +170,7 @@ export default defineComponent({
     const getTitle = () => {
       // check to see if props.resource.label is a function or string
       if (typeof props.resource.label === "function") {
-        return props.resource.label();
+        return props.resource.label({}, modalType.value);
       }
 
       return modalType.value == "create"
