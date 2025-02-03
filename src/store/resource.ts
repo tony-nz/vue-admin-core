@@ -45,7 +45,7 @@ function getApiUrl(
 
   // Loop through params to replace other dynamic parts of the URL
   for (const [key, value] of Object.entries(params)) {
-    if (value !== null) {
+    if (value !== null && value !== undefined) {
       // Check if value is not null
       apiUrl = apiUrl.replace(new RegExp(`:${key}(?=/|$)`), value.toString()); // Use regex to ensure full match
     }
@@ -221,7 +221,18 @@ async function handleApiCall(
         getApiUrl(apiUrl, action, params, routeId),
         params.id ? params.id : null,
         params
-      );
+      )
+        .then((res) => {
+          return res;
+        })
+        .catch((err) => {
+          appStore.showToast({
+            severity: "error",
+            summary: "Error",
+            message: err.response?.data?.message || "An error occurred",
+          });
+          return err;
+        });
     } else {
       // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
       const apiParams = action === GET_ONE ? {} : params;
