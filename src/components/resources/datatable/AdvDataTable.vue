@@ -369,6 +369,17 @@ export default defineComponent({
       { deep: true, immediate: true }
     );
 
+    /**
+     * Watch for changes in api url
+     */
+    watch(
+      () => props.apiUrl,
+      (newApiUrl) => {
+        apiUrl.value = newApiUrl;
+      },
+      { deep: true }
+    );
+
     return {
       canAction,
       clearSearch,
