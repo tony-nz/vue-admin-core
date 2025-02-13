@@ -226,16 +226,6 @@ export default defineComponent({
     });
 
     /**
-     * Filters
-     * @type {Ref<Record<string, { value: any; matchMode: FilterMatchMode }>>}
-     */
-    const filters = ref({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      ...props.resource.datatable?.filters,
-      ...props.filters,
-    });
-
-    /**
      * Datatable options
      * @type {Ref<Options>}
      */
@@ -255,6 +245,7 @@ export default defineComponent({
      */
     const {
       apiUrl,
+      filters,
       formData,
       getResourceData,
       getResourceFields,
@@ -270,7 +261,7 @@ export default defineComponent({
       showDeletePopup,
       showModal,
       totalRecords,
-    } = useResource(props.resource, filters, props);
+    } = useResource(props.resource, props);
     const { canAction } = props.resource;
 
     /**
@@ -338,6 +329,12 @@ export default defineComponent({
       if (props.resource.lazy) {
         lazyLoad();
       }
+      // Set filters
+      filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        ...props.resource.datatable?.filters,
+        ...props.filters,
+      };
       // Fetch resource data after all conditions are checked
       getResourceData();
     });

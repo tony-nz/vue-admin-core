@@ -103,22 +103,9 @@ export default defineComponent({
     const vueForm: any = ref();
 
     /**
-     * Filters
-     * @type {Ref<Record<string, { value: any; matchMode: FilterMatchMode }>>}
-     */
-    const filters = ref({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      ...props.resource.datatable?.filters,
-    });
-
-    /**
      * Use resource
      */
-    const { create, update, routeId } = useResource(
-      props.resource,
-      filters.value,
-      props
-    );
+    const { create, update, routeId } = useResource(props.resource, props);
 
     /**
      * Get Form props

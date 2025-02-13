@@ -6,14 +6,10 @@ import { useRoute } from "vue-router";
 import ResourceType from "../core/types/ResourceConfigTypes";
 import useResourceStore from "../store/resource";
 
-export default function useResource(
-  resource: ResourceType,
-  dtFilters: Ref<any>,
-  dtProps: any
-) {
+export default function useResource(resource: ResourceType, dtProps: any) {
   const apiUrl = ref();
   const confirmDelete = useConfirm();
-  const filters = ref(dtFilters);
+  const filters = ref();
   const formData = ref();
   const isLoading = ref(true);
   const lazyParams: Ref<any> = ref({});
@@ -427,6 +423,7 @@ export default function useResource(
     apiUrl,
     bulkRemove,
     create,
+    filters,
     formData,
     getResourceData,
     getResourceFields,

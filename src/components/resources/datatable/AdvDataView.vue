@@ -459,7 +459,7 @@ export default defineComponent({
       showModal,
       totalRecords,
       update,
-    } = useResource(props.resource, filters, props);
+    } = useResource(props.resource, props);
 
     const onLocalRowExpand = (event) => {
       const resource = resourceData.value.find(
