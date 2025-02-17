@@ -171,24 +171,24 @@ async function handleApiCall(
   const resource = this.resources[resourceName];
   const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
 
-  // Check if we should use cached data
-  if (loadingActions.includes(action) && resource.resource.cache === true) {
-    if (
-      resource.lastUpdated &&
-      Date.now() - resource.lastUpdated < cacheValidity &&
-      resource.data.list.length > 0
-    ) {
-      if (action === GET_ONE) {
-        return resource.data.item;
-      } else {
-        return resource.data.list;
-      }
-    }
-  }
   // carry on with the API call
   try {
+    // Check if we should use cached data
+    if (loadingActions.includes(action) && resource.resource.cache === true) {
+      if (
+        resource.lastUpdated &&
+        Date.now() - resource.lastUpdated < cacheValidity &&
+        resource.data.list.length > 0
+      ) {
+        if (action === GET_ONE) {
+          return resource.data?.item;
+        } else {
+          return resource.data?.list;
+        }
+      }
+    }
     let params = payload?.params || {};
-    if (action === UPDATE && !params.id) params.id = resource.data.item.id;
+    if (action === UPDATE && !params.id) params.id = resource.data?.item.id;
 
     const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
     const routeId = payload?.routeId || null;
@@ -221,18 +221,7 @@ async function handleApiCall(
         getApiUrl(apiUrl, action, params, routeId),
         params.id ? params.id : null,
         params
-      )
-        .then((res) => {
-          return res;
-        })
-        .catch((err) => {
-          appStore.showToast({
-            severity: "error",
-            summary: "Error",
-            message: err.response?.data?.message || "An error occurred",
-          });
-          return err;
-        });
+      );
     } else {
       // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
       const apiParams = action === GET_ONE ? {} : params;
