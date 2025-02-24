@@ -75,7 +75,7 @@
 
 <script>
 import { defineElement } from "@vueform/vueform";
-import { ref } from "vue";
+import { ref, toRefs, watch } from "vue";
 
 export default defineElement({
   name: "MarkerSettingElement",
@@ -85,6 +85,7 @@ export default defineElement({
     title: { type: String, default: null },
   },
   setup(props, { element }) {
+    const { size } = toRefs(props);
     const { value } = element;
     const colorInput = ref(null);
 
@@ -97,11 +98,21 @@ export default defineElement({
       }
     };
 
+    watch(
+      () => size,
+      (size) => {
+        // console.log(element);
+        // console.log(size);
+      },
+      { deep: true }
+    );
+
     return {
       ...element,
       ...props,
       colorInput,
       openColorPicker,
+      size,
       value,
     };
   },
