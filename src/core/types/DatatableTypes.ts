@@ -15,6 +15,7 @@ interface ToolbarOptions {
   title?: string;
   description?: string;
   buttons?: {
+    export?: boolean;
     refresh?: boolean;
     create?: boolean;
     bulkDelete?: boolean;

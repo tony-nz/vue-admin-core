@@ -121,6 +121,13 @@
           icon="pi pi-refresh"
           severity="info"
         />
+        <Button
+          v-if="toolbar?.buttons?.export"
+          @click="exportCSV"
+          class="px-4"
+          icon="pi pi-download"
+          severity="info"
+        />
       </div>
     </div>
     <div
@@ -213,6 +220,13 @@ export default defineComponent({
     };
 
     /**
+     * Export CSV
+     */
+    const exportCSV = () => {
+      emit("export");
+    };
+
+    /**
      * Refresh resource data
      * @description Emit refresh event
      */
@@ -249,6 +263,7 @@ export default defineComponent({
       canAction,
       clearSearch,
       debounce,
+      exportCSV,
       refreshData,
       showCreateEdit,
       showDeletePopup,

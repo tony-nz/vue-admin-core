@@ -12,10 +12,12 @@
     :totalRecords="totalRecords"
     :value="resourceData"
     :state-key="stateKey"
+    ref="dtRef"
     state-storage="session"
   >
     <template v-if="toolbar?.visible" #header>
       <AdvToolbar
+        @export="exportCSV"
         @clearSearch="clearSearch"
         @refresh="getResourceData"
         @createEdit="showCreateEdit"
@@ -245,6 +247,7 @@ export default defineComponent({
      */
     const {
       apiUrl,
+      dtRef,
       filters,
       formData,
       getResourceData,
@@ -278,6 +281,14 @@ export default defineComponent({
      */
     const emitLiveData = (data: any) => {
       emit("liveData", data);
+    };
+
+    /**
+     * Export CSV
+     * @returns {void}
+     */
+    const exportCSV = () => {
+      dtRef.value.exportCSV();
     };
 
     /**
@@ -382,8 +393,10 @@ export default defineComponent({
       clearSearch,
       debounce,
       dtOptions,
+      dtRef,
       emitLiveData,
       expandedRows,
+      exportCSV,
       filters,
       getResourceData,
       getResourceFields,

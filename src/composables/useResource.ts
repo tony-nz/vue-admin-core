@@ -8,6 +8,7 @@ import useResourceStore from "../store/resource";
 
 export default function useResource(resource: ResourceType, dtProps: any) {
   const apiUrl = ref();
+  const dtRef = ref();
   const confirmDelete = useConfirm();
   const filters = ref();
   const formData = ref();
@@ -423,6 +424,7 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     apiUrl,
     bulkRemove,
     create,
+    dtRef,
     filters,
     formData,
     getResourceData,
