@@ -11,6 +11,7 @@
     :loading="options?.loading ? isLoading : false"
     :totalRecords="totalRecords"
     :value="resourceData"
+    :rows="rows"
     :state-key="stateKey"
     ref="dtRef"
     state-storage="session"
@@ -228,21 +229,6 @@ export default defineComponent({
     });
 
     /**
-     * Datatable options
-     * @type {Ref<Options>}
-     */
-    const dtOptions = {
-      paginator: true,
-      rows: props.resource?.datatable?.rows || 10,
-      rowsPerPageOptions: [10, 25, 50, 100],
-      paginatorTemplate:
-        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
-      currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
-      first: 0,
-      ...attrs,
-    };
-
-    /**
      * Resource data
      */
     const {
@@ -264,8 +250,24 @@ export default defineComponent({
       showDeletePopup,
       showModal,
       totalRecords,
+      rows,
     } = useResource(props.resource, props);
     const { canAction } = props.resource;
+
+    /**
+     * Datatable options
+     * @type {Ref<Options>}
+     */
+    const dtOptions = {
+      paginator: true,
+      rows: rows.value,
+      rowsPerPageOptions: [10, 25, 50, 100],
+      paginatorTemplate:
+        "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
+      currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
+      first: 0,
+      ...attrs,
+    };
 
     /**
      * Clear search
@@ -302,11 +304,11 @@ export default defineComponent({
         lazyParams.value = {
           first: 0,
           filters: filters.value,
-          rows: dtOptions.rows || 10,
+          rows: dtOptions.rows,
         };
       }
       lazyParams.value.page = Math.fround(
-        parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows || 10)
+        parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows)
       );
     };
 
@@ -408,6 +410,7 @@ export default defineComponent({
       onPage,
       onSort,
       resourceData,
+      rows,
       selectedResources,
       showCreateEdit,
       showDeletePopup,

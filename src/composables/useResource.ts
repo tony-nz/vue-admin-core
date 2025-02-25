@@ -20,6 +20,7 @@ export default function useResource(resource: ResourceType, dtProps: any) {
   const resourceStore = useResourceStore();
   const route = useRoute();
   const routeId = ref(route?.params?.id);
+  const rows = ref(dtProps.datatable?.rows ?? 25);
   const showModal = ref(false);
   const totalRecords = ref(0);
 
@@ -55,8 +56,10 @@ export default function useResource(resource: ResourceType, dtProps: any) {
    * @param event
    */
   const onPage = (event) => {
+    console.log("onPage event:", event);
     if (resource?.lazy) {
       lazyParams.value = event;
+      rows.value = event.rows;
       getResourceData();
     }
   };
@@ -152,7 +155,14 @@ export default function useResource(resource: ResourceType, dtProps: any) {
           lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
         }
         // rows
-        lazyParams.value.rows = resource.datatable?.rows || 10;
+        if (
+          !lazyParams.value.rows ||
+          typeof lazyParams.value.rows !== "number"
+        ) {
+          lazyParams.value.rows = rows.value || 25; // Fallback to 25 if invalid
+        }
+        console.log("lazyParams before API call:", lazyParams.value);
+
         const params = {
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
@@ -440,6 +450,7 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     resource,
     route,
     routeId,
+    rows,
     searchableColumns,
     showCreateEdit,
     showDeletePopup,
