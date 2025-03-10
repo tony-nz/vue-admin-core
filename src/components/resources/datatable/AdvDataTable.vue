@@ -254,11 +254,8 @@ export default defineComponent({
     } = useResource(props.resource, props);
     const { canAction } = props.resource;
 
-    /**
-     * Datatable options
-     * @type {Ref<Options>}
-     */
-    const dtOptions = {
+    // Base default options for DataTable
+    const baseDtOptions = {
       paginator: true,
       rows: rows.value,
       rowsPerPageOptions: [10, 25, 50, 100],
@@ -266,8 +263,20 @@ export default defineComponent({
         "RowsPerPageDropdown CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink",
       currentPageReportTemplate: "Showing {first} to {last} of {totalRecords}",
       first: 0,
-      ...attrs,
     };
+
+    /**
+     * Datatable options
+     * @type {Ref<Options>}
+     */
+    const dtOptions = computed(() => {
+      return {
+        ...baseDtOptions,
+        ...props,
+        ...attrs,
+        rows: rows.value,
+      };
+    });
 
     /**
      * Clear search
@@ -304,7 +313,7 @@ export default defineComponent({
         lazyParams.value = {
           first: 0,
           filters: filters.value,
-          rows: dtOptions.rows,
+          rows: dtOptions.value.rows,
         };
       }
       lazyParams.value.page = Math.fround(
