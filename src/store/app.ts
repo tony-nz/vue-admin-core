@@ -41,16 +41,30 @@ const useAppStore = defineStore("AppStore", {
      * @param payload
      */
     addLog(payload) {
-      if (payload.log === "error") {
+      const maxLogs = 100; // Limit logs to 100 entries
+      if (
+        payload.log === "error" &&
+        this.notifications.error.length < maxLogs
+      ) {
         this.notifications.error.push(payload.message);
-      } else if (payload.log === "warning") {
+      } else if (
+        payload.log === "warning" &&
+        this.notifications.warning.length < maxLogs
+      ) {
         this.notifications.warning.push(payload.message);
-      } else if (payload.log === "api") {
+      } else if (
+        payload.log === "api" &&
+        this.notifications.api.length < maxLogs
+      ) {
         this.notifications.api.push(payload.message);
-      } else if (payload.log === "success") {
+      } else if (
+        payload.log === "success" &&
+        this.notifications.success.length < maxLogs
+      ) {
         this.notifications.success.push(payload.message);
       }
     },
+
     /**
      * Clear log
      * @param log
@@ -66,9 +80,10 @@ const useAppStore = defineStore("AppStore", {
         this.notifications.success.splice(0);
       }
     },
+
     /**
      * Find resource
-     * @param payload
+     * @param resourceName
      * @returns any
      */
     findResource(resourceName: string): any[] {
@@ -77,7 +92,7 @@ const useAppStore = defineStore("AppStore", {
         for (const [key, value] of Object.entries(this.config.resources)) {
           const foundResource = value as { name: string } | any;
           if (foundResource?.name === resourceName) {
-            return foundResource;
+            return { ...foundResource }; // Return a shallow copy
           }
         }
       } catch (e) {
@@ -89,47 +104,48 @@ const useAppStore = defineStore("AppStore", {
       }
       return [];
     },
+
     /**
      * Set api loading state
      * @param loading
-     * @returns void
      */
     setApiLoading(loading: boolean) {
-      this.api.loading = loading;
-      if (!loading) {
-        this.api.refresh = false;
+      if (this.api.loading !== loading) {
+        this.api.loading = loading;
+        if (!loading) {
+          this.api.refresh = false;
+        }
       }
     },
+
     /**
      * Set api refresh state
      * @param refresh
      */
     setApiRefresh(refresh: boolean) {
-      this.api.refresh = refresh;
+      if (this.api.refresh !== refresh) {
+        this.api.refresh = refresh;
+      }
     },
+
     /**
      * Set config
      * @param payload
      */
     setConfig(payload) {
       if (payload) {
-        /**
-         * Initialize Resources Config
-         */
-        if (payload.resources) {
+        if (payload.resources && payload.resources !== this.config.resources) {
           this.config.resources = {
             ...this.config.resources,
             ...payload.resources,
           };
         }
-        /**
-         * Initialize Locale
-         */
-        if (payload.locale) {
+        if (payload.locale && payload.locale !== this.config.locale) {
           this.config.locale = payload.locale;
         }
       }
     },
+
     /**
      * Set errors
      * @param errors
@@ -137,14 +153,18 @@ const useAppStore = defineStore("AppStore", {
     setErrors(errors) {
       this.errors = errors;
     },
+
     /**
      * Set locale
      * @param locale
      */
     setLocale(locale) {
-      this.config.locale = locale;
-      i18n.global.locale = locale;
+      if (this.config.locale !== locale) {
+        this.config.locale = locale;
+        i18n.global.locale = locale;
+      }
     },
+
     /**
      * Show toast notification
      * @param payload
@@ -155,12 +175,13 @@ const useAppStore = defineStore("AppStore", {
           ? `<strong>${payload.summary}</strong>\n` + payload.message
           : payload.summary;
         const options = {
-          dangerouslyHTMLString: true, // "dangerous"
+          dangerouslyHTMLString: true,
           autoClose: 2500,
           type: toast.TYPE.INFO,
           hideProgressBar: false,
           position: toast.POSITION.TOP_RIGHT,
           theme: "colored",
+          toastId: payload.summary, // Unique identifier for the toast
         } as ToastOptions;
 
         switch (payload.severity) {
@@ -177,62 +198,84 @@ const useAppStore = defineStore("AppStore", {
             options.type = toast.TYPE.INFO;
             break;
         }
-        toast(message, options);
+
+        if (!toast.isActive(payload.summary)) {
+          toast(message, options);
+        }
       }
     },
+
     /**
      * Update resource
      * @param resource
      */
     updateResource(resource: ResourceConfig): void {
-      if (!this.config.resources) return;
+      if (
+        !this.config.resources ||
+        this.config.resources[resource.name] === resource
+      ) {
+        return;
+      }
       this.config.resources[resource.name] = resource;
     },
   },
   getters: {
     /**
      * Get api loading state
-     * @returns object
+     * @returns boolean
      */
     getApiLoading(): boolean {
       return this.api.loading;
     },
+
     /**
      * Get api refresh state
-     * @returns object
+     * @returns boolean
      */
     getApiRefresh(): boolean {
       return this.api.refresh;
     },
+
     /**
      * Get config from app config
      * @returns {function(path, defaultValue): *}
      */
     getConfig() {
+      const cache = new Map(); // Cache for config values
       return (path, defaultValue?) => {
-        return objectPath.get(this.config, path, defaultValue);
+        if (cache.has(path)) {
+          return cache.get(path);
+        }
+        const value = objectPath.get(this.config, path, defaultValue);
+        cache.set(path, value);
+        return value;
       };
     },
+
     /**
      * Get app version
+     * @returns string
      */
     getAppVersion(): string {
       return this.appVersion;
     },
+
     /**
-     * Get authentification errors
+     * Get authentication errors
      * @returns array
      */
     getErrors(): Array<string> {
       return this.errors;
     },
+
     /**
      * Return the app's locale
-     * @returns boolean
+     * @returns string
      */
     getLocale(): string {
       return this.config.locale;
     },
+
     /**
      * Get resources
      * @returns object

@@ -24,250 +24,64 @@ const {
 interface IState {
   data: {
     item: any;
-    list: any[];
+    list: any[] | { data: any[] };
   };
   loading: boolean;
   resource: ResourceConfig;
-  lastUpdated: number; // Timestamp in milliseconds
-}
-
-// Helper for URL manipulation
-function getApiUrl(
-  apiUrl: string,
-  action: string,
-  params: Record<string, string | number | null>,
-  routeId: string | null
-): string {
-  // Replace :id in the URL if routeId is provided
-  if (routeId) {
-    apiUrl = apiUrl.replace(":id", routeId);
-  }
-
-  // Loop through params to replace other dynamic parts of the URL
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== null && value !== undefined) {
-      // Check if value is not null
-      apiUrl = apiUrl.replace(new RegExp(`:${key}(?=/|$)`), value.toString()); // Use regex to ensure full match
-    }
-  }
-
-  // Handle GETONE action
-  if (action.toLowerCase() === "getone") {
-    // Append the id to the URL if it exists in params
-    const id = params.id ? params.id.toString() : "";
-    return `${apiUrl}/${id}`;
-  }
-
-  return apiUrl;
-}
-
-// Action to process data based on the given action type
-function processStoreData(
-  store: any,
-  resourceName: string,
-  action: string,
-  payload: any,
-  data: any
-) {
-  const params = payload?.params || {};
-  const state = store.resources[resourceName];
-
-  switch (action) {
-    case CREATE:
-      if (state.data.list.data) {
-        state.data.list.data.push(data);
-      } else {
-        state.data.list.push(data);
-      }
-      break;
-
-    case DELETE:
-      if (state.data.list.data) {
-        state.data.list.data = state.data.list.data.filter(
-          (item) => item.id !== params.id
-        );
-      } else {
-        state.data.list = state.data.list.filter(
-          (item) => item.id !== params.id
-        );
-      }
-      break;
-
-    case DELETE_MANY:
-      if (params.values) {
-        if (state.data.list.data) {
-          state.data.list.data = state.data.list.data.filter(
-            (item) => !params.values.includes(item.id)
-          );
-        } else {
-          state.data.list = state.data.list.filter(
-            (item) => !params.values.includes(item.id)
-          );
-        }
-      }
-      break;
-
-    case GET:
-    case GET_ONE:
-      store.setItem(resourceName, data);
-      break;
-
-    case GET_LIST:
-    case GET_TREE:
-      store.setList(resourceName, data);
-      break;
-
-    case UPDATE:
-      if (state.data.list.data) {
-        const itemIndex = state.data.list.data.findIndex(
-          (item) => item.id === params.id
-        );
-        if (itemIndex !== -1) {
-          state.data.list.data[itemIndex] = {
-            ...state.data.list.data[itemIndex],
-            ...data,
-          };
-          store.setItem(resourceName, data);
-        }
-      } else {
-        const itemIndex = state.data.list.findIndex(
-          (item) => item.id === params.id
-        );
-        if (itemIndex !== -1) {
-          state.data.list[itemIndex] = {
-            ...state.data.list[itemIndex],
-            ...data,
-          };
-          store.setItem(resourceName, data);
-        }
-      }
-      break;
-    default:
-      console.warn(`Unhandled action in processStoreData: ${action}`);
-  }
-}
-
-// Centralized error handling
-function handleError(
-  appStore: any,
-  resourceStore: any,
-  resource: IState,
-  error: any
-): Promise<any> {
-  const message = error.response?.data?.message || "An error occurred";
-  appStore.setApiLoading(false);
-  resourceStore.showError(resource, error.message, message);
-  return Promise.reject(error);
-}
-
-async function handleApiCall(
-  this: ReturnType<typeof useResourceStore>,
-  action: string,
-  resourceName: string,
-  payload: any
-) {
-  const appStore = useAppStore();
-  const cacheValidity = 1 * 60 * 1000; // 1 minute
-  const resource = this.resources[resourceName];
-  const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
-
-  // carry on with the API call
-  try {
-    // Check if we should use cached data
-    if (loadingActions.includes(action) && resource.resource.cache === true) {
-      if (
-        resource.lastUpdated &&
-        Date.now() - resource.lastUpdated < cacheValidity &&
-        resource.data.list.length > 0
-      ) {
-        if (action === GET_ONE) {
-          return resource.data?.item;
-        } else {
-          return resource.data?.list;
-        }
-      }
-    }
-    let params = payload?.params || {};
-    if (action === UPDATE && !params.id) params.id = resource.data?.item.id;
-
-    const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
-    const routeId = payload?.routeId || null;
-
-    const apiMethod = loadingActions.includes(action)
-      ? "get"
-      : action.toLowerCase();
-
-    if (loadingActions.includes(action)) {
-      appStore.setApiLoading(true);
-    }
-
-    // Adjusting the call based on the method
-    let response;
-    if (apiMethod === "delete") {
-      // For DELETE, pass only the id or null if no id
-      response = await ApiService.delete(
-        getApiUrl(apiUrl, action, params, routeId),
-        params.id ? params.id : null
-      );
-    } else if (apiMethod === "create") {
-      // For CREATE and UPDATE, pass the URL and params
-      response = await ApiService[apiMethod](
-        getApiUrl(apiUrl, action, params, routeId),
-        params
-      );
-    } else if (apiMethod === "update") {
-      // For CREATE and UPDATE, pass the URL and params
-      response = await ApiService[apiMethod](
-        getApiUrl(apiUrl, action, params, routeId),
-        params.id ? params.id : null,
-        params
-      );
-    } else {
-      // For GET, GET_LIST, GET_NODES, GET_ONE, GET_TREE
-      const apiParams = action === GET_ONE ? {} : params;
-      response = await ApiService.get(
-        getApiUrl(apiUrl, action, params, routeId),
-        apiParams
-      );
-    }
-    const data = response.data.data;
-
-    processStoreData(this, resourceName, action, payload, data);
-
-    if (loadingActions.includes(action)) {
-      resource.lastUpdated = Date.now();
-    }
-    appStore.setApiLoading(false);
-    this.showSuccess(resource, { action, params, data });
-
-    return data;
-  } catch (error) {
-    return handleError(appStore, this, resource, error);
-  }
+  lastUpdated: number;
+  cacheTimeout?: ReturnType<typeof setTimeout>;
 }
 
 const useResourceStore = defineStore("ResourceStore", {
   state: () => ({
-    resources: {} as { [key: string]: IState },
+    resources: {} as Record<string, IState>,
   }),
   actions: {
     addResource(resourceName: string, resourceConfig: ResourceConfig) {
       if (!this.resources[resourceName]) {
         this.resources[resourceName] = {
-          data: { item: {}, list: [] },
+          data: { item: null, list: [] },
           loading: false,
           resource: resourceConfig,
           lastUpdated: 0,
         };
       }
+      return resourceName;
+    },
+    removeResource(resourceName: string) {
+      if (this.resources[resourceName]) {
+        const resource = this.resources[resourceName];
+        if (resource.cacheTimeout) {
+          clearTimeout(resource.cacheTimeout);
+          resource.cacheTimeout = undefined;
+        }
+        resource.data.item = null;
+        resource.data.list = [];
+        resource.lastUpdated = 0;
+        // ApiService.clearCache(); // Uncomment if applicable
+        console.log(
+          `Cleared data for resource: ${resourceName}, configuration preserved`
+        );
+      }
     },
     setItem(resourceName: string, item: any) {
-      this.resources[resourceName].data.item = item;
+      if (this.resources[resourceName]) {
+        this.resources[resourceName].data.item = item;
+      }
     },
     setList(resourceName: string, data: any[]) {
-      this.resources[resourceName].data.list = data;
+      if (this.resources[resourceName]) {
+        const resource = this.resources[resourceName];
+        if (resource.cacheTimeout) clearTimeout(resource.cacheTimeout);
+        resource.data.list = data;
+        if (resource.resource.cache) {
+          resource.cacheTimeout = setTimeout(() => {
+            resource.data.list = [];
+            resource.data.item = null;
+          }, 5 * 60 * 1000);
+        }
+      }
     },
-    // CRUD and State Management Actions
     async create({
       resourceName,
       payload,
@@ -275,6 +89,9 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) {
+        this.addResource(resourceName, payload.resource || {});
+      }
       return await handleApiCall.call(this, CREATE, resourceName, payload);
     },
     async delete({
@@ -284,6 +101,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, DELETE, resourceName, payload);
     },
     async deleteMany({
@@ -293,6 +111,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, DELETE_MANY, resourceName, payload);
     },
     async get({
@@ -302,6 +121,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, GET, resourceName, payload);
     },
     async getList({
@@ -311,6 +131,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, GET_LIST, resourceName, payload);
     },
     async getNodes({
@@ -320,6 +141,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, GET_NODES, resourceName, payload);
     },
     async getOne({
@@ -329,6 +151,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, GET_ONE, resourceName, payload);
     },
     async getTree({
@@ -338,6 +161,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, GET_TREE, resourceName, payload);
     },
     async lock({
@@ -347,6 +171,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, LOCK, resourceName, payload);
     },
     async unlock({
@@ -356,6 +181,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, UNLOCK, resourceName, payload);
     },
     async moveNode({
@@ -365,6 +191,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, MOVE_NODE, resourceName, payload);
     },
     async update({
@@ -374,6 +201,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, UPDATE, resourceName, payload);
     },
     async updateMany({
@@ -383,6 +211,7 @@ const useResourceStore = defineStore("ResourceStore", {
       resourceName: string;
       payload: any;
     }) {
+      if (!this.resources[resourceName]) return;
       return await handleApiCall.call(this, UPDATE_MANY, resourceName, payload);
     },
     showSuccess(
@@ -390,7 +219,7 @@ const useResourceStore = defineStore("ResourceStore", {
       { action, params, data }: { action: string; params: any; data: any }
     ) {
       const appStore = useAppStore();
-      const resourceConfig = resource.resource as ResourceConfig;
+      const resourceConfig = resource.resource;
 
       const messages = {
         [CREATE]: "va.messages.created",
@@ -422,14 +251,13 @@ const useResourceStore = defineStore("ResourceStore", {
         });
       };
 
-      // Check if notifications should be shown for this action
       if (
         !resourceConfig.notifications ||
         resourceConfig.notifications["all"] ||
         resourceConfig.notifications[action]
       ) {
         let message = "";
-        if ([CREATE, UPDATE].includes(action)) {
+        if ([CREATE, UPDATE].includes(action) && data?.id) {
           message = `<a class="mt-2" href="/${resourceConfig
             .getName?.(1)
             .toLowerCase()}/${data.id}">Open ${
@@ -448,7 +276,6 @@ const useResourceStore = defineStore("ResourceStore", {
       const appStore = useAppStore();
       const resourceConfig = resource.resource;
 
-      // Check if error notifications are enabled
       if (
         !resourceConfig.notifications ||
         resourceConfig.notifications["error"] === true
@@ -460,32 +287,209 @@ const useResourceStore = defineStore("ResourceStore", {
         });
       }
     },
+    cleanup() {
+      Object.keys(this.resources).forEach((resourceName) => {
+        const resource = this.resources[resourceName];
+        if (resource?.cacheTimeout) {
+          clearTimeout(resource.cacheTimeout);
+        }
+      });
+      this.resources = {};
+    },
   },
   getters: {
     getDataItem: (state) => (resourceName: string) =>
-      state.resources[resourceName]?.data.item,
-    getDataList: (state) => (resourceName: string) =>
-      state.resources[resourceName]?.data.list,
-    getLoading: (state) => (resourceName: string) =>
-      state.resources[resourceName]?.loading,
-    getResource: (state) => (resourceName: string) =>
-      state.resources[resourceName]?.resource,
-    getResourceData: (state) => (resourceName: string) =>
-      state.resources[resourceName],
-    getResourceList: (state) => (resource: string) => {
-      const r = Object.values(state.resources).find(
-        (r) => r.resource.name === resource
+      state.resources[resourceName]?.data.item ?? null,
+    getDataList: (state) => (resourceName: string) => {
+      const list = state.resources[resourceName]?.data.list;
+      console.log(
+        `getDataList called for ${resourceName}, returning:`,
+        list,
+        new Error().stack
       );
-      return r ? r.data.list : [];
+      return list ? (Array.isArray(list) ? list : list.data || []) : [];
     },
-    getResourcesAsObject(): any {
-      const obj: any = {};
-      Object.entries(this.resources).forEach(([key, r]) => {
-        obj[key] = r.data.list;
+    getLoading: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.loading ?? false,
+    getResource: (state) => (resourceName: string) =>
+      state.resources[resourceName]?.resource ?? null,
+    getResourceData: (state) => (resourceName: string) =>
+      state.resources[resourceName] ?? null,
+    getResourceList: (state) => (resourceName: string) => {
+      const list = state.resources[resourceName]?.data.list;
+      return list ? (Array.isArray(list) ? list : list.data || []) : [];
+    },
+    getResourcesAsObject: (state) => {
+      const obj: Record<string, any[]> = {};
+      Object.keys(state.resources).forEach((resourceName) => {
+        const list = state.resources[resourceName]?.data.list;
+        obj[resourceName] = list
+          ? Array.isArray(list)
+            ? list
+            : list.data || []
+          : [];
       });
       return obj;
     },
   },
 });
+
+function getApiUrl(
+  apiUrl: string,
+  action: string,
+  params: Record<string, string | number | null>,
+  routeId: string | null
+): string {
+  let url = apiUrl;
+  if (routeId) {
+    url = url.replace(":id", routeId);
+  }
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value != null) {
+      url = url.replace(new RegExp(`:${key}(?=/|$)`), String(value));
+    }
+  }
+
+  if (action.toLowerCase() === "getone" && params.id) {
+    return `${url}/${params.id}`;
+  }
+  return url;
+}
+
+function processStoreData(
+  store: any,
+  resourceName: string,
+  action: string,
+  payload: any,
+  data: any
+) {
+  const state = store.$state.resources[resourceName];
+  if (!state) return;
+
+  const params = payload?.params || {};
+  const list: any[] = Array.isArray(state.data.list)
+    ? state.data.list
+    : state.data.list?.data || [];
+
+  switch (action) {
+    case CREATE:
+      list.push(data);
+      state.data.list = list;
+      break;
+    case DELETE:
+      const deleteIndex = list.findIndex((item) => item.id === params.id);
+      if (deleteIndex !== -1) {
+        list.splice(deleteIndex, 1);
+        state.data.list = list;
+      }
+      break;
+    case DELETE_MANY:
+      if (params.values) {
+        state.data.list = list.filter(
+          (item) => !params.values.includes(item.id)
+        );
+      }
+      break;
+    case GET:
+    case GET_ONE:
+      state.data.item = data;
+      break;
+    case GET_LIST:
+    case GET_TREE:
+      store.setList(resourceName, data);
+      break;
+    case UPDATE:
+      const updateIndex = list.findIndex((item) => item.id === params.id);
+      if (updateIndex !== -1) {
+        list[updateIndex] = Object.assign(list[updateIndex], data);
+        state.data.list = list;
+        state.data.item = data;
+      }
+      break;
+    default:
+      console.warn(`Unhandled action in processStoreData: ${action}`);
+  }
+}
+
+async function handleApiCall(
+  this: ReturnType<typeof useResourceStore>,
+  action: string,
+  resourceName: string,
+  payload: any
+) {
+  const appStore = useAppStore();
+  const cacheValidity = 60000;
+  const resource = this.$state.resources[resourceName];
+  if (!resource) return;
+
+  const loadingActions = [GET, GET_LIST, GET_TREE, GET_NODES, GET_ONE];
+
+  try {
+    if (loadingActions.includes(action) && resource.resource.cache) {
+      const listLength = Array.isArray(resource.data.list)
+        ? resource.data.list.length
+        : resource.data.list?.data.length || 0;
+      if (
+        resource.lastUpdated &&
+        Date.now() - resource.lastUpdated < cacheValidity &&
+        listLength > 0
+      ) {
+        return action === GET_ONE ? resource.data.item : resource.data.list;
+      }
+    }
+
+    const params = payload?.params || {};
+    if (action === UPDATE && !params.id) params.id = resource.data?.item.id;
+
+    const apiUrl = payload?.apiUrl || resource.resource.apiUrl;
+    const routeId = payload?.routeId || null;
+    const apiMethod = loadingActions.includes(action)
+      ? "get"
+      : action.toLowerCase();
+
+    if (loadingActions.includes(action)) appStore.setApiLoading(true);
+
+    const url = getApiUrl(apiUrl, action, params, routeId);
+    let response;
+
+    switch (apiMethod) {
+      case "delete":
+        response = await ApiService.delete(url, params.id || null);
+        break;
+      case "create":
+        response = await ApiService.create(url, params);
+        break;
+      case "update":
+        response = await ApiService.update(url, params.id || null, params);
+        break;
+      default:
+        response = await ApiService.get(url, action === GET_ONE ? {} : params);
+    }
+
+    const data = response.data.data;
+    processStoreData(this, resourceName, action, payload, data);
+
+    if (loadingActions.includes(action)) {
+      resource.lastUpdated = Date.now();
+    }
+    appStore.setApiLoading(false);
+    this.showSuccess(resource, { action, params, data });
+
+    return data;
+  } catch (error: unknown) {
+    appStore.setApiLoading(false);
+    const err = error as {
+      message?: string;
+      response?: { data?: { message?: string } };
+    };
+    this.showError(
+      resource,
+      err.message || "Error",
+      err.response?.data?.message || "An error occurred"
+    );
+    throw error;
+  }
+}
 
 export default useResourceStore;

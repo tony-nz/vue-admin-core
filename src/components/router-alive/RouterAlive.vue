@@ -23,6 +23,7 @@ import {
   toRefs,
   TransitionProps,
   watch,
+  onUnmounted,
 } from "vue";
 import { useRoute } from "vue-router";
 import { useTabsStore } from "../../store/tabs";
@@ -38,8 +39,14 @@ function resolveTransition(opt: string | TransitionProps) {
 /**
  * Cache control
  * @param {Ref<string>} currentKey Current key
+ * @param {number} max Maximum cache size
+ * @param {Map<string, ComponentInternalInstance>} componentMap Component map
  */
-function useCache(currentKey: Ref<string>, max: number) {
+function useCache(
+  currentKey: Ref<string>,
+  max: number,
+  componentMap: Map<string, ComponentInternalInstance>
+) {
   /** Set of keys for cached components */
   const keys: Ref<string[]> = ref([]);
 
@@ -54,8 +61,10 @@ function useCache(currentKey: Ref<string>, max: number) {
       if (!key) return;
 
       const idx = keys.value.indexOf(key);
-
-      idx > -1 && keys.value.splice(idx, 1);
+      if (idx > -1) {
+        keys.value.splice(idx, 1);
+        componentMap.delete(key); // Remove the component from the map
+      }
     },
 
     /**
@@ -65,10 +74,21 @@ function useCache(currentKey: Ref<string>, max: number) {
     add(key: string = currentKey.value) {
       if (!keys.value.includes(key)) {
         if (keys.value.length >= max && max > 0) {
-          keys.value.shift(); // Remove the oldest entry
+          const oldestKey: any = keys.value.shift(); // Remove the oldest entry
+          componentMap.delete(oldestKey); // Clean up the oldest component
         }
         keys.value.push(key);
       }
+    },
+
+    /**
+     * Clean up the entire cache
+     */
+    cleanup() {
+      keys.value.forEach((key) => {
+        componentMap.delete(key); // Remove all components from the map
+      });
+      keys.value = []; // Clear the keys array
     },
   });
 }
@@ -76,7 +96,7 @@ function useCache(currentKey: Ref<string>, max: number) {
 /**
  * Operations
  * @param {object} cache Cache control
- * @param {map} componentMap Component collection
+ * @param {Map<string, ComponentInternalInstance>} componentMap Component collection
  */
 function useOperate(
   cache: ReturnType<typeof useCache>,
@@ -98,9 +118,7 @@ function useOperate(
   /** Trigger reset */
   async function triggerReset() {
     resetting.value = true;
-    cache.keys = [];
-    componentMap.clear();
-
+    cache.cleanup(); // Clean up the cache and component map
     await nextTick();
     resetting.value = false;
   }
@@ -188,10 +206,21 @@ export default defineComponent({
     const route = useRoute();
     /** Current page component cache key */
     const currentKey = computed(() => route.fullPath);
-    // const currentKey = computed(() => props.viewKey || route.fullPath);
+
+    /** Component collection */
+    const componentMap: Map<string, ComponentInternalInstance> = new Map();
 
     /** Cache control */
-    const cache = useCache(currentKey, props.max);
+    const cache = useCache(currentKey, props.max, componentMap);
+
+    /**
+     * Remove cache for a specific route by its key
+     * @param {string} key - The cache key to remove
+     */
+    function removeCache(key: string) {
+      cache.remove(key);
+      componentMap.delete(key);
+    }
 
     watch(
       currentKey,
@@ -220,17 +249,10 @@ export default defineComponent({
       { deep: true }
     );
 
-    /**
-     * Remove cache for a specific route by its key
-     * @param {string} key - The cache key to remove
-     */
-    function removeCache(key: string) {
-      cache.remove(key);
-      componentMap.delete(key);
-    }
-
-    /** Component collection */
-    const componentMap: Map<string, ComponentInternalInstance> = new Map();
+    /** Clean up on component unmount */
+    onUnmounted(() => {
+      cache.cleanup(); // Clean up the cache and component map
+    });
 
     return {
       current,

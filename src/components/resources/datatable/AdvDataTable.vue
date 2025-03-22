@@ -3,7 +3,6 @@
     v-bind="dtOptions"
     v-model:expandedRows="expandedRows"
     v-model:filters="filters"
-    v-model:selection="selectedResources"
     @filter="onFilter"
     @page="onPage"
     @onRowExpand="onLocalRowExpand"
@@ -12,9 +11,7 @@
     :totalRecords="totalRecords"
     :value="resourceData"
     :rows="rows"
-    :state-key="stateKey"
     ref="dtRef"
-    state-storage="session"
   >
     <template v-if="toolbar?.visible" #header>
       <AdvToolbar
@@ -50,10 +47,7 @@
       headerStyle="width: 3em"
     />
     <slot name="columns">
-      <div
-        v-for="field in getResourceFields(resource.fields)"
-        v-bind:key="field.id"
-      >
+      <div v-for="field in getResourceFields(resource.fields)" :key="field.id">
         <Column :field="field.id" :header="field.label" :sortable="true" />
       </div>
     </slot>
@@ -142,6 +136,7 @@ import {
   ref,
   toRef,
   watch,
+  onBeforeUnmount,
 } from "vue";
 import { FilterMatchMode } from "@primevue/core/api";
 import {
@@ -149,7 +144,6 @@ import {
   ToolbarOptions,
 } from "../../../core/types/DatatableTypes";
 import { translate, upperCaseFirst } from "../../../core/helpers/functions";
-import { useDebounce } from "../../../composables/useDebounce";
 import ActionColumn from "./partials/ActionColumn.vue";
 import AdvToolbar from "./partials/AdvToolbar.vue";
 import CreateUpdateDialog from "../partials/CreateUpdateDialog.vue";
@@ -208,29 +202,21 @@ export default defineComponent({
   },
   inheritAttrs: false,
   setup(props, { emit, attrs }) {
-    const debounce = useDebounce();
     const expandedRows = ref([] as unknown[]);
     const refresh = toRef(props, "refresh");
     const selectedResources = ref();
-    const stateKey = ref("dt-" + props.resource.name + "-state:");
+    const stateKey = ref("dt-" + props.resource.name + "-state");
     const store = useResourceStore();
 
-    /**
-     * Reactive resource data
-     */
+    // Reactive resource data
     const resourceData = computed(() => {
       const dataList: any = store.getDataList(props.resource.name);
-
-      if (props.resource.lazy) {
-        return dataList.data;
-      }
-
-      return dataList;
+      return props.resource.lazy && dataList?.data
+        ? dataList.data
+        : dataList || [];
     });
 
-    /**
-     * Resource data
-     */
+    // Resource data and composable
     const {
       apiUrl,
       dtRef,
@@ -252,6 +238,7 @@ export default defineComponent({
       totalRecords,
       rows,
     } = useResource(props.resource, props);
+
     const { canAction } = props.resource;
 
     // Base default options for DataTable
@@ -265,50 +252,32 @@ export default defineComponent({
       first: 0,
     };
 
-    /**
-     * Datatable options
-     * @type {Ref<Options>}
-     */
-    const dtOptions = computed(() => {
-      return {
-        ...baseDtOptions,
-        ...props,
-        ...attrs,
-        rows: rows.value,
-      };
-    });
+    // Datatable options
+    const dtOptions = computed(() => ({
+      ...baseDtOptions,
+      ...props,
+      ...attrs,
+      rows: rows.value,
+    }));
 
-    /**
-     * Clear search
-     */
+    // Clear search
     const clearSearch = () => {
       filters.value.global.value = null;
       getResourceData();
     };
 
-    /**
-     * Emit live data
-     * @param data
-     */
+    // Emit live data
     const emitLiveData = (data: any) => {
       emit("liveData", data);
     };
 
-    /**
-     * Export CSV
-     * @returns {void}
-     */
+    // Export CSV
     const exportCSV = () => {
-      dtRef.value.exportCSV();
+      dtRef.value?.exportCSV();
     };
 
-    /**
-     * Lazy load resource data
-     */
+    // Lazy load resource data
     const lazyLoad = () => {
-      // lazyParams.value = JSON.parse(
-      //   sessionStorage.getItem(stateKey.value as string) as string
-      // );
       if (!lazyParams.value) {
         lazyParams.value = {
           first: 0,
@@ -316,93 +285,100 @@ export default defineComponent({
           rows: dtOptions.value.rows,
         };
       }
-      lazyParams.value.page = Math.fround(
-        parseInt(lazyParams.value.first) / parseInt(lazyParams.value.rows)
+      lazyParams.value.page = Math.floor(
+        lazyParams.value.first / lazyParams.value.rows
       );
     };
 
-    /**
-     * On local row expand
-     * @param event
-     * @returns {void}
-     */
-    const onLocalRowExpand = (event) => {
+    // On local row expand
+    const onLocalRowExpand = (event: any) => {
       const resource = resourceData.value.find(
-        (item) => item.id == event.data.id
+        (item: any) => item.id === event.data.id
       );
-      expandedRows.value = [resource];
+      expandedRows.value = resource ? [resource] : [];
     };
+
+    // Store watcher stop handles
+    const stopHandles: Array<() => void> = [];
 
     onMounted(async () => {
-      // Set apiUrl if provided
-      if (props.apiUrl) {
-        apiUrl.value = props.apiUrl;
-      }
-      // Set routeId if provided
-      if (props.routeId) {
-        routeId.value = props.routeId;
-      }
-      // Merge form data if available
-      if (props.form?.data) {
-        formData.value = props.form.data;
-        // modalData.value = { ...props.form.data, ...modalData.value };
-      }
-      // Lazy load if resource is set to lazy
-      if (props.resource.lazy) {
-        lazyLoad();
-      }
-      // Set filters
+      if (props.apiUrl) apiUrl.value = props.apiUrl;
+      if (props.routeId) routeId.value = props.routeId;
+      if (props.form?.data) formData.value = props.form.data;
+      if (props.resource.lazy) lazyLoad();
+
       filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
         ...props.resource.datatable?.filters,
         ...props.filters,
       };
-      // Fetch resource data after all conditions are checked
+
       getResourceData();
     });
 
-    /**
-     * Watch for new prop data
-     */
-    watch(
-      () => props.form?.data,
-      async (newData: any) => {
-        modalData.value = newData;
-      },
-      { deep: true }
+    // Watchers with cleanup
+    stopHandles.push(
+      watch(
+        () => props.form?.data,
+        (newData: any) => {
+          modalData.value = newData;
+        },
+        { deep: true }
+      )
     );
 
-    watch(refresh, (val) => {
-      getResourceData();
-    });
+    stopHandles.push(
+      watch(refresh, () => {
+        getResourceData();
+      })
+    );
 
-    watch(
-      () => props.filters,
-      (newFilters) => {
+    stopHandles.push(
+      watch(
+        () => props.filters,
+        (newFilters) => {
+          filters.value = {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+            ...props.resource.datatable?.filters,
+            ...newFilters,
+          };
+        },
+        { deep: true, immediate: true }
+      )
+    );
+
+    stopHandles.push(
+      watch(
+        () => props.apiUrl,
+        (newApiUrl) => {
+          apiUrl.value = newApiUrl;
+        },
+        { deep: true }
+      )
+    );
+
+    // Cleanup on unmount
+    onBeforeUnmount(() => {
+      // Stop all watchers
+      stopHandles.forEach((stop) => stop());
+      stopHandles.length = 0;
+
+      // Clear refs to allow garbage collection
+      expandedRows.value = [];
+      selectedResources.value = null;
+      if (lazyParams.value) lazyParams.value = null;
+      if (filters.value)
         filters.value = {
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          ...props.resource.datatable?.filters,
-          ...newFilters,
         };
-      },
-      { deep: true, immediate: true }
-    );
 
-    /**
-     * Watch for changes in api url
-     */
-    watch(
-      () => props.apiUrl,
-      (newApiUrl) => {
-        apiUrl.value = newApiUrl;
-      },
-      { deep: true }
-    );
+      // Clear this component's resource from the store
+      store.removeResource(props.resource.name);
+    });
 
     return {
       canAction,
       clearSearch,
-      debounce,
       dtOptions,
       dtRef,
       emitLiveData,
@@ -428,7 +404,6 @@ export default defineComponent({
       totalRecords,
       translate,
       upperCaseFirst,
-      useDebounce,
     };
   },
 });

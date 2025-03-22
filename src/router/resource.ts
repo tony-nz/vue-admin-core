@@ -1,4 +1,4 @@
-import { h, resolveComponent, getCurrentInstance, handleError } from "vue";
+import { h, resolveComponent, getCurrentInstance } from "vue";
 import { formatKebabCase, upperCaseFirst } from "../core/helpers/functions";
 import i18n from "../core/plugins/i18n";
 import useAppStore from "../store/app";
@@ -10,13 +10,14 @@ export const useResourceRoutes = function (resource) {
   const { name, routes, translatable, getTitle, pluralName } = resource;
   const { t, te } = i18n.global;
 
+  const appStore = useAppStore();
+  const resourceStore = useResourceStore();
+  const tabsStore = useTabsStore();
+
   const setTitle = (to, action, item = null) => {
     return (to.meta.title = getTitle(action, item));
   };
 
-  /**
-   * CRUD Children
-   */
   const crudChildren = [
     { name: "list", path: "" },
     { name: "create", path: "create" },
@@ -24,77 +25,47 @@ export const useResourceRoutes = function (resource) {
     { name: "edit", path: ":id/edit" },
   ];
 
-  /**
-   * Construct the resource name from the
-   * resource name and action
-   */
   const resourceName = (name, action) => {
     return `${upperCaseFirst(name) + upperCaseFirst(action)}`;
   };
 
-  /**
-   * Build routes for resource
-   */
   const buildRoute = (resource: any, action, path) => {
-    const appStore = useAppStore();
-    const resourceStore = useResourceStore(); // Get the store instance
+    const routeName = resourceName(name, action);
+    const routerPermissions = []; // Adjust according to your permission structure
 
     try {
-      const routerPermissions = []; // Adjust according to your permission structure
       return {
         path,
-        name: resourceName(name, action),
+        name: routeName,
         props: true,
         component: {
           render(c) {
-            const components = JSON.parse(
-              JSON.stringify(getCurrentInstance()?.appContext.components)
-            );
+            const components =
+              getCurrentInstance()?.appContext.components || {};
             const props = {
               title: getTitle(action),
               resource,
             };
-            if (
-              Array.prototype.includes.call(
-                Object.keys(components),
-                resourceName(resource.name, action)
-              )
-            ) {
-              return h(
-                resolveComponent(resourceName(resource.name, action)),
-                props
-              );
+            if (routeName in components) {
+              return h(resolveComponent(routeName), props);
             }
-            /**
-             * Return guesser page component
-             */
             return h(
               resolveComponent(`Va${upperCaseFirst(action)}Guesser`),
               props
             );
           },
           async beforeRouteEnter(to, from, next) {
-            const tabsStore = useTabsStore();
-
-            // Check if the route or its data is cached
             const cachedTab = tabsStore.getTabs.find(
               (tab) => tab.path === to.fullPath
             );
 
-            // If the tab is cached, return next
             if (cachedTab) {
               return next();
             }
 
-            /**
-             * Initialize from query if available
-             */
             const id = to.params.id || to.query.source;
 
             if (id) {
-              /**
-               * Route model binding
-               */
               try {
                 const response = await resourceStore.getOne({
                   resourceName: resource.name,
@@ -102,11 +73,6 @@ export const useResourceRoutes = function (resource) {
                     params: { id: id },
                   },
                 });
-
-                /**
-                 * Insert model into route & resource store
-                 */
-                // resourceStore.setItem(resource.name, response.data);
 
                 if (to.params.id) {
                   setTitle(to, action, response);
@@ -139,8 +105,6 @@ export const useResourceRoutes = function (resource) {
             next();
           },
           beforeRouteLeave(to, from, next) {
-            // Here you might want to clear the item from the store if necessary
-            // resourceStore.setItem(resource.name, {});
             next();
           },
         },
@@ -150,24 +114,23 @@ export const useResourceRoutes = function (resource) {
           requiresAuth: true,
           icon: resource.icon,
           layout: resource.layout,
-          resource,
+          resource: resource.name, // Store only the name
           middleware: roles,
           roles: resource.roles,
           permissions: routerPermissions,
         },
       };
     } catch (error) {
+      console.error("Error building route:", error);
       appStore.showToast({
         severity: "error",
         summary: "Error",
         message: "An error occurred",
       });
+      throw error;
     }
   };
 
-  /**
-   * Return crud routes for this resource
-   */
   return {
     path: `${formatKebabCase(resource.url)}`,
     meta: {

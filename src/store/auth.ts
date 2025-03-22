@@ -14,6 +14,8 @@ interface IState {
   user: Array<string>;
 }
 
+let abortController: AbortController;
+
 const useAuthStore = defineStore("AuthStore", {
   state: (): IState => ({
     config: getAuthConfig,
@@ -25,33 +27,37 @@ const useAuthStore = defineStore("AuthStore", {
   }),
   actions: {
     /**
-     * Get api settings
+     * Get API settings
      * @returns Promise<void>
      */
     async getApiSettings() {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
+      abortController = new AbortController();
       try {
-        const response = await ApiService.get(this.getConfig("api.settings"));
+        const response = await ApiService.get(this.getConfig("api.settings"), {
+          signal: abortController.signal,
+        });
         this.setSettings(
           response.data.data ? response.data.data : response.data
         );
-      } catch (e) {
-        appStore.showToast({
-          summary: "Error",
-          message: "Failed to retrieve settings",
-          severity: "error",
-        });
+      } catch (e: any) {
+        if (e.name !== "AbortError") {
+          appStore.showToast({
+            summary: "Error",
+            message: "Failed to retrieve settings",
+            severity: "error",
+          });
+        }
       }
-
-      return this.settings;
     },
+
     /**
      * Login user
      * @param credentials
      * @returns Promise<void>
      */
     async login(credentials) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.getConfig("api.csrfCookie"))
           .then(() => {
@@ -85,12 +91,13 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Login with OAuth
      * @returns Promise<void>
      */
     loginOauth() {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.getConfig("api.csrfCookie"))
           .then(() => {
@@ -118,13 +125,14 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Login with OAuth callback
      * @param payload
      * @returns Promise<void>
      */
     loginOauthCallback(payload) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.getConfig("api.csrfCookie"))
           .then(() => {
@@ -153,12 +161,13 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Logout user
      * @returns Promise<void>
      */
     logout() {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.getConfig("api.logout"), {})
           .then(({ data }) => {
@@ -176,13 +185,14 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Register user
      * @param credentials
      * @returns Promise<void>
      */
     register(credentials) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.getConfig("api.register"), credentials)
           .then(({ data }) => {
@@ -200,13 +210,14 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Forgot password
      * @param payload
      * @returns Promise<void>
      */
     forgotPassword(payload) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.post(this.getConfig("api.forgotPassword"), payload)
           .then(({ data }) => {
@@ -224,26 +235,27 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Verify user authentication
      * @returns Promise<void>
      */
     async verifyAuth() {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.get(this.getConfig("api.verify"))
           .then(async ({ data }) => {
-            await this.getApiSettings().then(() => {
-              this.setAuth(data.data);
-              resolve();
-            });
+            if (Object.keys(this.settings).length === 0) {
+              await this.getApiSettings();
+            }
+            this.setAuth(data.data);
+            resolve();
           })
           .catch(({ response }) => {
             this.purgeAuth();
             if (response) {
               appStore.setErrors(response.message);
             }
-            this.purgeAuth();
             appStore.showToast({
               summary: "Error",
               message: "Failed to verify authentication",
@@ -253,27 +265,30 @@ const useAuthStore = defineStore("AuthStore", {
           });
       });
     },
+
     /**
      * Purge user authentication
      * @returns void
      */
     purgeAuth() {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
+      if (abortController) {
+        abortController.abort();
+      }
       appStore.setErrors([]);
       this.setIsAuthenticated(false);
       this.setPermissions([]);
       this.setRoles([]);
       this.setUser([]);
+      this.settings = {};
     },
+
     /**
      * Set auth config
      * @param payload
      * @returns void
      */
     setConfig(payload) {
-      /**
-       * Initialize API Config
-       */
       if (payload.api) {
         this.config.api = payload.api;
       }
@@ -281,18 +296,28 @@ const useAuthStore = defineStore("AuthStore", {
         this.config.oauth = payload.oauth;
       }
     },
+
     /**
      * Set user authentication
      * @param data
      */
     setAuth(data) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
+      if (
+        this.isAuthenticated === true &&
+        this.permissions === data.permissions &&
+        this.roles === data.roles &&
+        this.user === data.user
+      ) {
+        return;
+      }
       appStore.setErrors([]);
       this.setIsAuthenticated(true);
-      this.setPermissions(data.permissions);
-      this.setRoles(data.roles);
-      this.setUser(data.user);
+      this.setPermissions([...data.permissions]);
+      this.setRoles([...data.roles]);
+      this.setUser({ ...data.user });
     },
+
     /**
      * Set user authentication
      * @param isAuthenticated
@@ -301,6 +326,7 @@ const useAuthStore = defineStore("AuthStore", {
     setIsAuthenticated(isAuthenticated) {
       this.isAuthenticated = isAuthenticated;
     },
+
     /**
      * Set permissions
      * @param permissions
@@ -309,6 +335,7 @@ const useAuthStore = defineStore("AuthStore", {
     setPermissions(permissions) {
       this.permissions = permissions;
     },
+
     /**
      * Set roles
      * @param roles
@@ -317,6 +344,7 @@ const useAuthStore = defineStore("AuthStore", {
     setRoles(roles) {
       this.roles = roles;
     },
+
     /**
      * Set settings
      * @param settings
@@ -325,6 +353,7 @@ const useAuthStore = defineStore("AuthStore", {
     setSettings(settings: any) {
       this.settings = settings;
     },
+
     /**
      * Set user
      * @param user
@@ -333,13 +362,14 @@ const useAuthStore = defineStore("AuthStore", {
     setUser(user) {
       this.user = user;
     },
+
     /**
      * Update settings
      * @param payload
      * @returns Promise<void>
      */
     updateSettings(payload) {
-      const appStore = useAppStore();
+      const appStore = useAppStore(); // Move inside the action
       return new Promise<void>((resolve, reject) => {
         ApiService.put(this.getConfig("api.settings"), payload)
           .then(({ data }) => {
@@ -358,6 +388,7 @@ const useAuthStore = defineStore("AuthStore", {
               severity: "error",
             });
             appStore.setErrors(response.data.errors);
+            reject(response);
           });
       });
     },
@@ -372,13 +403,15 @@ const useAuthStore = defineStore("AuthStore", {
         return objectPath.get(this.config, path, defaultValue);
       };
     },
+
     /**
-     * User's roles
+     * User's permissions
      * @returns array
      */
     getPermissions(): Array<string> {
       return this.permissions;
     },
+
     /**
      * User's roles
      * @returns array
@@ -386,23 +419,21 @@ const useAuthStore = defineStore("AuthStore", {
     getRoles(): Array<string> {
       return this.roles;
     },
+
     /**
      * Get setting from settings
      * @returns {function(setting): *}
      */
     getSetting(): any {
       return (setting) => {
-        // if setting is "true" or "false" return boolean
-        if (
-          objectPath.get(this.settings, setting) === "true" ||
-          objectPath.get(this.settings, setting) === "false"
-        ) {
-          return objectPath.get(this.settings, setting) == "true";
+        const value = objectPath.get(this.settings, setting);
+        if (value === "true" || value === "false") {
+          return value === "true";
         }
-
-        return objectPath.get(this.settings, setting);
+        return value;
       };
     },
+
     /**
      * Site settings
      * @returns array
@@ -410,6 +441,7 @@ const useAuthStore = defineStore("AuthStore", {
     getSettings(): any {
       return this.settings;
     },
+
     /**
      * Return current user object
      * @returns User
@@ -417,6 +449,7 @@ const useAuthStore = defineStore("AuthStore", {
     getUser(): Array<string> {
       return this.user;
     },
+
     /**
      * Verify user authentication
      * @returns boolean

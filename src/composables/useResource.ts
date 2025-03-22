@@ -1,4 +1,4 @@
-import { Ref, ref } from "vue";
+import { Ref, ref, onUnmounted } from "vue";
 import { Constraint, Filter } from "../core/types/FilterTypes";
 import { upperCaseFirst } from "../core/helpers/functions";
 import { useConfirm } from "primevue/useconfirm";
@@ -24,14 +24,7 @@ export default function useResource(resource: ResourceType, dtProps: any) {
   const showModal = ref(false);
   const totalRecords = ref(0);
 
-  /**
-   * Set the resource name
-   */
   const resourceName = resource.name;
-
-  /**
-   * Set the searchable columns
-   */
   const searchableColumns = ref(
     props.searchableColumns || resource?.datatable?.globalFilterFields || []
   );
@@ -42,11 +35,8 @@ export default function useResource(resource: ResourceType, dtProps: any) {
    */
   const onFilter = () => {
     if (resource?.lazy) {
-      // set filters
       lazyParams.value.filters = filters.value;
-      // reset pagination first
       lazyParams.value.originalEvent = { first: 0, page: 0 };
-      // call onPage to get data
       onPage(lazyParams.value);
     }
   };
@@ -135,30 +125,22 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     if (resource?.name) {
       isLoading.value = true;
 
-      /**
-       * Check for resource.lazy
-       */
       if (resource.lazy) {
-        // remove filter items if they are empty
         lazyParams.value.filters = cleanFilters(filters.value);
-        // if filters is empty, remove filters
         if (Object.keys(lazyParams.value.filters).length === 0) {
           delete lazyParams.value.filters;
         }
-        // sortField
         if (!lazyParams.value.sortField) {
           lazyParams.value.sortField = props.sortField || "id";
         }
-        // sortOrder
         if (![-1, 1].includes(lazyParams.value.sortOrder)) {
           lazyParams.value.sortOrder = props.sortDesc ? -1 : 1;
         }
-        // rows
         if (
           !lazyParams.value.rows ||
           typeof lazyParams.value.rows !== "number"
         ) {
-          lazyParams.value.rows = rows.value || 25; // Fallback to 25 if invalid
+          lazyParams.value.rows = rows.value || 25;
         }
 
         const params = {
@@ -266,7 +248,6 @@ export default function useResource(resource: ResourceType, dtProps: any) {
    * @returns string
    */
   function addSearchableColumns() {
-    // check to see if cleanFilters(filters.value) has global filter
     const cleanedFilters = cleanFilters(filters.value);
     if (cleanedFilters.global) {
       return true;
@@ -310,53 +291,6 @@ export default function useResource(resource: ResourceType, dtProps: any) {
 
     return cleanedFilters;
   }
-  // function cleanFilters(filters: { [key: string]: Filter }): {
-  //   [key: string]: Filter;
-  // } {
-  //   const cleanedFilters: { [key: string]: Filter } = {};
-
-  //   for (const [key, filter] of Object.entries(filters)) {
-  //     // Check if value exists
-  //     if (
-  //       "value" in filter &&
-  //       filter.value !== null &&
-  //       filter.value !== undefined
-  //     ) {
-  //       if (Array.isArray(filter.constraints)) {
-  //         // Clean constraints array
-  //         const cleanedConstraints = (
-  //           filter.constraints as Constraint[]
-  //         ).filter(
-  //           (constraint) =>
-  //             constraint.value !== null && constraint.value !== undefined
-  //         );
-
-  //         if (cleanedConstraints.length > 0 || filter.operator) {
-  //           cleanedFilters[key] = {
-  //             ...filter,
-  //             constraints: cleanedConstraints,
-  //           };
-  //         }
-  //       } else {
-  //         cleanedFilters[key] = filter;
-  //       }
-  //     } else if (Array.isArray(filter.constraints)) {
-  //       // If value doesn't exist but constraints do, still include the filter if there are valid constraints or an operator
-  //       const cleanedConstraints = (filter.constraints as Constraint[]).filter(
-  //         (constraint) =>
-  //           constraint.value !== null && constraint.value !== undefined
-  //       );
-  //       if (cleanedConstraints.length > 0 || filter.operator) {
-  //         cleanedFilters[key] = {
-  //           ...filter,
-  //           constraints: cleanedConstraints,
-  //         };
-  //       }
-  //     }
-  //   }
-
-  //   return cleanedFilters;
-  // }
 
   /**
    * Get resource fields
@@ -387,13 +321,19 @@ export default function useResource(resource: ResourceType, dtProps: any) {
    * @param data
    * @returns void
    */
-  function showCreateEdit(display, type, data = []) {
+  function showCreateEdit(display: string, type: string, data: any = []) {
     modalType.value = type;
     if (type === "update") {
       modalData.value = { ...formData.value, ...data };
+      console.log(
+        `showCreateEdit called in useResource for ${resourceName}, type: ${type}, retaining data:`,
+        modalData.value
+      );
     } else {
-      // reset for create dialog
       modalData.value = { ...formData.value };
+      console.log(
+        `showCreateEdit called in useResource for ${resourceName}, type: ${type}, resetting modalData`
+      );
     }
 
     if (display === "dialog") {
@@ -402,11 +342,24 @@ export default function useResource(resource: ResourceType, dtProps: any) {
   }
 
   /**
+   * Close the modal and clear modalData
+   * @returns void
+   */
+  function closeModal() {
+    showModal.value = false;
+    modalData.value = [];
+    formData.value = null;
+    console.log(
+      `Closed modal in useResource for ${resourceName}, cleared modalData and formData`
+    );
+  }
+
+  /**
    * Show delete popup
    * @param params
    * @returns void
    */
-  function showDeletePopup(params) {
+  function showDeletePopup(params: any) {
     if (resource && resource.name && params.$event) {
       confirmDelete.require({
         group: "DT_" + upperCaseFirst(resource.name),
@@ -427,6 +380,18 @@ export default function useResource(resource: ResourceType, dtProps: any) {
       });
     }
   }
+
+  // Cleanup on unmount
+  onUnmounted(() => {
+    console.log(`Cleaning up useResource for ${resourceName}`);
+    filters.value = null;
+    formData.value = null;
+    lazyParams.value = null;
+    modalData.value = [];
+    showModal.value = false;
+    totalRecords.value = 0;
+    searchableColumns.value = [];
+  });
 
   return {
     apiUrl,
@@ -451,6 +416,7 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     rows,
     searchableColumns,
     showCreateEdit,
+    closeModal, // Expose closeModal to components
     showDeletePopup,
     showModal,
     totalRecords,

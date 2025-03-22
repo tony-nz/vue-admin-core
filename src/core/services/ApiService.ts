@@ -17,12 +17,23 @@ class ApiService {
   public static vueInstance: App;
 
   /**
+   * @description response interceptor reference
+   */
+  private static responseInterceptor: number | null = null;
+
+  /**
+   * @description abort controller for cancelling requests
+   */
+  private static abortController: AbortController | null = null;
+
+  /**
    * @description initialize vue axios
    */
   public static init(app: App<Element>) {
     const appStore = useAppStore();
     const authStore = useAuthStore();
 
+    ApiService.abortController = new AbortController();
     ApiService.vueInstance = app;
     ApiService.vueInstance.use(VueAxios, axios);
     ApiService.vueInstance.axios.defaults.baseURL = authStore.getConfig(
@@ -32,43 +43,59 @@ class ApiService {
       : BASE_URL;
     ApiService.vueInstance.axios.defaults.withCredentials = true;
     ApiService.vueInstance.axios.defaults.withXSRFToken = true;
+    ApiService.vueInstance.axios.defaults.signal =
+      ApiService.abortController.signal;
 
-    // interceptors
-    ApiService.vueInstance.axios.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      function (error) {
-        if (error.message.includes("Network Error")) {
-          appStore.showToast({
-            severity: "error",
-            summary: "Error",
-            message:
-              "Connection refused. Please check your internet connection.",
-          });
+    // Add response interceptor
+    ApiService.responseInterceptor =
+      ApiService.vueInstance.axios.interceptors.response.use(
+        (response) => {
+          return response;
+        },
+        function (error) {
+          if (error.message.includes("Network Error")) {
+            appStore.showToast({
+              severity: "error",
+              summary: "Error",
+              message:
+                "Connection refused. Please check your internet connection.",
+            });
+          }
+          if (
+            error.response &&
+            [401, 419].includes(error.response.status) &&
+            authStore.getUser
+          ) {
+            authStore.purgeAuth();
+          }
+          return Promise.reject(error);
         }
-        if (
-          error.response &&
-          [401, 419].includes(error.response.status) &&
-          authStore.getUser
-        ) {
-          authStore.purgeAuth();
-        }
-        return Promise.reject(error);
-      }
-    );
+      );
+  }
+
+  /**
+   * @description cleanup axios interceptors and abort pending requests
+   */
+  public static cleanup() {
+    if (ApiService.abortController) {
+      ApiService.abortController.abort();
+      ApiService.abortController = null;
+    }
+    if (ApiService.responseInterceptor !== null) {
+      ApiService.vueInstance.axios.interceptors.response.eject(
+        ApiService.responseInterceptor
+      );
+      ApiService.responseInterceptor = null;
+    }
   }
 
   /**
    * @description set the default HTTP request headers
    */
-  public static setHeader(): void {
+  public static setHeader(token: string): void {
     ApiService.vueInstance.axios.defaults.headers.common[
-      "Access-Control-Allow-Origin"
-    ] = "*";
-    // ApiService.vueInstance.axios.defaults.headers.common[
-    //   "Authorization"
-    // ] = `Token ${getToken()}`;
+      "Authorization"
+    ] = `Bearer ${token}`;
   }
 
   /**
@@ -81,27 +108,20 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios.get(resource, params).catch((error) => {
-      return Promise.reject(error);
-    });
+    return ApiService.vueInstance.axios.get(resource, params);
   }
 
   /**
    * @description send the GET HTTP request
    * @param resource: string
-   * @param slug: string
+   * @param params: AxiosRequestConfig
    * @returns Promise<AxiosResponse>
    */
   public static get(
     resource: string,
-    // slug = "" as string,
-    params = [] as AxiosRequestConfig
+    params = {} as AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .get(`${resource}`, { params })
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.get(`${resource}`, { params });
   }
 
   /**
@@ -114,11 +134,7 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .post(`${resource}`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.post(`${resource}`, params);
   }
 
   /**
@@ -131,11 +147,7 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .post(`${resource}`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.post(`${resource}`, params);
   }
 
   /**
@@ -150,11 +162,7 @@ class ApiService {
     slug: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .put(`${resource}/${slug}`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.put(`${resource}/${slug}`, params);
   }
 
   /**
@@ -167,11 +175,7 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .put(`${resource}`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.put(`${resource}`, params);
   }
 
   /**
@@ -180,11 +184,7 @@ class ApiService {
    * @returns Promise<AxiosResponse>
    */
   public static delete(resource: string, slug: string): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .delete(`${resource}/${slug}`)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.delete(`${resource}/${slug}`);
   }
 
   /**
@@ -196,17 +196,13 @@ class ApiService {
     resource: string,
     params: AxiosRequestConfig
   ): Promise<AxiosResponse> {
-    return ApiService.vueInstance.axios
-      .delete(`${resource}`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.delete(`${resource}`, params);
   }
 
   /**
    * @description Mass update resources via id
    * @param resource: string
-   * @param slug: string
+   * @param params: AxiosRequestConfig
    * @returns Promise<any>
    */
   public static updateMany(
@@ -217,26 +213,20 @@ class ApiService {
       params.data.ids.map((id) =>
         ApiService.vueInstance.axios.put(`${resource}/${id}`, params.data)
       )
-    ).catch((error) => {
-      return Promise.reject(error);
-    });
+    );
   }
 
   /**
    * @description Mass update resources via id
    * @param resource: string
-   * @param slug: string
+   * @param params: AxiosRequestConfig
    * @returns Promise<any>
    */
   public static deleteMany(
     resource: string,
     params: AxiosRequestConfig
   ): Promise<any> {
-    return ApiService.vueInstance.axios
-      .post(`${resource}/bulkDelete`, params)
-      .catch((error) => {
-        return Promise.reject(error);
-      });
+    return ApiService.vueInstance.axios.post(`${resource}/bulkDelete`, params);
   }
 }
 
