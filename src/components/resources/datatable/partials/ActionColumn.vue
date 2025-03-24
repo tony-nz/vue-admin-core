@@ -4,7 +4,7 @@
     <template v-if="resource.edit.modal && showDefaults && canAction('update')">
       <button
         @click.stop="$emit('showCreateEdit', 'dialog', 'update', data)"
-        v-tooltip="'Edit ' + resource.singularName.toLowerCase()"
+        v-tooltip="'Edit'"
         :disabled="data.locked"
         :class="btnClass"
       >
@@ -30,7 +30,7 @@
           name: upperCaseFirst(resource.name) + 'Show',
           params: { id: data.id },
         }"
-        v-tooltip="'Open ' + resource.singularName.toLowerCase()"
+        v-tooltip="'Open'"
       >
         <button :class="btnClass">
           <svg
@@ -52,7 +52,7 @@
     <template v-if="resource.delete && showDefaults && canAction('delete')">
       <button
         @click="$emit('deletePopup', { $event, data })"
-        v-tooltip="'Delete ' + resource.singularName.toLowerCase()"
+        v-tooltip="'Delete'"
         :disabled="data.locked"
         :class="btnDelClass"
       >
