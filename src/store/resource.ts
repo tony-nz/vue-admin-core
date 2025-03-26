@@ -58,10 +58,6 @@ const useResourceStore = defineStore("ResourceStore", {
         resource.data.item = null;
         resource.data.list = [];
         resource.lastUpdated = 0;
-        // ApiService.clearCache(); // Uncomment if applicable
-        console.log(
-          `Cleared data for resource: ${resourceName}, configuration preserved`
-        );
       }
     },
     setItem(resourceName: string, item: any) {
@@ -302,11 +298,6 @@ const useResourceStore = defineStore("ResourceStore", {
       state.resources[resourceName]?.data.item ?? null,
     getDataList: (state) => (resourceName: string) => {
       const list = state.resources[resourceName]?.data.list;
-      console.log(
-        `getDataList called for ${resourceName}, returning:`,
-        list,
-        new Error().stack
-      );
       return list ? (Array.isArray(list) ? list : list.data || []) : [];
     },
     getLoading: (state) => (resourceName: string) =>

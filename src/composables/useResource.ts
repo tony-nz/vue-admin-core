@@ -143,10 +143,15 @@ export default function useResource(resource: ResourceType, dtProps: any) {
           lazyParams.value.rows = rows.value || 25;
         }
 
-        const params = {
+        let params = {
           lazy: true,
           dt_params: JSON.stringify(lazyParams.value),
         };
+
+        // add dtProps.params.payload to params
+        if (dtProps.params?.payload) {
+          params = { ...params, ...dtProps.params.payload };
+        }
 
         if (addSearchableColumns()) {
           params["searchable_columns"] = JSON.stringify(
@@ -325,15 +330,8 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     modalType.value = type;
     if (type === "update") {
       modalData.value = { ...formData.value, ...data };
-      console.log(
-        `showCreateEdit called in useResource for ${resourceName}, type: ${type}, retaining data:`,
-        modalData.value
-      );
     } else {
       modalData.value = { ...formData.value };
-      console.log(
-        `showCreateEdit called in useResource for ${resourceName}, type: ${type}, resetting modalData`
-      );
     }
 
     if (display === "dialog") {
@@ -349,9 +347,6 @@ export default function useResource(resource: ResourceType, dtProps: any) {
     showModal.value = false;
     modalData.value = [];
     formData.value = null;
-    console.log(
-      `Closed modal in useResource for ${resourceName}, cleared modalData and formData`
-    );
   }
 
   /**
@@ -383,7 +378,6 @@ export default function useResource(resource: ResourceType, dtProps: any) {
 
   // Cleanup on unmount
   onUnmounted(() => {
-    console.log(`Cleaning up useResource for ${resourceName}`);
     filters.value = null;
     formData.value = null;
     lazyParams.value = null;
