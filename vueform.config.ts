@@ -1,6 +1,7 @@
 // vueform.config.(js|ts)
 
 import { defineConfig } from "@vueform/vueform";
+// Only import the English locale we need
 import en from "@vueform/vueform/locales/en";
 import ColorPickerPlugin from "./src/components/ui/color-picker";
 import InputNumberPlugin from "./src/components/ui/input-number";

@@ -8,7 +8,6 @@ export default defineConfig({
   plugins: [
     dts({
       include: "src/*.d.ts",
-      // insertTypesEntry: true,
     }),
     copy({
       targets: [{ src: "./src/index.d.ts", dest: "./dist" }],
@@ -25,7 +24,22 @@ export default defineConfig({
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
-      external: ["vue", "pinia", "vue-router", "vue-inline-svg"],
+      external: [
+        "vue",
+        "pinia",
+        "vue-router",
+        "vue-inline-svg",
+        "primevue",
+        "chart.js",
+        "vue3-google-map",
+        "vue-i18n",
+        "axios",
+        "vue-axios",
+        "vue3-toastify",
+        "deepmerge",
+        "object-path",
+        "@vueform/vueform",
+      ],
       output: {
         exports: "named",
         globals: {
@@ -33,9 +47,37 @@ export default defineConfig({
           "vue-inline-svg": "InlineSvg",
           "vue-router": "VueRouter",
           pinia: "pinia",
+          primevue: "PrimeVue",
+          "chart.js": "Chart",
+          "vue3-google-map": "VueGoogleMap",
+          "vue-i18n": "VueI18n",
+          axios: "axios",
+          "vue-axios": "VueAxios",
+          "vue3-toastify": "Vue3Toastify",
+          deepmerge: "deepmerge",
+          "object-path": "objectPath",
+          "@vueform/vueform": "Vueform",
+        },
+        manualChunks: {
+          vendor: ["vue", "pinia", "vue-router"],
+          ui: ["primevue", "@vueform/vueform"],
+          charts: ["chart.js"],
+          maps: ["vue3-google-map"],
+          i18n: ["vue-i18n"],
+          http: ["axios", "vue-axios"],
+          utils: ["deepmerge", "object-path"],
         },
       },
     },
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
   },
   resolve: {
     alias: {
